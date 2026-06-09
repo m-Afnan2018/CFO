@@ -1,37 +1,54 @@
 services:
   mongo:
     image: mongo:7
+    container_name: cfo_mongo
     restart: unless-stopped
     volumes:
-      - mongo_data:/data/db
+      - cfo_mongo_data:/data/db
+    networks:
+      - cfo_net
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   server:
     build: ./server
+    container_name: cfo_backend
     restart: unless-stopped
     ports:
-      - "5050:5000"
+      - "5018:5000"
     environment:
       PORT: "5000"
-      MONGO_URI: mongodb://mongo:27017/cfo_dashboard
+      NODE_ENV: production
+      MONGO_URI: mongodb://cfo_mongo:27017/cfo_dashboard
     depends_on:
       mongo:
         condition: service_healthy
+    networks:
+      - cfo_net
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      args:
+        API_ORIGIN: http://cfo_backend:5000
+    container_name: cfo_frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3018:3000"
     environment:
-      API_ORIGIN: http://server:5000
+      API_ORIGIN: http://cfo_backend:5000
     depends_on:
       - server
+    networks:
+      - cfo_net
+
+networks:
+  cfo_net:
+    driver: bridge
 
 volumes:
-  mongo_data:
+  cfo_mongo_data:
