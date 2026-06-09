@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ganesyx Pvt Ltd — CFO Finance Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#12151c;--bg3:#181c26;
+  --surface:#1e2330;--surface2:#252a38;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#f0f2f8;--text2:#8b92a8;--text3:#555e73;
+  --emerald:#10b981;--emerald2:#059669;--emerald-dim:rgba(16,185,129,0.12);
+  --indigo:#6366f1;--indigo-dim:rgba(99,102,241,0.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
+#app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-logo{padding:20px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--emerald),var(--indigo));border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;letter-spacing:-0.5px}
+.logo-text{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-0.2px}
+.logo-sub{font-size:10px;color:var(--text2)}
+.nav-section{padding:8px 8px 0}
+.nav-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;padding:10px 10px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;transition:all 0.12s;margin-bottom:1px}
+.nav-item:hover{background:var(--surface);color:var(--text)}
+.nav-item.active{background:var(--emerald-dim);color:var(--emerald)}
+.nav-item i{font-size:16px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10}
+.topbar-title{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.fp{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2)}
+.fp select{background:transparent;border:none;color:var(--text);font-size:12px;outline:none;cursor:pointer}
+.content{padding:20px 24px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.grid21{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px}
+.kpi-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
+.kpi-value{font-size:21px;font-weight:800;color:var(--text);margin-bottom:5px;letter-spacing:-0.5px}
+.kpi-change{font-size:11px;display:flex;align-items:center;gap:3px}
+.kpi-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.kpi-ico i{font-size:14px}
+.up{color:var(--emerald)}.down{color:var(--red)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:15px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-0.2px}
+.card-sub{font-size:11px;color:var(--text3);font-weight:400}
+.cw{position:relative;width:100%;height:220px}
+.cw-sm{height:165px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.02em}
+.bg{background:var(--emerald-dim);color:var(--emerald)}
+.br{background:var(--red-dim);color:var(--red)}
+.ba{background:var(--amber-dim);color:var(--amber)}
+.bb{background:var(--blue-dim);color:var(--blue)}
+.bi{background:var(--indigo-dim);color:var(--indigo)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;font-size:12px}
+.bar-label{width:110px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-val{width:55px;text-align:right;color:var(--text);font-weight:600}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stat-row:last-child{border-bottom:none}
+.sk{color:var(--text2)}.sv{color:var(--text);font-weight:600}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text);transition:all 0.12s}
+.btn:hover{background:var(--surface);border-color:var(--emerald);color:var(--emerald)}
+.btn-p{background:var(--emerald);border-color:var(--emerald);color:#fff}
+.btn-p:hover{background:var(--emerald2);border-color:var(--emerald2);color:#fff}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:11px;border-radius:10px;margin-bottom:7px;border:1px solid}
+.a-od{background:var(--red-dim);border-color:rgba(239,68,68,0.18)}
+.a-pe{background:var(--amber-dim);border-color:rgba(245,158,11,0.18)}
+.a-in{background:var(--blue-dim);border-color:rgba(59,130,246,0.18)}
+.cf-sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.cf-item{background:var(--bg3);border-radius:10px;padding:13px;text-align:center}
+.cf-label{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600}
+.cf-val{font-size:17px;font-weight:800}
+input,select{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--emerald)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-label{font-size:11px;color:var(--text2);margin-bottom:5px;font-weight:600;display:block}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.hidden{display:none!important}
+.dot-alert{width:8px;height:8px;background:var(--red);border-radius:50%}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">G</div>
+        <div><div class="logo-text">Ganesyx</div><div class="logo-sub">CFO Dashboard</div></div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="go('overview',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="nav-label">Finance</div>
+      <div class="nav-item" onclick="go('clients',this)"><i class="ti ti-users"></i>Clients</div>
+      <div class="nav-item" onclick="go('invoices',this)"><i class="ti ti-file-invoice"></i>Invoices<span class="nav-badge">3</span></div>
+      <div class="nav-item" onclick="go('payments',this)"><i class="ti ti-credit-card"></i>Payments</div>
+      <div class="nav-item" onclick="go('expenses',this)"><i class="ti ti-receipt"></i>Expenses</div>
+      <div class="nav-item" onclick="go('payroll',this)"><i class="ti ti-users-group"></i>Payroll</div>
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item" onclick="go('cashflow',this)"><i class="ti ti-trending-up"></i>Cash Flow</div>
+      <div class="nav-item" onclick="go('profit',this)"><i class="ti ti-chart-pie"></i>Profitability</div>
+      <div class="nav-item" onclick="go('gst',this)"><i class="ti ti-file-text"></i>GST / Tax</div>
+      <div class="nav-label">System</div>
+      <div class="nav-item" onclick="go('alerts',this)"><i class="ti ti-bell"></i>Alerts<span class="nav-badge">5</span></div>
+      <div class="nav-item" onclick="go('reports',this)"><i class="ti ti-report"></i>Reports</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+
+    <!-- OVERVIEW -->
+    <div id="page-overview">
+      <div class="topbar">
+        <div class="topbar-title">CFO Overview</div>
+        <div class="topbar-right">
+          <div class="fp"><i class="ti ti-calendar" style="font-size:13px"></i><select><option>This Month</option><option>Last Month</option><option>Q4 FY2025</option><option>FY 2024-25</option></select></div>
+          <div class="fp"><i class="ti ti-filter" style="font-size:13px"></i><select><option>All Services</option><option>Social Media</option><option>SEO</option><option>Web Dev</option><option>Perf. Mktg</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;cursor:pointer" onclick="go('alerts',null)"><div class="dot-alert"></div><span style="font-size:12px;color:var(--text2)">5 Alerts</span></div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4">
+          <div class="kpi">
+            <div class="kpi-label">Total Revenue<div class="kpi-ico" style="background:var(--emerald-dim)"><i class="ti ti-trending-up" style="color:var(--emerald)"></i></div></div>
+            <div class="kpi-value">₹42.6L</div>
+            <div class="kpi-change up"><i class="ti ti-arrow-up-right" style="font-size:11px"></i>+18.4% vs last month</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Net Profit<div class="kpi-ico" style="background:var(--indigo-dim)"><i class="ti ti-coin" style="color:var(--indigo)"></i></div></div>
+            <div class="kpi-value" style="color:var(--emerald)">₹14.2L</div>
+            <div class="kpi-change up"><i class="ti ti-arrow-up-right" style="font-size:11px"></i>Margin: 33.3%</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Pending Receivables<div class="kpi-ico" style="background:var(--amber-dim)"><i class="ti ti-clock" style="color:var(--amber)"></i></div></div>
+            <div class="kpi-value" style="color:var(--amber)">₹8.9L</div>
+            <div class="kpi-change" style="color:var(--text2)">12 invoices pending</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Total Expenses<div class="kpi-ico" style="background:var(--red-dim)"><i class="ti ti-receipt" style="color:var(--red)"></i></div></div>
+            <div class="kpi-value">₹28.4L</div>
+            <div class="kpi-change down"><i class="ti ti-arrow-down-right" style="font-size:11px"></i>+6.2% vs last month</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Cash In Bank<div class="kpi-ico" style="background:var(--blue-dim)"><i class="ti ti-building-bank" style="color:var(--blue)"></i></div></div>
+            <div class="kpi-value">₹22.1L</div>
+            <div class="kpi-change up"><i class="ti ti-arrow-up-right" style="font-size:11px"></i>Healthy runway</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Monthly Burn<div class="kpi-ico" style="background:var(--red-dim)"><i class="ti ti-flame" style="color:var(--red)"></i></div></div>
+            <div class="kpi-value">₹9.4L</div>
+            <div class="kpi-change" style="color:var(--text2)">~2.4 months runway</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Active Clients<div class="kpi-ico" style="background:var(--indigo-dim)"><i class="ti ti-users" style="color:var(--indigo)"></i></div></div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-change up"><i class="ti ti-arrow-up-right" style="font-size:11px"></i>+3 this month</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Overdue Payments<div class="kpi-ico" style="background:var(--red-dim)"><i class="ti ti-alert-triangle" style="color:var(--red)"></i></div></div>
+            <div class="kpi-value" style="color:var(--red)">₹3.2L</div>
+            <div class="kpi-change down">4 invoices overdue</div>
+          </div>
+        </div>
+        <div class="grid21">
+          <div class="card">
+            <div class="card-title">Revenue & Expense Trend<span class="card-sub">Apr 2024 – Mar 2025</span></div>
+            <div class="cw"><canvas id="c-rev" aria-label="Revenue and expense trends">Revenue grew from ₹18L to ₹42.6L; expenses from ₹12L to ₹28.4L.</canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Profit Margin %<span class="card-sub">Monthly</span></div>
+            <div class="cw"><canvas id="c-margin" aria-label="Profit margin trend">Margin improved from 27% to 33%.</canvas></div>
+          </div>
+        </div>
+        <div class="grid3">
+          <div class="card">
+            <div class="card-title">Top Clients by Revenue</div>
+            <div class="bar-row"><span class="bar-label">Nexus Brands</span><div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--emerald)"></div></div><span class="bar-val">₹7.2L</span></div>
+            <div class="bar-row"><span class="bar-label">BluePeak Retail</span><div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--indigo)"></div></div><span class="bar-val">₹5.8L</span></div>
+            <div class="bar-row"><span class="bar-label">Orion Digital</span><div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--blue)"></div></div><span class="bar-val">₹4.9L</span></div>
+            <div class="bar-row"><span class="bar-label">Kratos Corp</span><div class="bar-track"><div class="bar-fill" style="width:51%;background:var(--amber)"></div></div><span class="bar-val">₹3.8L</span></div>
+            <div class="bar-row"><span class="bar-label">SkyEdge Media</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--text3)"></div></div><span class="bar-val">₹3.1L</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Service Revenue Mix</div>
+            <div class="cw cw-sm"><canvas id="c-svc" aria-label="Service revenue: Social 34%, PerfMktg 22%, WebDev 18%, SEO 14%, Content 12%">Service distribution chart.</canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Financial Health</div>
+            <div class="stat-row"><span class="sk">Collection Efficiency</span><span class="sv" style="color:var(--emerald)">87%</span></div>
+            <div class="stat-row"><span class="sk">MoM Revenue Growth</span><span class="sv" style="color:var(--emerald)">+18.4%</span></div>
+            <div class="stat-row"><span class="sk">Avg Invoice Value</span><span class="sv">₹74,800</span></div>
+            <div class="stat-row"><span class="sk">Avg Days to Pay</span><span class="sv" style="color:var(--amber)">22 days</span></div>
+            <div class="stat-row"><span class="sk">Monthly Burn Rate</span><span class="sv" style="color:var(--red)">₹9.4L</span></div>
+            <div class="stat-row"><span class="sk">Cash Runway</span><span class="sv">2.4 months</span></div>
+          </div>
+        </div>
+        <div class="grid21">
+          <div class="card">
+            <div class="card-title">Recent Transactions</div>
+            <table>
+              <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--indigo);font-weight:700">#INV-0089</td><td>Nexus Brands</td><td style="color:var(--text);font-weight:600">₹1,25,000</td><td>12 Mar 2025</td><td><span class="badge bg">Paid</span></td></tr>
+                <tr><td style="color:var(--indigo);font-weight:700">#INV-0088</td><td>BluePeak Retail</td><td style="color:var(--text);font-weight:600">₹98,000</td><td>10 Mar 2025</td><td><span class="badge bg">Paid</span></td></tr>
+                <tr><td style="color:var(--indigo);font-weight:700">#INV-0087</td><td>Kratos Corp</td><td style="color:var(--text);font-weight:600">₹75,000</td><td>08 Mar 2025</td><td><span class="badge ba">Partial</span></td></tr>
+                <tr><td style="color:var(--indigo);font-weight:700">#INV-0086</td><td>Orion Digital</td><td style="color:var(--text);font-weight:600">₹1,40,000</td><td>05 Mar 2025</td><td><span class="badge br">Overdue</span></td></tr>
+                <tr><td style="color:var(--indigo);font-weight:700">#INV-0085</td><td>SkyEdge Media</td><td style="color:var(--text);font-weight:600">₹62,500</td><td>02 Mar 2025</td><td><span class="badge bb">Pending</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-title">Upcoming Dues</div>
+            <div class="stat-row"><div><div style="font-size:12px;color:var(--text);font-weight:500">SkyEdge Media</div><div style="font-size:11px;color:var(--text3)">Due: 15 Mar 2025</div></div><span style="color:var(--amber);font-weight:700">₹62,500</span></div>
+            <div class="stat-row"><div><div style="font-size:12px;color:var(--text);font-weight:500">BrandMart Ltd</div><div style="font-size:11px;color:var(--text3)">Due: 18 Mar 2025</div></div><span style="color:var(--amber);font-weight:700">₹88,000</span></div>
+            <div class="stat-row"><div><div style="font-size:12px;color:var(--text);font-weight:500">Zenith Works</div><div style="font-size:11px;color:var(--text3)">Due: 22 Mar 2025</div></div><span style="color:var(--text);font-weight:700">₹45,000</span></div>
+            <div class="stat-row"><div><div style="font-size:12px;color:var(--text);font-weight:500">Apex Finance</div><div style="font-size:11px;color:var(--text3)">Due: 28 Mar 2025</div></div><span style="color:var(--text);font-weight:700">₹1,10,000</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="page-clients" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Client Management</div>
+        <div class="topbar-right">
+          <input type="text" placeholder="Search clients…" style="width:200px" oninput="searchClients(this.value)">
+          <button class="btn btn-p" onclick="openModal('client')"><i class="ti ti-plus"></i>Add Client</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">Total Clients</div><div class="kpi-value">24</div><div class="kpi-change up">+3 this month</div></div>
+          <div class="kpi"><div class="kpi-label">Active</div><div class="kpi-value" style="color:var(--emerald)">21</div><div class="kpi-change" style="color:var(--text2)">87.5% retention</div></div>
+          <div class="kpi"><div class="kpi-label">Avg Monthly Billing</div><div class="kpi-value">₹1.77L</div><div class="kpi-change up">per client</div></div>
+          <div class="kpi"><div class="kpi-label">Total LTV</div><div class="kpi-value">₹2.4Cr</div><div class="kpi-change up">Lifetime value</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">All Clients<span id="cl-count" class="card-sub">24 total</span></div>
+          <table>
+            <thead><tr><th>Client</th><th>Service</th><th>Monthly Billing</th><th>Manager</th><th>Renewal</th><th>Status</th><th></th></tr></thead>
+            <tbody id="cl-tbody">
+              <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:var(--emerald-dim);color:var(--emerald)">NB</div><div><div style="color:var(--text);font-weight:600">Nexus Brands</div><div style="font-size:11px;color:var(--text3)">nexus@brand.com</div></div></div></td><td>Social Media + SEO</td><td style="color:var(--text);font-weight:700">₹72,000</td><td>Riya Sharma</td><td>Jun 2025</td><td><span class="badge bg">Active</span></td><td><button class="btn" style="padding:4px 10px;font-size:11px">View</button></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:var(--indigo-dim);color:var(--indigo)">BP</div><div><div style="color:var(--text);font-weight:600">BluePeak Retail</div><div style="font-size:11px;color:var(--text3)">info@bluepeak.in</div></div></div></td><td>Performance Mktg</td><td style="color:var(--text);font-weight:700">₹58,000</td><td>Arjun Mehta</td><td>Aug 2025</td><td><span class="badge bg">Active</span></td><td><button class="btn" style="padding:4px 10px;font-size:11px">View</button></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:var(--blue-dim);color:var(--blue)">OD</div><div><div style="color:var(--text);font-weight:600">Orion Digital</div><div style="font-size:11px;color:var(--text3)">contact@orion.co</div></div></div></td><td>Web Dev + SEO</td><td style="color:var(--text);font-weight:700">₹49,000</td><td>Priya Kapoor</td><td>Apr 2025</td><td><span class="badge ba">Renewal Due</span></td><td><button class="btn" style="padding:4px 10px;font-size:11px">View</button></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:var(--amber-dim);color:var(--amber)">KC</div><div><div style="color:var(--text);font-weight:600">Kratos Corp</div><div style="font-size:11px;color:var(--text3)">hi@kratos.com</div></div></div></td><td>Content Creation</td><td style="color:var(--text);font-weight:700">₹38,000</td><td>Riya Sharma</td><td>Sep 2025</td><td><span class="badge bg">Active</span></td><td><button class="btn" style="padding:4px 10px;font-size:11px">View</button></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:var(--red-dim);color:var(--red)">SE</div><div><div style="color:var(--text);font-weight:600">SkyEdge Media</div><div style="font-size:11px;color:var(--text3)">sky@edge.media</div></div></div></td><td>Social Media</td><td style="color:var(--text);font-weight:700">₹31,000</td><td>Arjun Mehta</td><td>Jul 2025</td><td><span class="badge br">Inactive</span></td><td><button class="btn" style="padding:4px 10px;font-size:11px">View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES -->
+    <div id="page-invoices" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Invoice Management</div>
+        <div class="topbar-right">
+          <div class="fp"><select><option>All Status</option><option>Paid</option><option>Pending</option><option>Overdue</option><option>Partial</option></select></div>
+          <button class="btn btn-p" onclick="openModal('invoice')"><i class="ti ti-plus"></i>New Invoice</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">Total Invoiced</div><div class="kpi-value">₹42.6L</div><div class="kpi-change" style="color:var(--text2)">This month</div></div>
+          <div class="kpi"><div class="kpi-label">Collected</div><div class="kpi-value" style="color:var(--emerald)">₹33.7L</div><div class="kpi-change up">87% collected</div></div>
+          <div class="kpi"><div class="kpi-label">Overdue</div><div class="kpi-value" style="color:var(--red)">₹3.2L</div><div class="kpi-change down">4 invoices</div></div>
+          <div class="kpi"><div class="kpi-label">Pending</div><div class="kpi-value" style="color:var(--amber)">₹5.7L</div><div class="kpi-change" style="color:var(--text2)">8 invoices</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">All Invoices</div>
+          <table>
+            <thead><tr><th>Invoice #</th><th>Client</th><th>Date</th><th>Due Date</th><th>Amount</th><th>GST</th><th>Total</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--indigo);font-weight:700">#INV-0089</td><td>Nexus Brands</td><td>01 Mar</td><td>15 Mar</td><td>₹1,05,932</td><td>₹19,068</td><td style="font-weight:700;color:var(--text)">₹1,25,000</td><td><span class="badge bg">Paid</span></td><td><button class="btn" style="padding:4px 9px;font-size:11px"><i class="ti ti-download" style="font-size:11px"></i></button></td></tr>
+              <tr><td style="color:var(--indigo);font-weight:700">#INV-0088</td><td>BluePeak Retail</td><td>28 Feb</td><td>14 Mar</td><td>₹83,051</td><td>₹14,949</td><td style="font-weight:700;color:var(--text)">₹98,000</td><td><span class="badge bg">Paid</span></td><td><button class="btn" style="padding:4px 9px;font-size:11px"><i class="ti ti-download" style="font-size:11px"></i></button></td></tr>
+              <tr><td style="color:var(--indigo);font-weight:700">#INV-0087</td><td>Kratos Corp</td><td>25 Feb</td><td>11 Mar</td><td>₹63,559</td><td>₹11,441</td><td style="font-weight:700;color:var(--text)">₹75,000</td><td><span class="badge ba">Partial</span></td><td><button class="btn" style="padding:4px 9px;font-size:11px"><i class="ti ti-download" style="font-size:11px"></i></button></td></tr>
+              <tr><td style="color:var(--indigo);font-weight:700">#INV-0086</td><td>Orion Digital</td><td>20 Feb</td><td>07 Mar</td><td>₹1,18,644</td><td>₹21,356</td><td style="font-weight:700;color:var(--text)">₹1,40,000</td><td><span class="badge br">Overdue</span></td><td><button class="btn" style="padding:4px 9px;font-size:11px"><i class="ti ti-download" style="font-size:11px"></i></button></td></tr>
+              <tr><td style="color:var(--indigo);font-weight:700">#INV-0085</td><td>SkyEdge Media</td><td>15 Feb</td><td>01 Mar</td><td>₹52,966</td><td>₹9,534</td><td style="font-weight:700;color:var(--text)">₹62,500</td><td><span class="badge bb">Pending</span></td><td><button class="btn" style="padding:4px 9px;font-size:11px"><i class="ti ti-download" style="font-size:11px"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="page-payments" class="hidden">
+      <div class="topbar"><div class="topbar-title">Payment Tracking</div></div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">Total Collected</div><div class="kpi-value" style="color:var(--emerald)">₹33.7L</div></div>
+          <div class="kpi"><div class="kpi-label">Pending</div><div class="kpi-value" style="color:var(--amber)">₹5.7L</div><div class="kpi-change" style="color:var(--text2)">8 invoices</div></div>
+          <div class="kpi"><div class="kpi-label">Overdue</div><div class="kpi-value" style="color:var(--red)">₹3.2L</div><div class="kpi-change down">4 invoices</div></div>
+          <div class="kpi"><div class="kpi-label">Partial Payments</div><div class="kpi-value" style="color:var(--indigo)">₹1.4L</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Receivable Aging</div>
+            <div class="bar-row"><span class="bar-label">0–30 days</span><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--emerald)"></div></div><span class="bar-val">₹5.7L</span></div>
+            <div class="bar-row"><span class="bar-label">31–60 days</span><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--amber)"></div></div><span class="bar-val">₹2.1L</span></div>
+            <div class="bar-row"><span class="bar-label">61–90 days</span><div class="bar-track"><div class="bar-fill" style="width:15%;background:var(--red)"></div></div><span class="bar-val">₹0.8L</span></div>
+            <div class="bar-row"><span class="bar-label">90+ days</span><div class="bar-track"><div class="bar-fill" style="width:5%;background:#7f1d1d"></div></div><span class="bar-val">₹0.3L</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Payment Mode Split</div>
+            <div class="cw cw-sm"><canvas id="c-pay" aria-label="Payment modes: UPI 45%, NEFT 30%, Cheque 15%, Card 10%">Payment mode chart.</canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPENSES -->
+    <div id="page-expenses" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Expense Management</div>
+        <div class="topbar-right">
+          <div class="fp"><select><option>All Categories</option><option>Salaries</option><option>Rent</option><option>Software</option><option>Freelancers</option></select></div>
+          <button class="btn btn-p" onclick="openModal('expense')"><i class="ti ti-plus"></i>Add Expense</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">Total Expenses</div><div class="kpi-value">₹28.4L</div><div class="kpi-change down">+6.2% MoM</div></div>
+          <div class="kpi"><div class="kpi-label">Fixed Costs</div><div class="kpi-value">₹18.9L</div><div class="kpi-change" style="color:var(--text2)">66.5% of total</div></div>
+          <div class="kpi"><div class="kpi-label">Variable Costs</div><div class="kpi-value">₹9.5L</div><div class="kpi-change" style="color:var(--text2)">33.5% of total</div></div>
+          <div class="kpi"><div class="kpi-label">Largest Category</div><div class="kpi-value" style="font-size:16px">Salaries</div><div class="kpi-change" style="color:var(--text2)">₹14.2L (50%)</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Expense by Category</div>
+            <div class="bar-row"><span class="bar-label">Salaries</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--indigo)"></div></div><span class="bar-val">₹14.2L</span></div>
+            <div class="bar-row"><span class="bar-label">Freelancers</span><div class="bar-track"><div class="bar-fill" style="width:35%;background:var(--emerald)"></div></div><span class="bar-val">₹3.8L</span></div>
+            <div class="bar-row"><span class="bar-label">Rent</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:var(--blue)"></div></div><span class="bar-val">₹2.8L</span></div>
+            <div class="bar-row"><span class="bar-label">Software Tools</span><div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--amber)"></div></div><span class="bar-val">₹1.9L</span></div>
+            <div class="bar-row"><span class="bar-label">Content Shoots</span><div class="bar-track"><div class="bar-fill" style="width:15%;background:var(--red)"></div></div><span class="bar-val">₹1.6L</span></div>
+            <div class="bar-row"><span class="bar-label">Ads & Marketing</span><div class="bar-track"><div class="bar-fill" style="width:13%;background:var(--text3)"></div></div><span class="bar-val">₹1.4L</span></div>
+            <div class="bar-row"><span class="bar-label">Other</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--text3)"></div></div><span class="bar-val">₹2.7L</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Expense Trend<span class="card-sub">Last 6 months</span></div>
+            <div class="cw"><canvas id="c-exp" aria-label="Expense trend over 6 months">Monthly expenses from ₹22L to ₹28.4L.</canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Expenses</div>
+          <table>
+            <thead><tr><th>Date</th><th>Category</th><th>Vendor</th><th>Description</th><th>Amount</th><th>Type</th></tr></thead>
+            <tbody>
+              <tr><td>10 Mar 2025</td><td><span class="badge bi">Salaries</span></td><td>—</td><td>March salary disbursement</td><td style="color:var(--text);font-weight:700">₹14,20,000</td><td><span class="badge bb">Fixed</span></td></tr>
+              <tr><td>08 Mar 2025</td><td><span class="badge bg">Software</span></td><td>Adobe Inc</td><td>Creative Cloud annual</td><td style="color:var(--text);font-weight:700">₹32,000</td><td><span class="badge bb">Fixed</span></td></tr>
+              <tr><td>05 Mar 2025</td><td><span class="badge ba">Freelancers</span></td><td>Content Tribe</td><td>Video production — 3 clients</td><td style="color:var(--text);font-weight:700">₹85,000</td><td><span class="badge ba">Variable</span></td></tr>
+              <tr><td>03 Mar 2025</td><td><span class="badge bb">Rent</span></td><td>PropSol Pvt</td><td>Office rent — March</td><td style="color:var(--text);font-weight:700">₹95,000</td><td><span class="badge bb">Fixed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYROLL -->
+    <div id="page-payroll" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Payroll Management</div>
+        <div class="topbar-right">
+          <div class="fp"><select><option>March 2025</option><option>February 2025</option><option>January 2025</option></select></div>
+          <button class="btn btn-p"><i class="ti ti-send"></i>Process Payroll</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">Total Payroll</div><div class="kpi-value">₹14.2L</div><div class="kpi-change" style="color:var(--text2)">10 employees</div></div>
+          <div class="kpi"><div class="kpi-label">Disbursed</div><div class="kpi-value" style="color:var(--emerald)">₹14.2L</div><div class="kpi-change up">All paid</div></div>
+          <div class="kpi"><div class="kpi-label">Avg Salary</div><div class="kpi-value">₹1.42L</div></div>
+          <div class="kpi"><div class="kpi-label">Incentives Paid</div><div class="kpi-value">₹68,000</div><div class="kpi-change up">+12% MoM</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Employee Payroll — March 2025</div>
+          <table>
+            <thead><tr><th>Employee</th><th>Department</th><th>Base Salary</th><th>Incentives</th><th>Deductions</th><th>Final Salary</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--emerald-dim);color:var(--emerald)">RS</div>Riya Sharma</div></td><td>Account Mgmt</td><td>₹85,000</td><td style="color:var(--emerald)">₹12,000</td><td style="color:var(--red)">₹8,500</td><td style="font-weight:700;color:var(--text)">₹88,500</td><td><span class="badge bg">Paid</span></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--indigo-dim);color:var(--indigo)">AM</div>Arjun Mehta</div></td><td>Performance</td><td>₹75,000</td><td style="color:var(--emerald)">₹18,000</td><td style="color:var(--red)">₹7,500</td><td style="font-weight:700;color:var(--text)">₹85,500</td><td><span class="badge bg">Paid</span></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--blue-dim);color:var(--blue)">PK</div>Priya Kapoor</div></td><td>Web Dev</td><td>₹95,000</td><td style="color:var(--emerald)">₹5,000</td><td style="color:var(--red)">₹9,500</td><td style="font-weight:700;color:var(--text)">₹90,500</td><td><span class="badge bg">Paid</span></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--amber-dim);color:var(--amber)">VN</div>Vikram Nair</div></td><td>Content</td><td>₹55,000</td><td style="color:var(--emerald)">₹8,000</td><td style="color:var(--red)">₹5,500</td><td style="font-weight:700;color:var(--text)">₹57,500</td><td><span class="badge bg">Paid</span></td></tr>
+              <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:var(--red-dim);color:var(--red)">SJ</div>Sneha Joshi</div></td><td>SEO</td><td>₹60,000</td><td style="color:var(--emerald)">₹10,000</td><td style="color:var(--red)">₹6,000</td><td style="font-weight:700;color:var(--text)">₹64,000</td><td><span class="badge bg">Paid</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASHFLOW -->
+    <div id="page-cashflow" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Cash Flow Tracker</div>
+        <div class="topbar-right"><div class="fp"><select><option>Last 12 Months</option><option>Last 6 Months</option><option>Last Quarter</option></select></div></div>
+      </div>
+      <div class="content">
+        <div class="cf-sum">
+          <div class="cf-item"><div class="cf-label">Cash Inflow</div><div class="cf-val" style="color:var(--emerald)">₹42.6L</div></div>
+          <div class="cf-item"><div class="cf-label">Cash Outflow</div><div class="cf-val" style="color:var(--red)">₹28.4L</div></div>
+          <div class="cf-item"><div class="cf-label">Net Cash Flow</div><div class="cf-val" style="color:var(--blue)">₹14.2L</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Cash Flow Chart<span class="card-sub">Monthly net flow</span></div>
+            <div class="cw" style="height:260px"><canvas id="c-cf" aria-label="Monthly cash inflow, outflow and net flow chart">Cash flow chart showing positive net flow peaking at ₹14.2L.</canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Runway & Forecast</div>
+            <div class="stat-row"><span class="sk">Current Bank Balance</span><span class="sv" style="color:var(--emerald)">₹22.1L</span></div>
+            <div class="stat-row"><span class="sk">Monthly Burn Rate</span><span class="sv" style="color:var(--red)">₹9.4L</span></div>
+            <div class="stat-row"><span class="sk">Cash Runway</span><span class="sv" style="color:var(--amber)">2.4 months</span></div>
+            <div class="stat-row"><span class="sk">Expected Collections (Apr)</span><span class="sv">₹38.5L</span></div>
+            <div class="stat-row"><span class="sk">Expected Liabilities (Apr)</span><span class="sv">₹29.2L</span></div>
+            <div class="stat-row"><span class="sk">Projected Net (Apr)</span><span class="sv" style="color:var(--emerald)">₹9.3L</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFITABILITY -->
+    <div id="page-profit" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Service-wise Profitability</div>
+        <div class="topbar-right"><div class="fp"><select><option>March 2025</option><option>Q4 2024</option><option>FY 2024-25</option></select></div></div>
+      </div>
+      <div class="content">
+        <div class="grid3" style="margin-bottom:18px">
+          <div class="kpi" style="border-left:3px solid var(--emerald)"><div class="kpi-label">Highest Margin</div><div class="kpi-value" style="color:var(--emerald);font-size:16px">Performance Mktg</div><div class="kpi-change up">42% net margin</div></div>
+          <div class="kpi" style="border-left:3px solid var(--amber)"><div class="kpi-label">Lowest Margin</div><div class="kpi-value" style="color:var(--amber);font-size:16px">Content Creation</div><div class="kpi-change down">18% net margin</div></div>
+          <div class="kpi" style="border-left:3px solid var(--indigo)"><div class="kpi-label">Highest Revenue</div><div class="kpi-value" style="color:var(--indigo);font-size:16px">Social Media Mktg</div><div class="kpi-change" style="color:var(--text2)">34% revenue share</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Profitability Comparison — All Services</div>
+          <div class="cw" style="height:280px"><canvas id="c-profit" aria-label="Grouped bar chart of revenue, gross profit, and net profit per service">Performance Marketing has highest net margin at 42%; Content Creation lowest at 18%.</canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Service-wise P&L</div>
+          <table>
+            <thead><tr><th>Service</th><th>Revenue</th><th>Direct Costs</th><th>Team Cost</th><th>Gross Profit</th><th>Net Profit</th><th>Margin %</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--text);font-weight:600">Social Media Mktg</td><td>₹14.5L</td><td>₹3.2L</td><td>₹4.1L</td><td>₹11.3L</td><td style="color:var(--emerald);font-weight:700">₹7.2L</td><td><span class="badge bg">34%</span></td></tr>
+              <tr><td style="color:var(--text);font-weight:600">Performance Mktg</td><td>₹9.4L</td><td>₹1.8L</td><td>₹2.2L</td><td>₹7.6L</td><td style="color:var(--emerald);font-weight:700">₹5.4L</td><td><span class="badge bg">42%</span></td></tr>
+              <tr><td style="color:var(--text);font-weight:600">Website Development</td><td>₹7.6L</td><td>₹2.4L</td><td>₹2.8L</td><td>₹5.2L</td><td style="color:var(--emerald);font-weight:700">₹2.4L</td><td><span class="badge ba">31%</span></td></tr>
+              <tr><td style="color:var(--text);font-weight:600">SEO</td><td>₹5.9L</td><td>₹1.1L</td><td>₹1.8L</td><td>₹4.8L</td><td style="color:var(--emerald);font-weight:700">₹3.0L</td><td><span class="badge bg">37%</span></td></tr>
+              <tr><td style="color:var(--text);font-weight:600">Ecommerce Mgmt</td><td>₹3.2L</td><td>₹0.9L</td><td>₹1.1L</td><td>₹2.3L</td><td style="color:var(--emerald);font-weight:700">₹1.2L</td><td><span class="badge ba">28%</span></td></tr>
+              <tr><td style="color:var(--text);font-weight:600">Content Creation</td><td>₹2.0L</td><td>₹0.8L</td><td>₹0.6L</td><td>₹1.2L</td><td style="color:var(--amber);font-weight:700">₹0.6L</td><td><span class="badge br">18%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GST -->
+    <div id="page-gst" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">GST / Tax Summary</div>
+        <div class="topbar-right">
+          <div class="fp"><select><option>March 2025</option><option>Q4 FY2025</option><option>FY 2024-25</option></select></div>
+          <button class="btn"><i class="ti ti-download"></i>Export</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="grid4" style="margin-bottom:18px">
+          <div class="kpi"><div class="kpi-label">GST Collected (Output)</div><div class="kpi-value" style="color:var(--emerald)">₹7.67L</div><div class="kpi-change" style="color:var(--text2)">18% on ₹42.6L</div></div>
+          <div class="kpi"><div class="kpi-label">GST Paid (Input)</div><div class="kpi-value" style="color:var(--red)">₹3.12L</div></div>
+          <div class="kpi"><div class="kpi-label">Net GST Payable</div><div class="kpi-value" style="color:var(--amber)">₹4.55L</div><div class="kpi-change down">Due 20 Apr 2025</div></div>
+          <div class="kpi"><div class="kpi-label">TDS Collected</div><div class="kpi-value">₹1.28L</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Monthly GST Summary</div>
+            <table>
+              <thead><tr><th>Month</th><th>Output GST</th><th>Input GST</th><th>Net Payable</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="color:var(--text)">March 2025</td><td style="color:var(--emerald)">₹7.67L</td><td style="color:var(--red)">₹3.12L</td><td style="font-weight:700;color:var(--text)">₹4.55L</td><td><span class="badge ba">Due</span></td></tr>
+                <tr><td style="color:var(--text)">February 2025</td><td style="color:var(--emerald)">₹6.84L</td><td style="color:var(--red)">₹2.89L</td><td style="font-weight:700;color:var(--text)">₹3.95L</td><td><span class="badge bg">Filed</span></td></tr>
+                <tr><td style="color:var(--text)">January 2025</td><td style="color:var(--emerald)">₹6.12L</td><td style="color:var(--red)">₹2.56L</td><td style="font-weight:700;color:var(--text)">₹3.56L</td><td><span class="badge bg">Filed</span></td></tr>
+                <tr><td style="color:var(--text)">December 2024</td><td style="color:var(--emerald)">₹5.94L</td><td style="color:var(--red)">₹2.41L</td><td style="font-weight:700;color:var(--text)">₹3.53L</td><td><span class="badge bg">Filed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-title">Tax Insights</div>
+            <div class="stat-row"><span class="sk">Annual GST Collected</span><span class="sv">₹76.8L</span></div>
+            <div class="stat-row"><span class="sk">Annual GST Paid</span><span class="sv">₹31.4L</span></div>
+            <div class="stat-row"><span class="sk">Annual Net GST</span><span class="sv" style="color:var(--amber)">₹45.4L</span></div>
+            <div class="stat-row"><span class="sk">Effective GST Rate</span><span class="sv">18%</span></div>
+            <div class="stat-row"><span class="sk">Advance Tax (FY)</span><span class="sv">₹12.5L</span></div>
+            <div class="stat-row"><span class="sk">Next Filing Date</span><span class="sv" style="color:var(--red)">20 Apr 2025</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="page-alerts" class="hidden">
+      <div class="topbar"><div class="topbar-title">Alerts &amp; Reminders</div></div>
+      <div class="content">
+        <div class="grid2">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-size:15px;font-weight:700">Active Alerts</span><span class="badge br">5 urgent</span></div>
+            <div class="alert-item a-od"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:18px;flex-shrink:0"></i><div><div style="font-size:13px;color:var(--text);font-weight:600">Invoice Overdue — Orion Digital</div><div style="font-size:11px;color:var(--text2);margin-top:2px">INV-0086 · ₹1,40,000 · 8 days overdue</div></div><button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px;flex-shrink:0">Send Reminder</button></div>
+            <div class="alert-item a-od"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:18px;flex-shrink:0"></i><div><div style="font-size:13px;color:var(--text);font-weight:600">GST Payment Due</div><div style="font-size:11px;color:var(--text2);margin-top:2px">₹4.55L due by 20 Apr 2025</div></div><button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px;flex-shrink:0">View</button></div>
+            <div class="alert-item a-pe"><i class="ti ti-clock" style="color:var(--amber);font-size:18px;flex-shrink:0"></i><div><div style="font-size:13px;color:var(--text);font-weight:600">Invoice Due in 3 Days — SkyEdge</div><div style="font-size:11px;color:var(--text2);margin-top:2px">INV-0085 · ₹62,500 · Due 15 Mar</div></div><button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px;flex-shrink:0">Remind</button></div>
+            <div class="alert-item a-pe"><i class="ti ti-refresh" style="color:var(--amber);font-size:18px;flex-shrink:0"></i><div><div style="font-size:13px;color:var(--text);font-weight:600">Contract Renewal — Orion Digital</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Expires Apr 2025 · ₹49,000/month</div></div><button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px;flex-shrink:0">Review</button></div>
+            <div class="alert-item a-in"><i class="ti ti-users" style="color:var(--blue);font-size:18px;flex-shrink:0"></i><div><div style="font-size:13px;color:var(--text);font-weight:600">Payroll Due Next Week</div><div style="font-size:11px;color:var(--text2);margin-top:2px">April payroll · ₹14.2L · Due 5 Apr</div></div><button class="btn" style="margin-left:auto;padding:4px 10px;font-size:11px;flex-shrink:0">View</button></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Alert Thresholds</div>
+            <div class="stat-row"><span class="sk">Overdue Invoice Alert</span><span class="sv">After 7 days</span></div>
+            <div class="stat-row"><span class="sk">Due Date Reminder</span><span class="sv">3 days before</span></div>
+            <div class="stat-row"><span class="sk">Low Balance Alert</span><span class="sv">Below ₹5L</span></div>
+            <div class="stat-row"><span class="sk">Expense Limit Warning</span><span class="sv">At 90% budget</span></div>
+            <div class="stat-row"><span class="sk">Payroll Reminder</span><span class="sv">5 days before</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="hidden">
+      <div class="topbar">
+        <div class="topbar-title">Financial Reports</div>
+        <div class="topbar-right"><div class="fp"><select><option>March 2025</option><option>Q4 FY2025</option><option>FY 2024-25</option></select></div></div>
+      </div>
+      <div class="content">
+        <div class="grid3">
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--emerald-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-report-money" style="color:var(--emerald);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">P&L Report</div><div style="font-size:11px;color:var(--text2)">Profit & Loss Statement</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Revenue, expenses, and net profit breakdown by month and category.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--indigo)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--indigo-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-cash" style="color:var(--indigo);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">Cash Flow Statement</div><div style="font-size:11px;color:var(--text2)">Inflows & Outflows</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Monthly cash movement, runway analysis, and forecast projection.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--blue-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-users" style="color:var(--blue);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">Client Revenue Report</div><div style="font-size:11px;color:var(--text2)">Per-client analysis</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Revenue, LTV, and profitability breakdown per client.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--amber-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-receipt" style="color:var(--amber);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">Expense Report</div><div style="font-size:11px;color:var(--text2)">Category-wise spending</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Detailed expense breakdown by category, vendor, and department.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--red-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-file-invoice" style="color:var(--red);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">Outstanding Report</div><div style="font-size:11px;color:var(--text2)">Aging & dues</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Overdue invoices, aging buckets, and collection status.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+          <div class="card" style="cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--emerald)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:40px;height:40px;border-radius:10px;background:var(--emerald-dim);display:flex;align-items:center;justify-content:center"><i class="ti ti-users-group" style="color:var(--emerald);font-size:18px"></i></div><div><div style="font-weight:700;color:var(--text)">Payroll Report</div><div style="font-size:11px;color:var(--text2)">Salary & incentives</div></div></div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Monthly payroll disbursement, deductions, and team cost analysis.</div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-download" style="font-size:12px"></i> PDF</button><button class="btn" style="flex:1;justify-content:center"><i class="ti ti-table" style="font-size:12px"></i> Excel</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title"><span id="modal-title"></span><span style="cursor:pointer;color:var(--text3);font-size:20px" onclick="closeModal()"><i class="ti ti-x"></i></span></div>
+    <div id="modal-body"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-p" onclick="closeModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const REV=[18,21,23,25,27,26,29,31,34,36,39,42.6];
+const EXP=[12,13.5,14.2,15.8,16.1,16.5,18.2,19.4,21.1,22.8,25.1,28.4];
+const MARGIN=[33,36,38,37,40,37,37,37,38,37,36,33];
+const inited={};
+
+function go(page,el){
+  document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('page-'+page).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  else{
+    document.querySelectorAll('.nav-item').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');
+    });
+  }
+  setTimeout(()=>initPage(page),80);
+}
+
+function initPage(p){
+  if(inited[p])return;inited[p]=true;
+  const cfg=(id,type,data,opts)=>{
+    const el=document.getElementById(id);if(!el)return;
+    new Chart(el,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},...opts}});
+  };
+  const xg={grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#555e73',font:{size:11}}};
+  const yg=(cb)=>({grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#555e73',font:{size:11},callback:cb}});
+
+  if(p==='overview'){
+    cfg('c-rev','bar',{labels:MONTHS,datasets:[
+      {label:'Revenue',data:REV,backgroundColor:'rgba(16,185,129,0.8)',borderRadius:4,borderSkipped:false},
+      {label:'Expenses',data:EXP,backgroundColor:'rgba(99,102,241,0.6)',borderRadius:4,borderSkipped:false}
+    ]},{plugins:{legend:{display:true,labels:{color:'#8b92a8',font:{size:11},boxWidth:8}}},scales:{x:xg,y:yg(v=>'₹'+v+'L')}});
+    new Chart(document.getElementById('c-margin'),{type:'line',data:{labels:MONTHS,datasets:[{data:MARGIN,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',fill:true,tension:0.4,pointRadius:3,pointBackgroundColor:'#10b981'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:xg,y:yg(v=>v+'%')}}});
+    new Chart(document.getElementById('c-svc'),{type:'doughnut',data:{labels:['Social','Perf.Mktg','Web Dev','SEO','Content'],datasets:[{data:[34,22,18,14,12],backgroundColor:['#10b981','#6366f1','#3b82f6','#f59e0b','#ef4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b92a8',font:{size:10},boxWidth:8,padding:6}}},cutout:'65%'}});
+  }
+  if(p==='cashflow'){
+    const NET=REV.map((r,i)=>Math.round((r-EXP[i])*10)/10);
+    new Chart(document.getElementById('c-cf'),{type:'bar',data:{labels:MONTHS,datasets:[
+      {label:'Inflow (₹L)',data:REV,backgroundColor:'rgba(16,185,129,0.7)',borderRadius:3},
+      {label:'Outflow (₹L)',data:EXP.map(v=>-v),backgroundColor:'rgba(239,68,68,0.6)',borderRadius:3},
+      {label:'Net (₹L)',data:NET,type:'line',borderColor:'#6366f1',backgroundColor:'transparent',tension:0.4,pointRadius:3,pointBackgroundColor:'#6366f1'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8b92a8',font:{size:11},boxWidth:8}}},scales:{x:xg,y:yg(v=>'₹'+Math.abs(v)+'L')}}});
+  }
+  if(p==='profit'){
+    new Chart(document.getElementById('c-profit'),{type:'bar',data:{labels:['Social Media','Perf. Mktg','Web Dev','SEO','Ecommerce','Content'],datasets:[
+      {label:'Revenue (₹L)',data:[14.5,9.4,7.6,5.9,3.2,2.0],backgroundColor:'rgba(99,102,241,0.7)',borderRadius:3},
+      {label:'Gross Profit (₹L)',data:[11.3,7.6,5.2,4.8,2.3,1.2],backgroundColor:'rgba(59,130,246,0.7)',borderRadius:3},
+      {label:'Net Profit (₹L)',data:[7.2,5.4,2.4,3.0,1.2,0.6],backgroundColor:'rgba(16,185,129,0.8)',borderRadius:3}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8b92a8',font:{size:11},boxWidth:8}}},scales:{x:xg,y:yg(v=>'₹'+v+'L')}}});
+  }
+  if(p==='expenses'){
+    new Chart(document.getElementById('c-exp'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{data:[21.1,22.8,25.1,22.8,25.1,28.4],backgroundColor:'rgba(239,68,68,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:xg,y:yg(v=>'₹'+v+'L')}}});
+  }
+  if(p==='payments'){
+    new Chart(document.getElementById('c-pay'),{type:'doughnut',data:{labels:['UPI','NEFT/RTGS','Cheque','Card'],datasets:[{data:[45,30,15,10],backgroundColor:['#10b981','#6366f1','#f59e0b','#3b82f6'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b92a8',font:{size:10},boxWidth:8,padding:6}}},cutout:'60%'}});
+  }
+}
+
+function searchClients(q){
+  const rows=document.querySelectorAll('#cl-tbody tr');let c=0;
+  rows.forEach(r=>{const m=r.textContent.toLowerCase().includes(q.toLowerCase());r.style.display=m?'':'none';if(m)c++;});
+  document.getElementById('cl-count').textContent=c+' total';
+}
+
+const MODALS={
+  client:{title:'Add New Client',html:`<div class="form-row"><div><label class="form-label">Client Name</label><input placeholder="Nexus Brands"></div><div><label class="form-label">Company</label><input placeholder="Nexus Brands Ltd."></div></div><div class="form-row"><div><label class="form-label">Email</label><input type="email" placeholder="contact@company.com"></div><div><label class="form-label">Phone</label><input placeholder="+91 98765 43210"></div></div><div class="form-row"><div><label class="form-label">Service Type</label><select><option>Social Media</option><option>SEO</option><option>Web Dev</option><option>Performance Mktg</option><option>Content</option><option>Ecommerce</option></select></div><div><label class="form-label">Monthly Billing (₹)</label><input type="number" placeholder="50000"></div></div><div class="form-row"><div><label class="form-label">Contract Start</label><input type="date"></div><div><label class="form-label">Payment Terms</label><select><option>Net 15</option><option>Net 30</option><option>Advance</option></select></div></div>`},
+  invoice:{title:'New Invoice',html:`<div class="form-row"><div><label class="form-label">Client</label><select><option>Nexus Brands</option><option>BluePeak Retail</option><option>Orion Digital</option><option>Kratos Corp</option></select></div><div><label class="form-label">Invoice Date</label><input type="date"></div></div><div class="form-row"><div><label class="form-label">Due Date</label><input type="date"></div><div><label class="form-label">Amount (excl. GST) ₹</label><input type="number" placeholder="100000"></div></div><div class="form-row"><div><label class="form-label">GST Rate</label><select><option>18%</option><option>12%</option><option>5%</option><option>0%</option></select></div><div><label class="form-label">Service Type</label><select><option>Social Media</option><option>SEO</option><option>Web Dev</option><option>Performance Mktg</option></select></div></div>`},
+  expense:{title:'Add Expense',html:`<div class="form-row"><div><label class="form-label">Date</label><input type="date"></div><div><label class="form-label">Category</label><select><option>Salaries</option><option>Rent</option><option>Software</option><option>Freelancers</option><option>Marketing</option><option>Content Shoots</option><option>Travel</option><option>Utilities</option><option>Miscellaneous</option></select></div></div><div class="form-row"><div><label class="form-label">Vendor</label><input placeholder="Vendor name"></div><div><label class="form-label">Amount (₹)</label><input type="number" placeholder="50000"></div></div><div class="form-row"><div><label class="form-label">Payment Method</label><select><option>Bank Transfer</option><option>UPI</option><option>Cash</option><option>Card</option></select></div><div><label class="form-label">Type</label><select><option>Fixed</option><option>Variable</option></select></div></div><div style="margin-bottom:8px"><label class="form-label">Description</label><input placeholder="Brief description"></div>`}
+};
+function openModal(type){
+  const m=MODALS[type];
+  document.getElementById('modal-title').textContent=m.title;
+  document.getElementById('modal-body').innerHTML=m.html;
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden')}
+
+initPage('overview');
+</script>
+</body>
+</html>
