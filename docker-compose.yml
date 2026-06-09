@@ -18,8 +18,6 @@ services:
     build: ./server
     container_name: cfo_backend
     restart: unless-stopped
-    ports:
-      - "5018:5000"
     environment:
       PORT: "5000"
       NODE_ENV: production
