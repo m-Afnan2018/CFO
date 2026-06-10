@@ -7,6 +7,9 @@ export interface ISalaryRecord extends Document {
   baseSalary: number;
   incentives: number;
   deductions: number;
+  leaveDays: number;
+  leaveDeduction: number;
+  bonus: number;
   finalSalary: number;
   status: 'Paid' | 'Pending';
   payPeriod: string;       // "2026-06"
@@ -22,6 +25,9 @@ const SalaryRecordSchema = new Schema<ISalaryRecord>(
     baseSalary: Number,
     incentives: { type: Number, default: 0 },
     deductions: { type: Number, default: 0 },
+    leaveDays: { type: Number, default: 0 },
+    leaveDeduction: { type: Number, default: 0 },
+    bonus: { type: Number, default: 0 },
     finalSalary: Number,
     status: { type: String, enum: ['Paid', 'Pending'], default: 'Pending' },
     payPeriod: { type: String, required: true },

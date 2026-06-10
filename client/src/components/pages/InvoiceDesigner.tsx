@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import type { Invoice, LineItem } from '@/types';
+import type { Invoice, LineItem, ServiceItem } from '@/types';
 import { api } from '@/lib/api';
 
 const COMPANY = {
@@ -71,12 +71,40 @@ export default function InvoiceDesigner({ invoice, onSave, onClose }: Props) {
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState('');
   const [clientList, setClientList] = useState<string[]>([]);
+  const [clientData, setClientData] = useState<{ name: string; email: string; serviceBreakdown: ServiceItem[] }[]>([]);
 
   useEffect(() => {
     api.getClients()
-      .then(d => setClientList((d as { name: string }[]).map(c => c.name)))
+      .then(d => {
+        const clients = d as { name: string; email: string; serviceBreakdown: ServiceItem[] }[];
+        setClientData(clients);
+        setClientList(clients.map(c => c.name));
+      })
       .catch(() => {});
+    if (!isEdit) {
+      api.getNextInvoiceNumber()
+        .then(d => setInvNum((d as { number: string }).number))
+        .catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── derived ───────────────────────────────────────────────────────────────
+
+  const activeClient      = clientData.find(c => c.name === client);
+  const activeServices    = activeClient?.serviceBreakdown ?? [];
+  const checkedServiceSet = new Set(items.map(it => it.description));
+
+  function toggleService(svc: ServiceItem) {
+    if (checkedServiceSet.has(svc.name)) {
+      setItems(prev => prev.filter(it => it.description !== svc.name));
+    } else {
+      setItems(prev => {
+        const withoutEmptyPlaceholder = prev.filter(it => it.description || it.unitPrice);
+        return [...withoutEmptyPlaceholder, { description: svc.name, qty: '1', unitPrice: String(svc.amount) }];
+      });
+    }
+  }
 
   // ── computed ──────────────────────────────────────────────────────────────
 
@@ -294,8 +322,43 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
             <div className="form-field">
               <label className="form-label">Client Name *</label>
               <input className="form-input" list="inv-clients" placeholder="e.g. Nexus Brands"
-                value={client} onChange={e => { setClient(e.target.value); setError(''); }} />
+                value={client} onChange={e => {
+                  const name = e.target.value;
+                  setClient(name);
+                  setError('');
+                  const found = clientData.find(c => c.name === name);
+                  if (found?.email && !clientEmail) setClientEmail(found.email);
+                }} />
             </div>
+            {activeServices.length > 0 && (
+              <div className="form-field">
+                <label className="form-label">Services</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '4px' }}>
+                  {activeServices.map(svc => (
+                    <label
+                      key={svc.name}
+                      style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer',
+                        padding: '6px 10px', borderRadius: '6px',
+                        background: checkedServiceSet.has(svc.name) ? 'var(--indigo-dim)' : 'var(--surface)',
+                        border: `1px solid ${checkedServiceSet.has(svc.name) ? 'var(--indigo)' : 'var(--border)'}`,
+                        transition: 'all 0.1s',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checkedServiceSet.has(svc.name)}
+                        onChange={() => toggleService(svc)}
+                        style={{ accentColor: 'var(--indigo)', width: '14px', height: '14px', flexShrink: 0 }}
+                      />
+                      <span style={{ flex: 1, fontSize: '12px', color: 'var(--text)' }}>{svc.name}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text3)', fontFamily: 'monospace' }}>
+                        ₹{svc.amount.toLocaleString('en-IN')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="form-field">
               <label className="form-label">Email</label>
               <input className="form-input" type="email" placeholder="billing@client.com"

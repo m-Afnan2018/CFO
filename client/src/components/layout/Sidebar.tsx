@@ -1,13 +1,9 @@
 'use client';
-import type { Page } from '@/types';
-
-interface SidebarProps {
-  activePage: Page;
-  onNavigate: (page: Page) => void;
-}
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface NavItem {
-  page: Page;
+  href: string;
   icon: string;
   label: string;
   badge?: number;
@@ -16,36 +12,37 @@ interface NavItem {
 const sections: { label: string; items: NavItem[] }[] = [
   {
     label: 'Overview',
-    items: [{ page: 'overview', icon: 'ti-layout-dashboard', label: 'Dashboard' }],
+    items: [{ href: '/', icon: 'ti-layout-dashboard', label: 'Dashboard' }],
   },
   {
     label: 'Finance',
     items: [
-      { page: 'clients', icon: 'ti-users', label: 'Clients' },
-      { page: 'invoices', icon: 'ti-file-invoice', label: 'Invoices', badge: 3 },
-      { page: 'payments', icon: 'ti-credit-card', label: 'Payments' },
-      { page: 'expenses', icon: 'ti-receipt', label: 'Expenses' },
-      { page: 'payroll', icon: 'ti-users-group', label: 'Payroll' },
+      { href: '/clients',  icon: 'ti-users',        label: 'Clients' },
+      { href: '/invoices', icon: 'ti-file-invoice',  label: 'Invoices' },
+      { href: '/payments', icon: 'ti-credit-card',   label: 'Payments' },
+      { href: '/expenses', icon: 'ti-receipt',       label: 'Expenses' },
+      { href: '/payroll',  icon: 'ti-users-group',   label: 'Payroll' },
     ],
   },
   {
     label: 'Analytics',
     items: [
-      { page: 'cashflow', icon: 'ti-trending-up', label: 'Cash Flow' },
-      { page: 'profit', icon: 'ti-chart-pie', label: 'Profitability' },
-      { page: 'gst', icon: 'ti-file-text', label: 'GST / Tax' },
+      { href: '/cashflow', icon: 'ti-trending-up', label: 'Cash Flow' },
+      { href: '/profit',   icon: 'ti-chart-pie',   label: 'Profitability' },
+      { href: '/gst',      icon: 'ti-file-text',   label: 'GST / Tax' },
     ],
   },
   {
     label: 'System',
     items: [
-      { page: 'alerts', icon: 'ti-bell', label: 'Alerts', badge: 5 },
-      { page: 'reports', icon: 'ti-report', label: 'Reports' },
+      { href: '/alerts',  icon: 'ti-bell',   label: 'Alerts' },
+      { href: '/reports', icon: 'ti-report', label: 'Reports' },
     ],
   },
 ];
 
-export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
+export default function Sidebar() {
+  const pathname = usePathname();
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
@@ -62,15 +59,15 @@ export default function Sidebar({ activePage, onNavigate }: SidebarProps) {
           <div key={section.label}>
             <div className="nav-label">{section.label}</div>
             {section.items.map(item => (
-              <div
-                key={item.page}
-                className={`nav-item${activePage === item.page ? ' active' : ''}`}
-                onClick={() => onNavigate(item.page)}
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-item${pathname === item.href ? ' active' : ''}`}
               >
                 <i className={`ti ${item.icon}`} />
                 {item.label}
                 {item.badge && <span className="nav-badge">{item.badge}</span>}
-              </div>
+              </Link>
             ))}
           </div>
         ))}

@@ -13,12 +13,18 @@ export type Page =
 
 export type ColorKey = 'emerald' | 'indigo' | 'blue' | 'amber' | 'red';
 
+export interface ServiceItem {
+  name: string;
+  amount: number;
+}
+
 export interface Client {
   _id: string;
   name: string;
   email: string;
   service: string;
   monthlyBilling: number;
+  serviceBreakdown?: ServiceItem[];
   manager: string;
   renewal: string;
   status: 'Active' | 'Inactive' | 'Renewal Due';
@@ -81,6 +87,9 @@ export interface SalaryRecord {
   baseSalary: number;
   incentives: number;
   deductions: number;
+  leaveDays?: number;
+  leaveDeduction?: number;
+  bonus?: number;
   finalSalary: number;
   status: 'Paid' | 'Pending';
   payPeriod: string;

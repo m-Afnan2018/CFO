@@ -1,54 +1,63 @@
 'use client';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { Page, DashboardKPIs, Invoice, Client, Employee } from '@/types';
+import { useRouter } from 'next/navigation';
+import type { DashboardKPIs, Invoice, Client, Employee } from '@/types';
 import { api } from '@/lib/api';
 
 const RevenueExpenseChart = dynamic(() => import('@/components/charts/RevenueExpenseChart'), { ssr: false });
-const MarginChart = dynamic(() => import('@/components/charts/MarginChart'), { ssr: false });
-const ServiceMixChart = dynamic(() => import('@/components/charts/ServiceMixChart'), { ssr: false });
+const MarginChart         = dynamic(() => import('@/components/charts/MarginChart'),         { ssr: false });
+const ServiceMixChart     = dynamic(() => import('@/components/charts/ServiceMixChart'),     { ssr: false });
 
-const defaultKPIs: DashboardKPIs = {
-  totalRevenue: 4260000, netProfit: 1420000, netProfitMargin: 33.3,
-  pendingReceivables: 890000, totalExpenses: 2840000, cashInBank: 2210000,
-  monthlyBurn: 940000, activeClients: 21, totalClients: 24,
-  overduePayments: 320000, overdueCount: 4, pendingCount: 12,
+const zeroKPIs: DashboardKPIs = {
+  totalRevenue: 0, netProfit: 0, netProfitMargin: 0,
+  pendingReceivables: 0, totalExpenses: 0, cashInBank: 0,
+  monthlyBurn: 0, activeClients: 0, totalClients: 0,
+  overduePayments: 0, overdueCount: 0, pendingCount: 0,
 };
 
-const defaultInvoices: Invoice[] = [
-  { _id: '1', invoiceNumber: '#INV-0089', client: 'Nexus Brands', date: '12 Mar 2025', dueDate: '15 Mar', amount: 105932, gst: 19068, total: 125000, status: 'Paid' },
-  { _id: '2', invoiceNumber: '#INV-0088', client: 'BluePeak Retail', date: '10 Mar 2025', dueDate: '14 Mar', amount: 83051, gst: 14949, total: 98000, status: 'Paid' },
-  { _id: '3', invoiceNumber: '#INV-0087', client: 'Kratos Corp', date: '08 Mar 2025', dueDate: '11 Mar', amount: 63559, gst: 11441, total: 75000, status: 'Partial' },
-  { _id: '4', invoiceNumber: '#INV-0086', client: 'Orion Digital', date: '05 Mar 2025', dueDate: '07 Mar', amount: 118644, gst: 21356, total: 140000, status: 'Overdue' },
-  { _id: '5', invoiceNumber: '#INV-0085', client: 'SkyEdge Media', date: '02 Mar 2025', dueDate: '01 Mar', amount: 52966, gst: 9534, total: 62500, status: 'Pending' },
-];
-
 const statusBadge: Record<string, string> = { Paid: 'bg', Partial: 'ba', Overdue: 'br', Pending: 'bb' };
+const barColors = ['var(--emerald)', 'var(--indigo)', 'var(--blue)', 'var(--amber)', 'var(--text3)'];
 
 function fmt(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
   return `₹${n.toLocaleString('en-IN')}`;
 }
 
-interface Props { onNavigate: (p: Page) => void; }
-
-export default function Overview({ onNavigate }: Props) {
-  const [kpis, setKpis] = useState<DashboardKPIs>(defaultKPIs);
-  const [invoices, setInvoices] = useState<Invoice[]>(defaultInvoices);
+export default function Overview() {
+  const router = useRouter();
+  const [kpis, setKpis]             = useState<DashboardKPIs>(zeroKPIs);
+  const [invoices, setInvoices]     = useState<Invoice[]>([]);
+  const [clients, setClients]       = useState<Client[]>([]);
   const [alertCount, setAlertCount] = useState<number | null>(null);
 
   useEffect(() => {
-    api.getDashboardKPIs().then((d) => setKpis(d as DashboardKPIs)).catch(() => {});
-    api.getInvoices().then((d) => setInvoices((d as Invoice[]).slice(0, 5))).catch(() => {});
+    api.getDashboardKPIs().then(d => setKpis(d as DashboardKPIs)).catch(() => {});
+    api.getInvoices().then(d => setInvoices(d as Invoice[])).catch(() => {});
+    api.getClients().then(d => setClients(d as Client[])).catch(() => {});
     Promise.all([api.getInvoices(), api.getClients(), api.getEmployees()])
       .then(([inv, cli, emp]) => {
         const invoiceAlerts = (inv as Invoice[]).filter(i => ['Overdue', 'Pending', 'Partial'].includes(i.status)).length;
         const renewalAlerts = (cli as Client[]).filter(c => c.status === 'Renewal Due').length;
-        const payrollAlert = (emp as Employee[]).some(e => e.status === 'Pending') ? 1 : 0;
+        const payrollAlert  = (emp as Employee[]).some(e => e.status === 'Pending') ? 1 : 0;
         setAlertCount(invoiceAlerts + renewalAlerts + payrollAlert);
       })
       .catch(() => {});
   }, []);
+
+  const topClients   = [...clients].sort((a, b) => b.monthlyBilling - a.monthlyBilling).slice(0, 5);
+  const maxBilling   = topClients[0]?.monthlyBilling || 1;
+  const upcomingDues = invoices.filter(i => ['Pending', 'Partial', 'Overdue'].includes(i.status)).slice(0, 4);
+
+  const collectionEff = kpis.totalRevenue > 0
+    ? Math.round(((kpis.totalRevenue - kpis.pendingReceivables) / kpis.totalRevenue) * 100)
+    : 0;
+  const cashRunway = kpis.monthlyBurn > 0
+    ? (kpis.cashInBank / kpis.monthlyBurn).toFixed(1)
+    : '—';
+  const avgInvoice = invoices.length > 0
+    ? Math.round(invoices.reduce((s, i) => s + i.total, 0) / invoices.length)
+    : 0;
 
   return (
     <div>
@@ -67,7 +76,7 @@ export default function Overview({ onNavigate }: Props) {
               <option>All Services</option><option>Social Media</option><option>SEO</option><option>Web Dev</option><option>Perf. Mktg</option>
             </select>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => onNavigate('alerts')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => router.push('/alerts')}>
             <div className="dot-alert" />
             <span style={{ fontSize: '12px', color: 'var(--text2)' }}>{alertCount === null ? '…' : alertCount} Alert{alertCount === 1 ? '' : 's'}</span>
           </div>
@@ -79,7 +88,7 @@ export default function Overview({ onNavigate }: Props) {
           <div className="kpi">
             <div className="kpi-label">Total Revenue<div className="kpi-ico" style={{ background: 'var(--emerald-dim)' }}><i className="ti ti-trending-up" style={{ color: 'var(--emerald)' }} /></div></div>
             <div className="kpi-value">{fmt(kpis.totalRevenue)}</div>
-            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />+18.4% vs last month</div>
+            <div className="kpi-change" style={{ color: 'var(--text2)' }}>This month</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Net Profit<div className="kpi-ico" style={{ background: 'var(--indigo-dim)' }}><i className="ti ti-coin" style={{ color: 'var(--indigo)' }} /></div></div>
@@ -94,22 +103,22 @@ export default function Overview({ onNavigate }: Props) {
           <div className="kpi">
             <div className="kpi-label">Total Expenses<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-receipt" style={{ color: 'var(--red)' }} /></div></div>
             <div className="kpi-value">{fmt(kpis.totalExpenses)}</div>
-            <div className="kpi-change down"><i className="ti ti-arrow-down-right" style={{ fontSize: '11px' }} />+6.2% vs last month</div>
+            <div className="kpi-change" style={{ color: 'var(--text2)' }}>This month</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Cash In Bank<div className="kpi-ico" style={{ background: 'var(--blue-dim)' }}><i className="ti ti-building-bank" style={{ color: 'var(--blue)' }} /></div></div>
             <div className="kpi-value">{fmt(kpis.cashInBank)}</div>
-            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />Healthy runway</div>
+            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />{cashRunway === '—' ? 'Available' : `${cashRunway}mo runway`}</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Monthly Burn<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-flame" style={{ color: 'var(--red)' }} /></div></div>
             <div className="kpi-value">{fmt(kpis.monthlyBurn)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>~2.4 months runway</div>
+            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{cashRunway === '—' ? 'No burn data' : `${cashRunway}mo runway`}</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Active Clients<div className="kpi-ico" style={{ background: 'var(--indigo-dim)' }}><i className="ti ti-users" style={{ color: 'var(--indigo)' }} /></div></div>
             <div className="kpi-value">{kpis.activeClients}</div>
-            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />+3 this month</div>
+            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{kpis.totalClients} total</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Overdue Payments<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-alert-triangle" style={{ color: 'var(--red)' }} /></div></div>
@@ -132,17 +141,15 @@ export default function Overview({ onNavigate }: Props) {
         <div className="grid3">
           <div className="card">
             <div className="card-title">Top Clients by Revenue</div>
-            {[
-              { label: 'Nexus Brands', w: 88, color: 'var(--emerald)', val: '₹7.2L' },
-              { label: 'BluePeak Retail', w: 74, color: 'var(--indigo)', val: '₹5.8L' },
-              { label: 'Orion Digital', w: 62, color: 'var(--blue)', val: '₹4.9L' },
-              { label: 'Kratos Corp', w: 51, color: 'var(--amber)', val: '₹3.8L' },
-              { label: 'SkyEdge Media', w: 40, color: 'var(--text3)', val: '₹3.1L' },
-            ].map(r => (
-              <div key={r.label} className="bar-row">
-                <span className="bar-label">{r.label}</span>
-                <div className="bar-track"><div className="bar-fill" style={{ width: `${r.w}%`, background: r.color }} /></div>
-                <span className="bar-val">{r.val}</span>
+            {topClients.length === 0 ? (
+              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No client data yet</div>
+            ) : topClients.map((c, i) => (
+              <div key={c._id} className="bar-row">
+                <span className="bar-label">{c.name}</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: `${Math.round((c.monthlyBilling / maxBilling) * 100)}%`, background: barColors[i] }} />
+                </div>
+                <span className="bar-val">{fmt(c.monthlyBilling)}</span>
               </div>
             ))}
           </div>
@@ -153,12 +160,12 @@ export default function Overview({ onNavigate }: Props) {
           <div className="card">
             <div className="card-title">Financial Health</div>
             {[
-              { k: 'Collection Efficiency', v: '87%', c: 'var(--emerald)' },
-              { k: 'MoM Revenue Growth', v: '+18.4%', c: 'var(--emerald)' },
-              { k: 'Avg Invoice Value', v: '₹74,800', c: '' },
-              { k: 'Avg Days to Pay', v: '22 days', c: 'var(--amber)' },
-              { k: 'Monthly Burn Rate', v: '₹9.4L', c: 'var(--red)' },
-              { k: 'Cash Runway', v: '2.4 months', c: '' },
+              { k: 'Collection Efficiency', v: `${collectionEff}%`,                                c: collectionEff >= 80 ? 'var(--emerald)' : collectionEff >= 60 ? 'var(--amber)' : 'var(--red)' },
+              { k: 'Avg Invoice Value',     v: avgInvoice > 0 ? fmt(avgInvoice) : '—',             c: '' },
+              { k: 'Monthly Burn Rate',     v: fmt(kpis.monthlyBurn),                              c: 'var(--red)' },
+              { k: 'Cash Runway',           v: cashRunway === '—' ? '—' : `${cashRunway} months`,  c: '' },
+              { k: 'Pending Invoices',      v: String(kpis.pendingCount),                          c: kpis.pendingCount > 0 ? 'var(--amber)' : '' },
+              { k: 'Overdue Amount',        v: fmt(kpis.overduePayments),                          c: kpis.overduePayments > 0 ? 'var(--red)' : '' },
             ].map(row => (
               <div key={row.k} className="stat-row">
                 <span className="sk">{row.k}</span>
@@ -171,35 +178,38 @@ export default function Overview({ onNavigate }: Props) {
         <div className="grid21">
           <div className="card">
             <div className="card-title">Recent Transactions</div>
-            <table>
-              <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
-              <tbody>
-                {invoices.map(inv => (
-                  <tr key={inv._id}>
-                    <td style={{ color: 'var(--indigo)', fontWeight: 700 }}>{inv.invoiceNumber}</td>
-                    <td>{inv.client}</td>
-                    <td style={{ color: 'var(--text)', fontWeight: 600 }}>₹{inv.total.toLocaleString('en-IN')}</td>
-                    <td>{inv.date}</td>
-                    <td><span className={`badge ${statusBadge[inv.status]}`}>{inv.status}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {invoices.length === 0 ? (
+              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No transactions yet</div>
+            ) : (
+              <table>
+                <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+                <tbody>
+                  {invoices.slice(0, 5).map(inv => (
+                    <tr key={inv._id}>
+                      <td style={{ color: 'var(--indigo)', fontWeight: 700 }}>{inv.invoiceNumber}</td>
+                      <td>{inv.client}</td>
+                      <td style={{ color: 'var(--text)', fontWeight: 600 }}>₹{inv.total.toLocaleString('en-IN')}</td>
+                      <td>{inv.date}</td>
+                      <td><span className={`badge ${statusBadge[inv.status]}`}>{inv.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
           <div className="card">
             <div className="card-title">Upcoming Dues</div>
-            {[
-              { name: 'SkyEdge Media', due: 'Due: 15 Mar 2025', amt: '₹62,500', c: 'var(--amber)' },
-              { name: 'BrandMart Ltd', due: 'Due: 18 Mar 2025', amt: '₹88,000', c: 'var(--amber)' },
-              { name: 'Zenith Works', due: 'Due: 22 Mar 2025', amt: '₹45,000', c: 'var(--text)' },
-              { name: 'Apex Finance', due: 'Due: 28 Mar 2025', amt: '₹1,10,000', c: 'var(--text)' },
-            ].map(d => (
-              <div key={d.name} className="stat-row">
+            {upcomingDues.length === 0 ? (
+              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No pending dues</div>
+            ) : upcomingDues.map(inv => (
+              <div key={inv._id} className="stat-row">
                 <div>
-                  <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: 500 }}>{d.name}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)' }}>{d.due}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: 500 }}>{inv.client}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Due: {inv.dueDate || '—'}</div>
                 </div>
-                <span style={{ color: d.c, fontWeight: 700 }}>{d.amt}</span>
+                <span style={{ color: inv.status === 'Overdue' ? 'var(--red)' : 'var(--amber)', fontWeight: 700 }}>
+                  {fmt(inv.total)}
+                </span>
               </div>
             ))}
           </div>

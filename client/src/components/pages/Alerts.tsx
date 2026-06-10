@@ -1,9 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import type { Page, Invoice, Client, Employee } from '@/types';
+import { useRouter } from 'next/navigation';
+import type { Invoice, Client, Employee } from '@/types';
 import { api } from '@/lib/api';
-
-interface Props { onNavigate: (p: Page) => void; }
 
 interface AlertItem {
   id: string;
@@ -13,7 +12,7 @@ interface AlertItem {
   title: string;
   sub: string;
   action: string;
-  target: Page;
+  target: string;
 }
 
 function fmt(n: number) {
@@ -21,7 +20,8 @@ function fmt(n: number) {
   return `₹${n.toLocaleString('en-IN')}`;
 }
 
-export default function Alerts({ onNavigate }: Props) {
+export default function Alerts() {
+  const router = useRouter();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -46,7 +46,7 @@ export default function Alerts({ onNavigate }: Props) {
       icon: 'ti-alert-triangle', color: 'var(--red)', cls: 'a-od',
       title: `Invoice Overdue — ${inv.client}`,
       sub: `${inv.invoiceNumber} · ${fmt(inv.total)} · due ${inv.dueDate}`,
-      action: 'Send Reminder', target: 'invoices',
+      action: 'Send Reminder', target: '/invoices',
     });
   });
 
@@ -56,7 +56,7 @@ export default function Alerts({ onNavigate }: Props) {
       icon: 'ti-clock', color: 'var(--amber)', cls: 'a-pe',
       title: `Invoice ${inv.status} — ${inv.client}`,
       sub: `${inv.invoiceNumber} · ${fmt(inv.total)} · due ${inv.dueDate}`,
-      action: 'Remind', target: 'invoices',
+      action: 'Remind', target: '/invoices',
     });
   });
 
@@ -66,7 +66,7 @@ export default function Alerts({ onNavigate }: Props) {
       icon: 'ti-refresh', color: 'var(--amber)', cls: 'a-pe',
       title: `Contract Renewal — ${c.name}`,
       sub: `Renewal: ${c.renewal} · ${fmt(c.monthlyBilling)}/month`,
-      action: 'Review', target: 'clients',
+      action: 'Review', target: '/clients',
     });
   });
 
@@ -77,7 +77,7 @@ export default function Alerts({ onNavigate }: Props) {
       icon: 'ti-users', color: 'var(--blue)', cls: 'a-in',
       title: 'Payroll Pending',
       sub: `${pendingPayroll.length} employee${pendingPayroll.length === 1 ? '' : 's'} awaiting payout · ${fmt(pendingPayroll.reduce((s, e) => s + (e.finalSalary || 0), 0))}`,
-      action: 'View', target: 'payroll',
+      action: 'View', target: '/payroll',
     });
   }
 
@@ -114,7 +114,7 @@ export default function Alerts({ onNavigate }: Props) {
                   <div style={{ fontSize: '13px', color: 'var(--text)', fontWeight: 600 }}>{a.title}</div>
                   <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>{a.sub}</div>
                 </div>
-                <button className="btn" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: '11px', flexShrink: 0 }} onClick={() => onNavigate(a.target)}>{a.action}</button>
+                <button className="btn" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: '11px', flexShrink: 0 }} onClick={() => router.push(a.target)}>{a.action}</button>
               </div>
             ))}
           </div>

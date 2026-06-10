@@ -11,22 +11,16 @@ interface ModalProps {
 export default function Modal({ title, isOpen, onClose, onSave, children }: ModalProps) {
   if (!isOpen) return null;
   return (
-    <div
-      className="modal-overlay"
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
+    <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
-        <div className="modal-title">
-          <span>{title}</span>
-          <span
-            style={{ cursor: 'pointer', color: 'var(--text3)', fontSize: '20px' }}
-            onClick={onClose}
-          >
+        <div className="modal-header">
+          <span className="modal-title">{title}</span>
+          <button className="modal-close" onClick={onClose}>
             <i className="ti ti-x" />
-          </span>
+          </button>
         </div>
-        <div>{children}</div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+        <div className="modal-body">{children}</div>
+        <div className="modal-footer">
           <button className="btn" onClick={onClose}>Cancel</button>
           <button className="btn btn-p" onClick={onSave}>Save</button>
         </div>

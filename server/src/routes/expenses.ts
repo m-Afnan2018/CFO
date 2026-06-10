@@ -23,6 +23,16 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+router.put('/:id', async (req: Request, res: Response) => {
+  try {
+    const expense = await Expense.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!expense) return res.status(404).json({ error: 'Not found' });
+    res.json(expense);
+  } catch {
+    res.status(400).json({ error: 'Invalid data' });
+  }
+});
+
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     await Expense.findByIdAndDelete(req.params.id);

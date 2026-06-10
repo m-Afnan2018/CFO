@@ -95,6 +95,9 @@ router.post('/run', async (req: Request, res: Response) => {
       baseSalary: emp.baseSalary,
       incentives: emp.incentives,
       deductions: emp.deductions,
+      leaveDays: 0,
+      leaveDeduction: 0,
+      bonus: 0,
       finalSalary: emp.finalSalary,
       status: 'Pending' as const,
       payPeriod: period,
@@ -120,10 +123,10 @@ router.put('/period/:period/process', async (req: Request, res: Response) => {
   }
 });
 
-// PUT /:id — update a single record (status toggle)
+// PUT /:id — update a single record (partial update)
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const record = await SalaryRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const record = await SalaryRecord.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
     if (!record) return res.status(404).json({ error: 'Not found' });
     res.json(record);
   } catch {

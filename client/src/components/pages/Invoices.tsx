@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import DeleteConfirm from '@/components/ui/DeleteConfirm';
 import type { Invoice } from '@/types';
 import { api } from '@/lib/api';
-import InvoiceDesigner from './InvoiceDesigner';
 
 const statusBadge: Record<string, string> = { Paid: 'bg', Partial: 'ba', Overdue: 'br', Pending: 'bb' };
 
@@ -11,14 +12,22 @@ function fmt(n: number) {
   return `₹${n.toLocaleString('en-IN')}`;
 }
 
+function fmtMonth(ym: string) {
+  const [y, m] = ym.split('-');
+  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${names[parseInt(m) - 1]} ${y}`;
+}
+
 export default function Invoices() {
-  const [invoices, setInvoices]           = useState<Invoice[]>([]);
-  const [loaded, setLoaded]               = useState(false);
-  const [statusFilter, setStatusFilter]   = useState('All');
-  const [designing, setDesigning]         = useState(false);
-  const [editTarget, setEditTarget]       = useState<Invoice | undefined>(undefined);
-  const [deleteId, setDeleteId]           = useState<string | null>(null);
-  const [deleting, setDeleting]           = useState(false);
+  const router = useRouter();
+  const [invoices, setInvoices]         = useState<Invoice[]>([]);
+  const [loaded, setLoaded]             = useState(false);
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [monthFilter, setMonthFilter]   = useState('');
+  const [searchQ, setSearchQ]           = useState('');
+  const [deleteId, setDeleteId]         = useState<string | null>(null);
+  const [deleting, setDeleting]         = useState(false);
+  const [markingPaid, setMarkingPaid]   = useState<string | null>(null);
 
   function load() {
     api.getInvoices()
@@ -28,24 +37,30 @@ export default function Invoices() {
 
   useEffect(() => { load(); }, []);
 
-  const displayed = statusFilter === 'All'
-    ? invoices
-    : invoices.filter(i => i.status === statusFilter);
+  const months = Array.from(new Set(
+    invoices.map(i => i.date?.slice(0, 7)).filter(Boolean) as string[]
+  )).sort((a, b) => b.localeCompare(a));
+
+  const displayed = invoices
+    .filter(i => statusFilter === 'All' || i.status === statusFilter)
+    .filter(i => !monthFilter || i.date?.startsWith(monthFilter))
+    .filter(i => !searchQ ||
+      i.client.toLowerCase().includes(searchQ.toLowerCase()) ||
+      i.invoiceNumber.toLowerCase().includes(searchQ.toLowerCase())
+    );
 
   const totalInvoiced = invoices.reduce((s, i) => s + i.total, 0);
   const collected     = invoices.filter(i => i.status === 'Paid').reduce((s, i) => s + i.total, 0);
   const overdue       = invoices.filter(i => i.status === 'Overdue').reduce((s, i) => s + i.total, 0);
   const pending       = invoices.filter(i => ['Pending', 'Partial'].includes(i.status)).reduce((s, i) => s + i.total, 0);
 
-  function openNew() { setEditTarget(undefined); setDesigning(true); }
-  function openEdit(inv: Invoice) { setEditTarget(inv); setDesigning(true); }
-
-  function handleSaved(inv: Invoice) {
-    setInvoices(prev => {
-      const idx = prev.findIndex(i => i._id === inv._id);
-      return idx >= 0 ? prev.map(i => i._id === inv._id ? inv : i) : [inv, ...prev];
-    });
-    setDesigning(false);
+  async function markAsPaid(inv: Invoice) {
+    setMarkingPaid(inv._id);
+    try {
+      const updated = await api.updateInvoice(inv._id, { status: 'Paid' });
+      setInvoices(prev => prev.map(i => i._id === inv._id ? updated as Invoice : i));
+    } catch {}
+    setMarkingPaid(null);
   }
 
   async function confirmDelete() {
@@ -59,21 +74,27 @@ export default function Invoices() {
     setDeleteId(null);
   }
 
-  if (designing) {
-    return (
-      <InvoiceDesigner
-        invoice={editTarget}
-        onSave={handleSaved}
-        onClose={() => setDesigning(false)}
-      />
-    );
-  }
-
   return (
     <div>
       <div className="topbar">
         <div className="topbar-title">Invoice Management</div>
         <div className="topbar-right">
+          <input
+            type="text"
+            placeholder="Search client / invoice…"
+            style={{ width: '180px' }}
+            value={searchQ}
+            onChange={e => setSearchQ(e.target.value)}
+          />
+          {months.length > 0 && (
+            <div className="fp">
+              <i className="ti ti-calendar" style={{ fontSize: '13px' }} />
+              <select value={monthFilter} onChange={e => setMonthFilter(e.target.value)}>
+                <option value="">All Months</option>
+                {months.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
+              </select>
+            </div>
+          )}
           <div className="fp">
             <i className="ti ti-filter" style={{ fontSize: '13px' }} />
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
@@ -84,7 +105,7 @@ export default function Invoices() {
               <option>Partial</option>
             </select>
           </div>
-          <button className="btn btn-p" onClick={openNew}>
+          <button className="btn btn-p" onClick={() => router.push('/invoices/new')}>
             <i className="ti ti-plus" />New Invoice
           </button>
         </div>
@@ -129,10 +150,12 @@ export default function Invoices() {
           ) : displayed.length === 0 ? (
             <div style={{ padding: '32px 0', textAlign: 'center' }}>
               <div style={{ fontSize: '13px', color: 'var(--text3)', marginBottom: '12px' }}>
-                {statusFilter === 'All' ? 'No invoices yet' : `No ${statusFilter} invoices`}
+                {statusFilter === 'All' && !searchQ && !monthFilter
+                  ? 'No invoices yet'
+                  : 'No invoices match your filters'}
               </div>
-              {statusFilter === 'All' && (
-                <button className="btn btn-p" onClick={openNew}>
+              {statusFilter === 'All' && !searchQ && !monthFilter && (
+                <button className="btn btn-p" onClick={() => router.push('/invoices/new')}>
                   <i className="ti ti-plus" />Create your first invoice
                 </button>
               )}
@@ -158,8 +181,19 @@ export default function Invoices() {
                     <td><span className={`badge ${statusBadge[inv.status]}`}>{inv.status}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: '6px' }}>
+                        {inv.status !== 'Paid' && (
+                          <button
+                            className="btn"
+                            style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--emerald)' }}
+                            title="Mark as Paid"
+                            onClick={() => markAsPaid(inv)}
+                            disabled={markingPaid === inv._id}
+                          >
+                            <i className={`ti ${markingPaid === inv._id ? 'ti-loader-2' : 'ti-circle-check'}`} style={{ fontSize: '13px' }} />
+                          </button>
+                        )}
                         <button className="btn" style={{ padding: '4px 9px', fontSize: '11px' }}
-                          title="Edit" onClick={() => openEdit(inv)}>
+                          title="Edit" onClick={() => router.push(`/invoices/${inv._id}/edit`)}>
                           <i className="ti ti-pencil" style={{ fontSize: '12px' }} />
                         </button>
                         <button className="btn" style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--red)' }}
@@ -177,26 +211,13 @@ export default function Invoices() {
       </div>
 
       {deleteId && (
-        <div className="modal-overlay" onClick={() => setDeleteId(null)}>
-          <div className="modal" style={{ maxWidth: '360px' }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="modal-title">Delete Invoice</span>
-              <button className="modal-close" onClick={() => setDeleteId(null)}><i className="ti ti-x" /></button>
-            </div>
-            <div className="modal-body">
-              <p style={{ fontSize: '13px', color: 'var(--text2)', margin: 0 }}>
-                This will permanently delete the invoice. This cannot be undone.
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button className="btn" onClick={() => setDeleteId(null)}>Cancel</button>
-              <button className="btn" style={{ background: 'var(--red)', color: '#fff', border: 'none' }}
-                onClick={confirmDelete} disabled={deleting}>
-                {deleting ? 'Deleting…' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteConfirm
+          title="Delete Invoice"
+          message="This will permanently delete the invoice. This cannot be undone."
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteId(null)}
+          loading={deleting}
+        />
       )}
     </div>
   );

@@ -1,10 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IServiceItem {
+  name: string;
+  amount: number;
+}
+
 export interface IClient extends Document {
   name: string;
   email: string;
   service: string;
   monthlyBilling: number;
+  serviceBreakdown: IServiceItem[];
   manager: string;
   renewal: string;
   status: 'Active' | 'Inactive' | 'Renewal Due';
@@ -12,12 +18,18 @@ export interface IClient extends Document {
   colorKey: 'emerald' | 'indigo' | 'blue' | 'amber' | 'red';
 }
 
+const ServiceItemSchema = new Schema<IServiceItem>(
+  { name: { type: String, required: true }, amount: { type: Number, required: true } },
+  { _id: false }
+);
+
 const ClientSchema = new Schema<IClient>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
     service: String,
     monthlyBilling: Number,
+    serviceBreakdown: { type: [ServiceItemSchema], default: [] },
     manager: String,
     renewal: String,
     status: { type: String, enum: ['Active', 'Inactive', 'Renewal Due'], default: 'Active' },

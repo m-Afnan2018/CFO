@@ -38,6 +38,8 @@ export const api = {
   updateClient: (id: string, data: unknown) => put(`/clients/${id}`, data),
   deleteClient: (id: string) => del(`/clients/${id}`),
   getInvoices: (status?: string) => get(`/invoices${status ? `?status=${status}` : ''}`),
+  getInvoice: (id: string) => get(`/invoices/${id}`),
+  getNextInvoiceNumber: () => get('/invoices/next-number'),
   createInvoice: (data: unknown) => post('/invoices', data),
   updateInvoice: (id: string, data: unknown) => put(`/invoices/${id}`, data),
   deleteInvoice: (id: string) => del(`/invoices/${id}`),
