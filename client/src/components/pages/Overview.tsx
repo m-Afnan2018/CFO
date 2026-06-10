@@ -1,13 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import type { DashboardKPIs, Invoice, Client, Employee } from '@/types';
 import { api } from '@/lib/api';
-
-const RevenueExpenseChart = dynamic(() => import('@/components/charts/RevenueExpenseChart'), { ssr: false });
-const MarginChart         = dynamic(() => import('@/components/charts/MarginChart'),         { ssr: false });
-const ServiceMixChart     = dynamic(() => import('@/components/charts/ServiceMixChart'),     { ssr: false });
 
 const zeroKPIs: DashboardKPIs = {
   totalRevenue: 0, netProfit: 0, netProfitMargin: 0,
@@ -64,18 +59,6 @@ export default function Overview() {
       <div className="topbar">
         <div className="topbar-title">CFO Overview</div>
         <div className="topbar-right">
-          <div className="fp">
-            <i className="ti ti-calendar" style={{ fontSize: '13px' }} />
-            <select defaultValue="This Month">
-              <option>This Month</option><option>Last Month</option><option>Q4 FY2025</option><option>FY 2024-25</option>
-            </select>
-          </div>
-          <div className="fp">
-            <i className="ti ti-filter" style={{ fontSize: '13px' }} />
-            <select defaultValue="All Services">
-              <option>All Services</option><option>Social Media</option><option>SEO</option><option>Web Dev</option><option>Perf. Mktg</option>
-            </select>
-          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => router.push('/alerts')}>
             <div className="dot-alert" />
             <span style={{ fontSize: '12px', color: 'var(--text2)' }}>{alertCount === null ? '…' : alertCount} Alert{alertCount === 1 ? '' : 's'}</span>
@@ -129,12 +112,16 @@ export default function Overview() {
 
         <div className="grid21">
           <div className="card">
-            <div className="card-title">Revenue & Expense Trend<span className="card-sub">Apr 2024 – Mar 2025</span></div>
-            <div className="cw"><RevenueExpenseChart /></div>
+            <div className="card-title">Revenue & Expense Trend<span className="card-sub">No data yet</span></div>
+            <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+              Add invoices and expenses to see the trend chart
+            </div>
           </div>
           <div className="card">
-            <div className="card-title">Profit Margin %<span className="card-sub">Monthly</span></div>
-            <div className="cw"><MarginChart /></div>
+            <div className="card-title">Profit Margin %<span className="card-sub">No data yet</span></div>
+            <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+              No margin data yet
+            </div>
           </div>
         </div>
 
@@ -155,7 +142,9 @@ export default function Overview() {
           </div>
           <div className="card">
             <div className="card-title">Service Revenue Mix</div>
-            <div className="cw cw-sm"><ServiceMixChart /></div>
+            <div style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+              No service data yet
+            </div>
           </div>
           <div className="card">
             <div className="card-title">Financial Health</div>

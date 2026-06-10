@@ -1,10 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import type { Invoice, Client } from '@/types';
 import { api } from '@/lib/api';
-
-const ProfitabilityChart = dynamic(() => import('@/components/charts/ProfitabilityChart'), { ssr: false });
 
 function fmt(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
@@ -63,8 +60,10 @@ export default function Profitability() {
         </div>
 
         <div className="card" style={{ marginBottom: '16px' }}>
-          <div className="card-title">Revenue by Service<span className="card-sub">From invoiced amounts, grouped by client service</span></div>
-          <div className="cw" style={{ height: '280px' }}><ProfitabilityChart /></div>
+          <div className="card-title">Revenue by Service<span className="card-sub">No data yet</span></div>
+          <div style={{ height: '280px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+            Add clients and invoices to see service-wise revenue
+          </div>
         </div>
 
         <div className="card">

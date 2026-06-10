@@ -1,10 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import type { Invoice, Expense, DashboardKPIs } from '@/types';
 import { api } from '@/lib/api';
-
-const CashFlowChart = dynamic(() => import('@/components/charts/CashFlowChart'), { ssr: false });
 
 function fmt(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
@@ -36,13 +33,7 @@ export default function CashFlow() {
     <div>
       <div className="topbar">
         <div className="topbar-title">Cash Flow Tracker</div>
-        <div className="topbar-right">
-          <div className="fp">
-            <select defaultValue="Last 12 Months">
-              <option>Last 12 Months</option><option>Last 6 Months</option><option>Last Quarter</option>
-            </select>
-          </div>
-        </div>
+        <div className="topbar-right" />
       </div>
       <div className="content">
         <div className="cf-sum">
@@ -52,8 +43,10 @@ export default function CashFlow() {
         </div>
         <div className="grid2">
           <div className="card">
-            <div className="card-title">Cash Flow Chart<span className="card-sub">Monthly net flow</span></div>
-            <div className="cw" style={{ height: '260px' }}><CashFlowChart /></div>
+            <div className="card-title">Cash Flow Chart<span className="card-sub">No data yet</span></div>
+            <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+              Add invoices and expenses to see monthly cash flow
+            </div>
           </div>
           <div className="card">
             <div className="card-title">Runway & Forecast</div>
