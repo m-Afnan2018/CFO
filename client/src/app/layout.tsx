@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Sidebar from '@/components/layout/Sidebar';
+import SidebarWrapper from '@/components/layout/SidebarWrapper';
 
 export const metadata: Metadata = {
   title: 'Ganesyx Pvt Ltd — CFO Finance Dashboard',
@@ -16,10 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <div id="app">
-          <Sidebar />
-          <div className="main">{children}</div>
-        </div>
+        <SidebarWrapper>{children}</SidebarWrapper>
       </body>
     </html>
   );

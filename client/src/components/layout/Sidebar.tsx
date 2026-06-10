@@ -41,10 +41,15 @@ const sections: { label: string; items: NavItem[] }[] = [
   },
 ];
 
+async function handleLogout() {
+  await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  window.location.href = '/login';
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   return (
-    <div className="sidebar">
+    <div className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="sidebar-logo">
         <div className="logo-mark">
           <div className="logo-icon">G</div>
@@ -54,7 +59,7 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      <div className="nav-section">
+      <div className="nav-section" style={{ flex: 1 }}>
         {sections.map(section => (
           <div key={section.label}>
             <div className="nav-label">{section.label}</div>
@@ -71,6 +76,16 @@ export default function Sidebar() {
             ))}
           </div>
         ))}
+      </div>
+      <div style={{ padding: '12px 10px', borderTop: '1px solid var(--border)' }}>
+        <button
+          onClick={handleLogout}
+          className="nav-item"
+          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', textAlign: 'left' }}
+        >
+          <i className="ti ti-logout" />
+          Sign Out
+        </button>
       </div>
     </div>
   );
