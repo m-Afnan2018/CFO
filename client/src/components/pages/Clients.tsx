@@ -4,6 +4,7 @@ import Modal from '@/components/ui/Modal';
 import DeleteConfirm from '@/components/ui/DeleteConfirm';
 import type { Client, ClientRecord, ClientBillingPeriod, ColorKey, ServiceItem, PaymentEntry } from '@/types';
 import { api } from '@/lib/api';
+import ClientsYearly from './ClientsYearly';
 
 const colorMap: Record<string, { bg: string; fg: string }> = {
   emerald: { bg: 'var(--emerald-dim)', fg: 'var(--emerald)' },
@@ -65,7 +66,7 @@ export default function Clients() {
   const [deleting, setDeleting] = useState(false);
 
   // ── Billing tab ───────────────────────────────────────────────
-  const [tab, setTab]                   = useState<'clients' | 'billing'>('clients');
+  const [tab, setTab]                   = useState<'clients' | 'billing' | 'yearly'>('clients');
   const [billingPeriods, setBillingPeriods] = useState<ClientBillingPeriod[]>([]);
   const [billingRecords, setBillingRecords] = useState<ClientRecord[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState(nowPeriod);
@@ -404,7 +405,7 @@ export default function Clients() {
               onChange={e => setSearchQ(e.target.value)}
             />
             <button className="btn btn-p" onClick={openAdd}><i className="ti ti-plus" />Add Client</button>
-          </>) : (<>
+          </>) : tab === 'billing' ? (<>
             {periodExists && pendingRecords.length > 0 && (
               <button className="btn btn-p" onClick={processAll} disabled={processingAll}>
                 <i className="ti ti-check" />Mark All Paid ({pendingRecords.length})
@@ -416,7 +417,7 @@ export default function Clients() {
                 {runningBilling ? 'Running…' : `Run Billing (${activeClients.length})`}
               </button>
             )}
-          </>)}
+          </>) : null}
         </div>
       </div>
 
@@ -428,6 +429,9 @@ export default function Clients() {
           </button>
           <button className={`tab${tab === 'billing' ? ' active' : ''}`} onClick={() => setTab('billing')}>
             <i className="ti ti-refresh" style={{ marginRight: '5px', fontSize: '13px' }} />Monthly Billing
+          </button>
+          <button className={`tab${tab === 'yearly' ? ' active' : ''}`} onClick={() => setTab('yearly')}>
+            <i className="ti ti-calendar-stats" style={{ marginRight: '5px', fontSize: '13px' }} />Yearly
           </button>
         </div>
 
@@ -513,6 +517,9 @@ export default function Clients() {
             )}
           </div>
         </>)}
+
+        {/* ── YEARLY TAB ──────────────────────────────────────────── */}
+        {tab === 'yearly' && <ClientsYearly />}
 
         {/* ── MONTHLY BILLING TAB ──────────────────────────────────── */}
         {tab === 'billing' && (<>

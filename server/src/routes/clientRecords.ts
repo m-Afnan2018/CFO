@@ -127,6 +127,62 @@ router.post('/run', async (req: Request, res: Response) => {
   }
 });
 
+// GET /yearly — monthly + yearly aggregated billing summary (includes payment received totals)
+router.get('/yearly', async (_req: Request, res: Response) => {
+  try {
+    const records = await ClientRecord.find({}).lean();
+
+    type MonthBucket = {
+      billed: number; received: number;
+      paid: number; partial: number; pending: number;
+      count: number; paidCount: number; partialCount: number; pendingCount: number;
+    };
+    const yearMap: Record<string, Record<string, MonthBucket>> = {};
+
+    for (const r of records) {
+      const [year] = (r.billingPeriod as string).split('-');
+      const received = ((r.payments as { amount?: number }[] | undefined) ?? [])
+        .reduce((s, p) => s + (p.amount || 0), 0);
+
+      if (!yearMap[year]) yearMap[year] = {};
+      if (!yearMap[year][r.billingPeriod as string]) {
+        yearMap[year][r.billingPeriod as string] = {
+          billed: 0, received: 0, paid: 0, partial: 0, pending: 0,
+          count: 0, paidCount: 0, partialCount: 0, pendingCount: 0,
+        };
+      }
+      const m = yearMap[year][r.billingPeriod as string];
+      m.billed   += (r.monthlyBilling as number) || 0;
+      m.received += received;
+      m.count    += 1;
+      if (r.status === 'Paid')         { m.paid     += (r.monthlyBilling as number) || 0; m.paidCount    += 1; }
+      else if (r.status === 'Partial') { m.partial  += received;                          m.partialCount += 1; }
+      else                             { m.pending  += (r.monthlyBilling as number) || 0; m.pendingCount += 1; }
+    }
+
+    const result = Object.keys(yearMap)
+      .sort((a, b) => b.localeCompare(a))
+      .map(year => {
+        const months = Object.keys(yearMap[year]).sort().map(period => ({ period, ...yearMap[year][period] }));
+        const totals = months.reduce(
+          (acc, m) => ({
+            billed: acc.billed + m.billed, received: acc.received + m.received,
+            paid: acc.paid + m.paid, partial: acc.partial + m.partial, pending: acc.pending + m.pending,
+            count: acc.count + m.count, paidCount: acc.paidCount + m.paidCount,
+            partialCount: acc.partialCount + m.partialCount, pendingCount: acc.pendingCount + m.pendingCount,
+          }),
+          { billed: 0, received: 0, paid: 0, partial: 0, pending: 0, count: 0, paidCount: 0, partialCount: 0, pendingCount: 0 }
+        );
+        return { year, months, ...totals };
+      });
+
+    res.json(result);
+  } catch (err) {
+    console.error('GET /yearly:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // PUT /period/:period/process — mark all Pending records in a period as Paid (auto-creates invoices)
 router.put('/period/:period/process', async (req: Request, res: Response) => {
   try {

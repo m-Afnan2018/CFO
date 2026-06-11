@@ -59,6 +59,7 @@ export const api = {
   deleteSalaryPeriod: (period: string) => del(`/salary-records/period/${encodeURIComponent(period)}`),
   getSalaryAnalytics: () => get('/salary-records/analytics'),
   getClientBillingPeriods: () => get('/client-records/periods'),
+  getClientYearlySummary: () => get('/client-records/yearly'),
   getClientRecords: (period: string) => get(`/client-records?period=${encodeURIComponent(period)}`),
   runClientBilling: (period: string, clients?: unknown[]) => post('/client-records/run', { period, ...(clients ? { clients } : {}) }),
   processClientPeriod: (period: string) => put(`/client-records/period/${encodeURIComponent(period)}/process`, {}),
