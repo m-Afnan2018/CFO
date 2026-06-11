@@ -68,6 +68,9 @@ export default function InvoiceDesigner({ invoice, onSave, onClose }: Props) {
     return [emptyLI()];
   });
 
+  const [taxType, setTaxType]       = useState<'Intrastate' | 'Interstate'>(invoice?.taxType ?? 'Intrastate');
+  const [tdsSection, setTdsSection] = useState(invoice?.tdsSection ?? 'None');
+  const [tdsRate, setTdsRate]       = useState(invoice?.tdsRate ?? 0);
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState('');
   const [clientList, setClientList] = useState<string[]>([]);
@@ -113,10 +116,12 @@ export default function InvoiceDesigner({ invoice, onSave, onClose }: Props) {
     const p = Math.max(0, parseFloat(it.unitPrice) || 0);
     return { ...it, q, p, amt: q * p };
   });
-  const subtotal = parsed.reduce((s, i) => s + i.amt, 0);
-  const gstPct   = parseFloat(gstRate) || 0;
-  const gstAmt   = Math.round(subtotal * gstPct / 100);
-  const total    = subtotal + gstAmt;
+  const subtotal  = parsed.reduce((s, i) => s + i.amt, 0);
+  const gstPct    = parseFloat(gstRate) || 0;
+  const gstAmt    = Math.round(subtotal * gstPct / 100);
+  const total     = subtotal + gstAmt;
+  const tdsAmount = tdsSection !== 'None' ? Math.round(subtotal * tdsRate / 100) : 0;
+  const netAfterTds = total - tdsAmount;
 
   // ── handlers ──────────────────────────────────────────────────────────────
 
@@ -138,7 +143,8 @@ export default function InvoiceDesigner({ invoice, onSave, onClose }: Props) {
       const payload = {
         invoiceNumber: invNum, client, clientEmail, clientAddress: clientAddr,
         date, dueDate, gstRate: gstPct, lineItems,
-        amount: subtotal, gst: gstAmt, total, notes, status,
+        amount: subtotal, gst: gstAmt, total, notes, status, taxType,
+        tdsSection, tdsRate, tdsAmount,
       };
       const saved = isEdit
         ? await api.updateInvoice(invoice!._id, payload)
@@ -402,11 +408,64 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
 
           <div className="ds-section">
             <div className="ds-header">Tax</div>
-            <div className="form-field" style={{ maxWidth: '140px', marginBottom: 0 }}>
-              <label className="form-label">GST Rate</label>
-              <select className="form-input" value={gstRate} onChange={e => setGstRate(e.target.value)}>
-                {GST_RATES.map(r => <option key={r} value={r}>{r}%</option>)}
-              </select>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end' }}>
+              <div className="form-field" style={{ maxWidth: '140px', marginBottom: 0 }}>
+                <label className="form-label">GST Rate</label>
+                <select className="form-input" value={gstRate} onChange={e => setGstRate(e.target.value)}>
+                  {GST_RATES.map(r => <option key={r} value={r}>{r}%</option>)}
+                </select>
+              </div>
+              <div className="form-field" style={{ marginBottom: 0 }}>
+                <label className="form-label">Transaction Type</label>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {(['Intrastate', 'Interstate'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => setTaxType(t)}
+                      style={{
+                        padding: '5px 12px', fontSize: '11px', borderRadius: '6px', cursor: 'pointer',
+                        border: `1px solid ${taxType === t ? 'var(--indigo)' : 'var(--border)'}`,
+                        background: taxType === t ? 'var(--indigo-dim)' : 'transparent',
+                        color: taxType === t ? 'var(--indigo)' : 'var(--text2)',
+                        fontWeight: taxType === t ? 700 : 400,
+                      }}>
+                      {t === 'Intrastate' ? 'Intrastate (CGST+SGST)' : 'Interstate (IGST)'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="ds-section">
+            <div className="ds-header">TDS Deduction</div>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end' }}>
+              <div className="form-field" style={{ maxWidth: '180px', marginBottom: 0 }}>
+                <label className="form-label">TDS Section</label>
+                <select className="form-input" value={tdsSection} onChange={e => {
+                  const sec = e.target.value;
+                  setTdsSection(sec);
+                  const rates: Record<string, number> = { '194J': 10, '194C': 1, '194H': 5, '194I': 10, 'None': 0 };
+                  setTdsRate(rates[sec] ?? 0);
+                }}>
+                  <option value="None">None</option>
+                  <option value="194J">194J — Professional / Technical (10%)</option>
+                  <option value="194C">194C — Contractor (1%)</option>
+                  <option value="194H">194H — Commission (5%)</option>
+                  <option value="194I">194I — Rent (10%)</option>
+                </select>
+              </div>
+              {tdsSection !== 'None' && (
+                <div className="form-field" style={{ maxWidth: '100px', marginBottom: 0 }}>
+                  <label className="form-label">TDS Rate %</label>
+                  <input type="number" className="form-input" min={0} max={30} step={0.5}
+                    value={tdsRate} onChange={e => setTdsRate(parseFloat(e.target.value) || 0)} />
+                </div>
+              )}
+              {tdsSection !== 'None' && (
+                <div style={{ fontSize: '12px', color: 'var(--amber)', paddingBottom: '4px' }}>
+                  TDS deducted: <strong>{fmtRs(tdsAmount)}</strong>
+                  <div style={{ color: 'var(--text2)', fontSize: '11px' }}>Net receivable: {fmtRs(netAfterTds)}</div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -517,6 +576,22 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
                   <span style={{ color: '#0f172a' }}>Total</span>
                   <span style={{ color: '#6366f1' }}>{fmtRs(total)}</span>
                 </div>
+                {tdsSection !== 'None' && tdsAmount > 0 && (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                      <span>TDS u/s {tdsSection} ({tdsRate}%)</span>
+                      <span style={{ color: '#b45309' }}>− {fmtRs(tdsAmount)}</span>
+                    </div>
+                    <div style={{
+                      display: 'flex', justifyContent: 'space-between',
+                      borderTop: '1px dashed #e2e8f0', paddingTop: '8px', marginTop: '4px',
+                      fontSize: '13px', fontWeight: 700,
+                    }}>
+                      <span style={{ color: '#64748b' }}>Net Receivable</span>
+                      <span style={{ color: '#059669' }}>{fmtRs(netAfterTds)}</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

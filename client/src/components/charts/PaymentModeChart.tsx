@@ -1,8 +1,10 @@
 'use client';
 import '@/lib/chartSetup';
 import { Doughnut } from 'react-chartjs-2';
+import { useChartColors } from '@/context/ThemeContext';
 
 export default function PaymentModeChart() {
+  const { legend } = useChartColors();
   return (
     <Doughnut
       data={{
@@ -17,7 +19,7 @@ export default function PaymentModeChart() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: '#8b92a8', font: { size: 10 }, boxWidth: 8, padding: 6 } },
+          legend: { position: 'bottom', labels: { color: legend, font: { size: 10 }, boxWidth: 8, padding: 6 } },
         },
         cutout: '60%',
       }}

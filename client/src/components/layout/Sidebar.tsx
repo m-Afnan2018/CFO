@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@/context/ThemeContext';
 
 interface NavItem {
   href: string;
@@ -29,7 +30,8 @@ const sections: { label: string; items: NavItem[] }[] = [
     items: [
       { href: '/cashflow', icon: 'ti-trending-up', label: 'Cash Flow' },
       { href: '/profit',   icon: 'ti-chart-pie',   label: 'Profitability' },
-      { href: '/gst',      icon: 'ti-file-text',   label: 'GST / Tax' },
+      { href: '/gst',      icon: 'ti-file-text',    label: 'GST / Tax' },
+      { href: '/tds',      icon: 'ti-receipt-tax',  label: 'TDS' },
     ],
   },
   {
@@ -48,6 +50,7 @@ async function handleLogout() {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { theme, toggle } = useTheme();
   return (
     <div className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="sidebar-logo">
@@ -78,6 +81,14 @@ export default function Sidebar() {
         ))}
       </div>
       <div style={{ padding: '12px 10px', borderTop: '1px solid var(--border)' }}>
+        <button
+          onClick={toggle}
+          className="nav-item"
+          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', textAlign: 'left', marginBottom: '2px' }}
+        >
+          <i className={`ti ${theme === 'dark' ? 'ti-sun' : 'ti-moon'}`} />
+          {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+        </button>
         <button
           onClick={handleLogout}
           className="nav-item"

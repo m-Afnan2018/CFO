@@ -1,11 +1,13 @@
 'use client';
 import '@/lib/chartSetup';
 import { Line } from 'react-chartjs-2';
+import { useChartColors } from '@/context/ThemeContext';
 
 const MONTHS = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
 const MARGIN = [33,36,38,37,40,37,37,37,38,37,36,33];
 
 export default function MarginChart() {
+  const { tick, grid } = useChartColors();
   return (
     <Line
       data={{
@@ -25,8 +27,8 @@ export default function MarginChart() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 } } },
-          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 }, callback: (v) => `${v}%` } },
+          x: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } } },
+          y: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => `${v}%` } },
         },
       }}
     />

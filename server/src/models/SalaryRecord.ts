@@ -5,7 +5,13 @@ export interface ISalaryRecord extends Document {
   name: string;
   department: string;
   baseSalary: number;
+  hra: number;
+  specialAllowance: number;
   incentives: number;
+  providentFund: number;
+  esi: number;
+  professionalTax: number;
+  tds: number;
   deductions: number;
   leaveDays: number;
   leaveDeduction: number;
@@ -23,7 +29,13 @@ const SalaryRecordSchema = new Schema<ISalaryRecord>(
     name: { type: String, required: true },
     department: String,
     baseSalary: Number,
+    hra:              { type: Number, default: 0 },
+    specialAllowance: { type: Number, default: 0 },
     incentives: { type: Number, default: 0 },
+    providentFund:    { type: Number, default: 0 },
+    esi:              { type: Number, default: 0 },
+    professionalTax:  { type: Number, default: 0 },
+    tds:              { type: Number, default: 0 },
     deductions: { type: Number, default: 0 },
     leaveDays: { type: Number, default: 0 },
     leaveDeduction: { type: Number, default: 0 },

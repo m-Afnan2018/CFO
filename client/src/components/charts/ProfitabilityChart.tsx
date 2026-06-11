@@ -1,8 +1,10 @@
 'use client';
 import '@/lib/chartSetup';
 import { Bar } from 'react-chartjs-2';
+import { useChartColors } from '@/context/ThemeContext';
 
 export default function ProfitabilityChart() {
+  const { tick, grid, legend } = useChartColors();
   return (
     <Bar
       data={{
@@ -16,10 +18,10 @@ export default function ProfitabilityChart() {
       options={{
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#8b92a8', font: { size: 11 }, boxWidth: 8 } } },
+        plugins: { legend: { labels: { color: legend, font: { size: 11 }, boxWidth: 8 } } },
         scales: {
-          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 } } },
-          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 }, callback: (v) => `₹${v}L` } },
+          x: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } } },
+          y: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => `₹${v}L` } },
         },
       }}
     />

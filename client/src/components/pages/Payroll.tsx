@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { Employee, ColorKey, SalaryRecord, EmployeeTrend, SalaryAnalytics } from '@/types';
+import type { Employee, ColorKey, SalaryRecord, EmployeeTrend, SalaryAnalytics, SlipTemplate } from '@/types';
 import { api } from '@/lib/api';
+import SalarySlipViewer from './SalarySlipViewer';
 
 const DeptPayrollChart = dynamic(() => import('@/components/charts/DeptPayrollChart'), { ssr: false });
 
@@ -38,17 +39,32 @@ function currentPeriod() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function calcFinal(base: number, incentives: number, bonus: number, leaveDays: number, deductions: number) {
+function calcFinal(
+  base: number, hra: number, special: number, incentives: number, bonus: number,
+  pf: number, esi: number, pt: number, tds: number, otherDed: number, leaveDays: number
+) {
+  const gross = base + hra + special + incentives + bonus;
   const leaveDeduction = Math.round(base / 26 * leaveDays);
-  return base + incentives + bonus - leaveDeduction - deductions;
+  return gross - pf - esi - pt - tds - otherDed - leaveDeduction;
+}
+
+function recCalcFinal(rec: SalaryRecord, bonus: number, leaveDays: number) {
+  return calcFinal(
+    rec.baseSalary, rec.hra ?? 0, rec.specialAllowance ?? 0, rec.incentives, bonus,
+    rec.providentFund ?? 0, rec.esi ?? 0, rec.professionalTax ?? 0, rec.tds ?? 0,
+    rec.deductions, leaveDays
+  );
 }
 
 const emptyForm = {
-  name: '', department: DEPARTMENTS[0], baseSalary: '', incentives: '0', deductions: '0', colorKey: 'emerald' as ColorKey,
+  name: '', department: DEPARTMENTS[0],
+  baseSalary: '', hra: '0', specialAllowance: '0', incentives: '0',
+  providentFund: '0', esi: '0', professionalTax: '0', tds: '0', deductions: '0',
+  colorKey: 'emerald' as ColorKey,
 };
 
 export default function Payroll() {
-  const [tab, setTab] = useState<'employees' | 'payroll' | 'analytics'>('payroll');
+  const [tab, setTab] = useState<'employees' | 'payroll' | 'analytics' | 'template'>('payroll');
 
   // --- employees ---
   const [employees, setEmployees]       = useState<Employee[]>([]);
@@ -78,6 +94,20 @@ export default function Payroll() {
   const [analytics, setAnalytics]             = useState<SalaryAnalytics | null>(null);
   const [analyticsLoaded, setAnalyticsLoaded] = useState(false);
   const [totalRevenue, setTotalRevenue]       = useState(0);
+
+  // --- slip template ---
+  const DEFAULT_TEMPLATE: SlipTemplate = {
+    companyName: 'Ganesyx Pvt Ltd', companyAddress: '', companyEmail: '',
+    companyPhone: '', website: '', panNumber: '',
+    footerNote: 'This is a system generated payslip and does not require a signature.',
+  };
+  const [slipTemplate, setSlipTemplate]   = useState<SlipTemplate>(DEFAULT_TEMPLATE);
+  const [templateForm, setTemplateForm]   = useState<SlipTemplate>(DEFAULT_TEMPLATE);
+  const [templateSaving, setTemplateSaving] = useState(false);
+
+  // --- slip viewer ---
+  const [slipViewOpen, setSlipViewOpen] = useState(false);
+  const [slipViewIdx, setSlipViewIdx]   = useState(0);
 
   function load() {
     api.getEmployees()
@@ -115,11 +145,23 @@ export default function Payroll() {
   useEffect(() => { load(); }, []);
   useEffect(() => { if (tab === 'payroll') loadPayroll(payPeriod); }, [tab, payPeriod]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === 'analytics') loadAnalytics(); }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    api.getSlipTemplate()
+      .then(d => { const t = d as SlipTemplate; setSlipTemplate(t); setTemplateForm(t); })
+      .catch(() => {});
+  }, []);
 
-  const base          = Number(form.baseSalary) || 0;
-  const inc           = Number(form.incentives) || 0;
-  const ded           = Number(form.deductions) || 0;
-  const computedFinal = base + inc - ded;
+  const base    = Number(form.baseSalary) || 0;
+  const hra     = Number(form.hra) || 0;
+  const special = Number(form.specialAllowance) || 0;
+  const inc     = Number(form.incentives) || 0;
+  const pf      = Number(form.providentFund) || 0;
+  const esiAmt  = Number(form.esi) || 0;
+  const pt      = Number(form.professionalTax) || 0;
+  const tdsAmt  = Number(form.tds) || 0;
+  const ded     = Number(form.deductions) || 0;
+  const grossPay      = base + hra + special + inc;
+  const computedFinal = grossPay - pf - esiAmt - pt - tdsAmt - ded;
 
   function openAdd() {
     setEditing(null); setForm(emptyForm); setShowModal(true);
@@ -129,7 +171,11 @@ export default function Payroll() {
     setEditing(emp);
     setForm({
       name: emp.name, department: emp.department,
-      baseSalary: String(emp.baseSalary), incentives: String(emp.incentives),
+      baseSalary: String(emp.baseSalary),
+      hra: String(emp.hra ?? 0), specialAllowance: String(emp.specialAllowance ?? 0),
+      incentives: String(emp.incentives),
+      providentFund: String(emp.providentFund ?? 0), esi: String(emp.esi ?? 0),
+      professionalTax: String(emp.professionalTax ?? 0), tds: String(emp.tds ?? 0),
       deductions: String(emp.deductions), colorKey: emp.colorKey,
     });
     setShowModal(true);
@@ -140,7 +186,9 @@ export default function Payroll() {
     setSaving(true);
     const payload = {
       name: form.name.trim(), department: form.department,
-      baseSalary: base, incentives: inc, deductions: ded, finalSalary: computedFinal,
+      baseSalary: base, hra, specialAllowance: special, incentives: inc,
+      providentFund: pf, esi: esiAmt, professionalTax: pt, tds: tdsAmt,
+      deductions: ded, finalSalary: computedFinal,
       colorKey: form.colorKey, initials: mkInitials(form.name),
     };
     try {
@@ -168,7 +216,10 @@ export default function Payroll() {
     if (!incrementEmp) return;
     setIncrSaving(true);
     const nb = newBase();
-    const nf = nb + incrementEmp.incentives - incrementEmp.deductions;
+    const nf = nb + (incrementEmp.hra ?? 0) + (incrementEmp.specialAllowance ?? 0) + incrementEmp.incentives
+               - (incrementEmp.providentFund ?? 0) - (incrementEmp.esi ?? 0)
+               - (incrementEmp.professionalTax ?? 0) - (incrementEmp.tds ?? 0)
+               - incrementEmp.deductions;
     await api.updateEmployee(incrementEmp._id, { baseSalary: nb, finalSalary: nf }).catch(() => {});
     setIncrSaving(false); setIncrementEmp(null); setIncrVal(''); load();
   }
@@ -201,7 +252,7 @@ export default function Payroll() {
 
   function getDisplayFinal(rec: SalaryRecord) {
     const e = getEdits(rec._id);
-    return calcFinal(rec.baseSalary, rec.incentives, parseInt(e.bonus) || 0, parseInt(e.leaveDays) || 0, rec.deductions);
+    return recCalcFinal(rec, parseInt(e.bonus) || 0, parseInt(e.leaveDays) || 0);
   }
 
   function handleInlineChange(id: string, field: 'leaveDays' | 'bonus', val: string) {
@@ -214,8 +265,8 @@ export default function Payroll() {
     const leaveDays  = Math.max(0, parseInt(e.leaveDays) || 0);
     const bonus      = Math.max(0, parseInt(e.bonus) || 0);
     if (leaveDays === (rec.leaveDays ?? 0) && bonus === (rec.bonus ?? 0)) return;
-    const leaveDeduction = Math.round(rec.baseSalary / 26 * leaveDays);
-    const finalSalary    = calcFinal(rec.baseSalary, rec.incentives, bonus, leaveDays, rec.deductions);
+    const leaveDeduction = Math.round(rec.baseSalary / 30 * leaveDays);
+    const finalSalary    = recCalcFinal(rec, bonus, leaveDays);
     setSavingRecord(rec._id);
     const updated = await api.updateSalaryRecord(rec._id, { leaveDays, leaveDeduction, bonus, finalSalary }).catch(() => null);
     if (updated) setRecords(prev => prev.map(r => r._id === rec._id ? updated as SalaryRecord : r));
@@ -226,8 +277,8 @@ export default function Payroll() {
     const e              = getEdits(rec._id);
     const leaveDays      = Math.max(0, parseInt(e.leaveDays) || 0);
     const bonus          = Math.max(0, parseInt(e.bonus) || 0);
-    const leaveDeduction = Math.round(rec.baseSalary / 26 * leaveDays);
-    const finalSalary    = calcFinal(rec.baseSalary, rec.incentives, bonus, leaveDays, rec.deductions);
+    const leaveDeduction = Math.round(rec.baseSalary / 30 * leaveDays);
+    const finalSalary    = recCalcFinal(rec, bonus, leaveDays);
     setSavingRecord(rec._id);
     const updated = await api.updateSalaryRecord(rec._id, { leaveDays, leaveDeduction, bonus, finalSalary, status: 'Paid' }).catch(() => null);
     if (updated) setRecords(prev => prev.map(r => r._id === rec._id ? updated as SalaryRecord : r));
@@ -249,12 +300,23 @@ export default function Payroll() {
     setRecords([]); setInlineEdits({}); setRecordsLoaded(true);
   }
 
+  async function saveTemplate() {
+    setTemplateSaving(true);
+    try {
+      const saved = await api.saveSlipTemplate(templateForm) as SlipTemplate;
+      setSlipTemplate(saved);
+    } catch {} finally {
+      setTemplateSaving(false);
+    }
+  }
+
   const totalPayroll    = employees.reduce((s, e) => s + e.finalSalary, 0);
   const avgSalary       = employees.length > 0 ? Math.round(totalPayroll / employees.length) : 0;
   const deptCount       = new Set(employees.map(e => e.department)).size;
 
+  const paidRecords     = records.filter(r => r.status === 'Paid');
   const recTotal        = records.reduce((s, r) => s + getDisplayFinal(r), 0);
-  const recPaid         = records.filter(r => r.status === 'Paid').reduce((s, r) => s + getDisplayFinal(r), 0);
+  const recPaid         = paidRecords.reduce((s, r) => s + getDisplayFinal(r), 0);
   const recPendingCount = records.filter(r => r.status === 'Pending').length;
 
   const inputSx = {
@@ -280,6 +342,12 @@ export default function Payroll() {
                 {markingAll ? 'Marking…' : `Mark All Paid (${recPendingCount})`}
               </button>
             )}
+            {paidRecords.length > 0 && (
+              <button className="btn" onClick={() => { setSlipViewIdx(0); setSlipViewOpen(true); }}>
+                <i className="ti ti-file-text" />
+                Generate Slips ({paidRecords.length})
+              </button>
+            )}
             <button className="btn" style={{ color: 'var(--red)' }} onClick={deletePeriod} disabled={deletingPeriod}>
               <i className="ti ti-trash" />{deletingPeriod ? 'Deleting…' : 'Delete Period'}
             </button>
@@ -288,7 +356,7 @@ export default function Payroll() {
       </div>
 
       <div style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)', padding: '0 24px', display: 'flex' }}>
-        {([['employees', 'Employees'], ['payroll', 'Monthly Payroll'], ['analytics', 'Analytics']] as const).map(([t, label]) => (
+        {([['employees', 'Employees'], ['payroll', 'Monthly Payroll'], ['analytics', 'Analytics'], ['template', 'Slip Template']] as const).map(([t, label]) => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: '12px 20px', fontSize: '13px', fontWeight: tab === t ? 700 : 400,
             color: tab === t ? 'var(--indigo)' : 'var(--text2)', background: 'none', border: 'none',
@@ -339,7 +407,7 @@ export default function Payroll() {
                 <thead>
                   <tr>
                     <th>Employee</th><th>Department</th><th>Base Salary</th>
-                    <th>Incentives</th><th>Deductions</th><th>Net Salary</th>
+                    <th>Gross Pay</th><th>Deductions</th><th>Net Salary</th>
                     <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
@@ -356,8 +424,12 @@ export default function Payroll() {
                         </td>
                         <td style={{ color: 'var(--text2)' }}>{emp.department}</td>
                         <td>{fmt(emp.baseSalary)}</td>
-                        <td style={{ color: 'var(--emerald)' }}>+{fmt(emp.incentives)}</td>
-                        <td style={{ color: 'var(--red)' }}>−{fmt(emp.deductions)}</td>
+                        <td style={{ color: 'var(--emerald)' }}>
+                          {fmt(emp.baseSalary + (emp.hra ?? 0) + (emp.specialAllowance ?? 0) + emp.incentives)}
+                        </td>
+                        <td style={{ color: 'var(--red)' }}>
+                          −{fmt((emp.providentFund ?? 0) + (emp.esi ?? 0) + (emp.professionalTax ?? 0) + (emp.tds ?? 0) + emp.deductions)}
+                        </td>
                         <td style={{ fontWeight: 700, color: 'var(--indigo)' }}>{fmt(emp.finalSalary)}</td>
                         <td style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
@@ -467,7 +539,7 @@ export default function Payroll() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Employee</th><th>Department</th><th>Base</th>
+                      <th>Employee</th><th>Department</th><th>Gross Pay</th>
                       <th style={{ textAlign: 'center' }}>Leave Days</th>
                       <th>Leave Ded.</th>
                       <th style={{ textAlign: 'center' }}>Bonus (₹)</th>
@@ -480,8 +552,10 @@ export default function Payroll() {
                       const e           = getEdits(rec._id);
                       const leaveDays   = parseInt(e.leaveDays) || 0;
                       const bonus       = parseInt(e.bonus) || 0;
-                      const leaveDeduct = Math.round(rec.baseSalary / 26 * leaveDays);
-                      const netSalary   = calcFinal(rec.baseSalary, rec.incentives, bonus, leaveDays, rec.deductions);
+                      const leaveDeduct = Math.round(rec.baseSalary / 30 * leaveDays);
+                      const grossPay    = rec.baseSalary + (rec.hra ?? 0) + (rec.specialAllowance ?? 0) + rec.incentives;
+                      const statDed     = (rec.providentFund ?? 0) + (rec.esi ?? 0) + (rec.professionalTax ?? 0) + (rec.tds ?? 0) + rec.deductions;
+                      const netSalary   = recCalcFinal(rec, bonus, leaveDays);
                       const isSaving    = savingRecord === rec._id;
                       const isPaid      = rec.status === 'Paid';
                       return (
@@ -493,7 +567,10 @@ export default function Payroll() {
                             </div>
                           </td>
                           <td style={{ color: 'var(--text2)' }}>{rec.department}</td>
-                          <td>{fmt(rec.baseSalary)}</td>
+                          <td>
+                            <div style={{ fontWeight: 600 }}>{fmt(grossPay)}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text3)' }}>base {fmt(rec.baseSalary)}</div>
+                          </td>
                           <td style={{ textAlign: 'center' }}>
                             <input
                               type="number" min="0" max="31"
@@ -517,15 +594,28 @@ export default function Payroll() {
                               disabled={isSaving || isPaid}
                             />
                           </td>
-                          <td style={{ color: 'var(--red)', fontSize: '12px' }}>−{fmt(rec.deductions)}</td>
+                          <td style={{ color: 'var(--red)', fontSize: '12px' }}>−{fmt(statDed)}</td>
                           <td style={{ fontWeight: 700, color: 'var(--indigo)', fontSize: '14px', whiteSpace: 'nowrap' }}>
                             {fmt(netSalary)}
                           </td>
                           <td style={{ whiteSpace: 'nowrap' }}>
                             {isPaid ? (
-                              <span className="badge bg" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <i className="ti ti-circle-check" style={{ fontSize: '11px' }} /> Paid
-                              </span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span className="badge bg" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                  <i className="ti ti-circle-check" style={{ fontSize: '11px' }} /> Paid
+                                </span>
+                                <button
+                                  className="btn"
+                                  style={{ padding: '3px 8px', fontSize: '11px' }}
+                                  title="View Salary Slip"
+                                  onClick={() => {
+                                    setSlipViewIdx(paidRecords.findIndex(r => r._id === rec._id));
+                                    setSlipViewOpen(true);
+                                  }}
+                                >
+                                  <i className="ti ti-file-text" style={{ fontSize: '12px' }} />
+                                </button>
+                              </div>
                             ) : (
                               <button
                                 className="btn"
@@ -554,7 +644,83 @@ export default function Payroll() {
           analyticsLoaded={analyticsLoaded}
           totalRevenue={totalRevenue}
         />}
+
+        {/* ── Slip Template Tab ── */}
+        {tab === 'template' && (
+          <div>
+            <div className="card" style={{ maxWidth: '620px' }}>
+              <div className="card-title">
+                Salary Slip Template
+                <span className="card-sub">Company details printed on all salary slips</span>
+              </div>
+              <div className="form-row">
+                <div className="form-field">
+                  <label className="form-label">Company Name</label>
+                  <input className="form-input" placeholder="Ganesyx Pvt Ltd"
+                    value={templateForm.companyName}
+                    onChange={e => setTemplateForm(f => ({ ...f, companyName: e.target.value }))} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">PAN Number</label>
+                  <input className="form-input" placeholder="AAACG1234C"
+                    value={templateForm.panNumber}
+                    onChange={e => setTemplateForm(f => ({ ...f, panNumber: e.target.value }))} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Company Address</label>
+                <input className="form-input" placeholder="123 Business Park, Bengaluru, Karnataka 560001"
+                  value={templateForm.companyAddress}
+                  onChange={e => setTemplateForm(f => ({ ...f, companyAddress: e.target.value }))} />
+              </div>
+              <div className="form-row">
+                <div className="form-field">
+                  <label className="form-label">Phone</label>
+                  <input className="form-input" placeholder="+91 98765 43210"
+                    value={templateForm.companyPhone}
+                    onChange={e => setTemplateForm(f => ({ ...f, companyPhone: e.target.value }))} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Email</label>
+                  <input className="form-input" placeholder="hr@ganesyx.com"
+                    value={templateForm.companyEmail}
+                    onChange={e => setTemplateForm(f => ({ ...f, companyEmail: e.target.value }))} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Website</label>
+                  <input className="form-input" placeholder="ganesyx.com"
+                    value={templateForm.website}
+                    onChange={e => setTemplateForm(f => ({ ...f, website: e.target.value }))} />
+                </div>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Footer Note</label>
+                <input className="form-input" placeholder="This is a system generated payslip…"
+                  value={templateForm.footerNote}
+                  onChange={e => setTemplateForm(f => ({ ...f, footerNote: e.target.value }))} />
+              </div>
+              <div style={{ marginTop: '16px', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button className="btn" onClick={() => setTemplateForm(slipTemplate)}>Reset</button>
+                <button className="btn btn-p" onClick={saveTemplate} disabled={templateSaving}>
+                  <i className="ti ti-device-floppy" />
+                  {templateSaving ? 'Saving…' : 'Save Template'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* ── Salary Slip Viewer ── */}
+      {slipViewOpen && paidRecords.length > 0 && (
+        <SalarySlipViewer
+          records={paidRecords}
+          initialIndex={slipViewIdx}
+          period={payPeriod}
+          template={slipTemplate}
+          onClose={() => setSlipViewOpen(false)}
+        />
+      )}
 
       {/* ── Add / Edit Employee ── */}
       {showModal && (
@@ -565,6 +731,7 @@ export default function Payroll() {
               <button className="modal-close" onClick={() => setShowModal(false)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
+              {/* Basic info */}
               <div className="form-row">
                 <div className="form-field">
                   <label className="form-label">Full Name *</label>
@@ -579,34 +746,82 @@ export default function Payroll() {
                   </select>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+
+              {/* Earnings */}
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Earnings</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div className="form-field" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Base Salary (₹) *</label>
-                  <input className="form-input" type="number" min="0" placeholder="75000" value={form.baseSalary}
+                  <label className="form-label">Basic Salary (₹) *</label>
+                  <input className="form-input" type="number" min="0" placeholder="50000" value={form.baseSalary}
                     onChange={e => setForm(f => ({ ...f, baseSalary: e.target.value }))} />
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">HRA (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="0" value={form.hra}
+                    onChange={e => setForm(f => ({ ...f, hra: e.target.value }))} />
+                  {base > 0 && <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>40% = ₹{Math.round(base * 0.4).toLocaleString('en-IN')}</div>}
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Special Allowance (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="0" value={form.specialAllowance}
+                    onChange={e => setForm(f => ({ ...f, specialAllowance: e.target.value }))} />
                 </div>
                 <div className="form-field" style={{ marginBottom: 0 }}>
                   <label className="form-label">Incentives (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.incentives}
                     onChange={e => setForm(f => ({ ...f, incentives: e.target.value }))} />
                 </div>
+              </div>
+
+              {/* Deductions */}
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Deductions</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div className="form-field" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Deductions (₹)</label>
+                  <label className="form-label">Provident Fund (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="0" value={form.providentFund}
+                    onChange={e => setForm(f => ({ ...f, providentFund: e.target.value }))} />
+                  {base > 0 && <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>12% = ₹{Math.round(base * 0.12).toLocaleString('en-IN')}</div>}
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">ESI (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="0" value={form.esi}
+                    onChange={e => setForm(f => ({ ...f, esi: e.target.value }))} />
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Professional Tax (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="200" value={form.professionalTax}
+                    onChange={e => setForm(f => ({ ...f, professionalTax: e.target.value }))} />
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">TDS / Income Tax (₹)</label>
+                  <input className="form-input" type="number" min="0" placeholder="0" value={form.tds}
+                    onChange={e => setForm(f => ({ ...f, tds: e.target.value }))} />
+                </div>
+                <div className="form-field" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Other Deductions (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.deductions}
                     onChange={e => setForm(f => ({ ...f, deductions: e.target.value }))} />
                 </div>
               </div>
-              <div className="form-field" style={{ background: 'var(--bg3)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px' }}>
-                <label className="form-label" style={{ marginBottom: '4px' }}>Net Salary (auto-calculated)</label>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: computedFinal >= 0 ? 'var(--emerald)' : 'var(--red)' }}>
-                  {fmt(computedFinal)}
+
+              {/* Summary */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ background: 'var(--bg3)', borderRadius: '10px', padding: '10px 14px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '3px' }}>Gross Pay</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--emerald)' }}>{fmt(grossPay)}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>
+                    {base > 0 ? `base ${fmt(base)} + HRA ${fmt(hra)} + special ${fmt(special)} + inc ${fmt(inc)}` : '—'}
+                  </div>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '2px' }}>
-                  {base > 0
-                    ? `₹${base.toLocaleString('en-IN')} base + ₹${inc.toLocaleString('en-IN')} incentives − ₹${ded.toLocaleString('en-IN')} deductions`
-                    : 'Enter base salary above'}
+                <div style={{ background: 'var(--bg3)', borderRadius: '10px', padding: '10px 14px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '3px' }}>Net Salary</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: computedFinal >= 0 ? 'var(--indigo)' : 'var(--red)' }}>{fmt(computedFinal)}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>
+                    {base > 0 ? `PF ${fmt(pf)} + ESI ${fmt(esiAmt)} + PT ${fmt(pt)} + TDS ${fmt(tdsAmt)} + other ${fmt(ded)}` : '—'}
+                  </div>
                 </div>
               </div>
+
               <div className="form-field" style={{ marginBottom: 0 }}>
                 <label className="form-label">Color Tag</label>
                 <select className="form-input" value={form.colorKey}

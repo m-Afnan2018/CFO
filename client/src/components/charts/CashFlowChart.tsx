@@ -2,6 +2,7 @@
 import '@/lib/chartSetup';
 import { Chart } from 'react-chartjs-2';
 import type { ChartData } from 'chart.js';
+import { useChartColors } from '@/context/ThemeContext';
 
 const MONTHS = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
 const REV = [18,21,23,25,27,26,29,31,34,36,39,42.6];
@@ -9,6 +10,7 @@ const EXP = [12,13.5,14.2,15.8,16.1,16.5,18.2,19.4,21.1,22.8,25.1,28.4];
 const NET = REV.map((r, i) => Math.round((r - EXP[i]) * 10) / 10);
 
 export default function CashFlowChart() {
+  const { tick, grid, legend } = useChartColors();
   const data: ChartData<'bar'> = {
     labels: MONTHS,
     datasets: [
@@ -25,10 +27,10 @@ export default function CashFlowChart() {
       options={{
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: '#8b92a8', font: { size: 11 }, boxWidth: 8 } } },
+        plugins: { legend: { labels: { color: legend, font: { size: 11 }, boxWidth: 8 } } },
         scales: {
-          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 } } },
-          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 }, callback: (v) => `₹${Math.abs(Number(v))}L` } },
+          x: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } } },
+          y: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => `₹${Math.abs(Number(v))}L` } },
         },
       }}
     />

@@ -21,6 +21,10 @@ export interface IInvoice extends Document {
   total: number;
   notes?: string;
   status: 'Paid' | 'Pending' | 'Overdue' | 'Partial';
+  taxType?: 'Intrastate' | 'Interstate';
+  tdsSection?: string;
+  tdsRate?: number;
+  tdsAmount?: number;
 }
 
 const LineItemSchema = new Schema<ILineItem>(
@@ -42,7 +46,11 @@ const InvoiceSchema = new Schema<IInvoice>(
     gstRate: { type: Number, default: 18 },
     total: { type: Number, default: 0 },
     notes: String,
-    status: { type: String, enum: ['Paid', 'Pending', 'Overdue', 'Partial'], default: 'Pending' },
+    status:     { type: String, enum: ['Paid', 'Pending', 'Overdue', 'Partial'], default: 'Pending' },
+    taxType:    { type: String, enum: ['Intrastate', 'Interstate'], default: 'Intrastate' },
+    tdsSection: { type: String, default: 'None' },
+    tdsRate:    { type: Number, default: 0 },
+    tdsAmount:  { type: Number, default: 0 },
   },
   { timestamps: true }
 );

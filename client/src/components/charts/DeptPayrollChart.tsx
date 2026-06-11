@@ -1,6 +1,7 @@
 'use client';
 import '@/lib/chartSetup';
 import { Bar } from 'react-chartjs-2';
+import { useChartColors } from '@/context/ThemeContext';
 
 interface Props {
   labels: string[];
@@ -20,6 +21,7 @@ const COLORS = [
 ];
 
 export default function DeptPayrollChart({ labels, data }: Props) {
+  const { tick, grid } = useChartColors();
   if (!labels.length) return null;
   return (
     <Bar
@@ -50,15 +52,15 @@ export default function DeptPayrollChart({ labels, data }: Props) {
         },
         scales: {
           x: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
+            grid: { color: grid },
             ticks: {
-              color: '#555e73', font: { size: 11 },
+              color: tick, font: { size: 11 },
               callback: (v) => `₹${Number(v) >= 100000 ? (Number(v) / 100000).toFixed(0) + 'L' : v}`,
             },
           },
           y: {
             grid: { display: false },
-            ticks: { color: '#94a3b8', font: { size: 12 } },
+            ticks: { color: tick, font: { size: 12 } },
           },
         },
       }}

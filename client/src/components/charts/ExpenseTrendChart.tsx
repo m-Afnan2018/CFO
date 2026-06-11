@@ -1,8 +1,10 @@
 'use client';
 import '@/lib/chartSetup';
 import { Bar } from 'react-chartjs-2';
+import { useChartColors } from '@/context/ThemeContext';
 
 export default function ExpenseTrendChart() {
+  const { tick, grid } = useChartColors();
   return (
     <Bar
       data={{
@@ -18,8 +20,8 @@ export default function ExpenseTrendChart() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 } } },
-          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555e73', font: { size: 11 }, callback: (v) => `₹${v}L` } },
+          x: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 } } },
+          y: { grid: { color: grid }, ticks: { color: tick, font: { size: 11 }, callback: (v) => `₹${v}L` } },
         },
       }}
     />
