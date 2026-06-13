@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Modal from '@/components/ui/Modal';
 import DeleteConfirm from '@/components/ui/DeleteConfirm';
 import PageHeader from '@/components/ui/PageHeader';
-import type { Client, ClientRecord, ClientBillingPeriod, ColorKey, ServiceItem, PaymentEntry } from '@/types';
+import type { Client, ClientRecord, ClientBillingPeriod, ColorKey, ServiceItem, PaymentEntry, Service } from '@/types';
 import { api } from '@/lib/api';
 import ClientsYearly from './ClientsYearly';
 import styles from './Clients.module.css';
@@ -21,10 +21,6 @@ const colorLabels: Record<ColorKey, string> = { emerald: 'Green', indigo: 'Indig
 const statusBadge: Record<string, string>   = { Active: 'bg', Inactive: 'br', 'Renewal Due': 'ba' };
 const recBadge: Record<string, string>      = { Pending: 'br', Paid: 'bg', Partial: 'ba' };
 
-const DEFAULT_SERVICES = [
-  'Social Media', 'SEO', 'Web Dev', 'Performance Mktg',
-  'Content Creation', 'Ecommerce', 'Email Marketing', 'Paid Ads', 'Branding',
-];
 
 const emptyForm = {
   name: '', email: '', manager: '', renewal: '',
@@ -78,20 +74,13 @@ export default function Clients() {
   const [billingLoaded, setBillingLoaded]         = useState(false);
   const [generatingInvoice, setGeneratingInvoice] = useState<string | null>(null);
 
-  // ── Service options (global list, persisted in localStorage) ────
-  const [serviceOptions, setServiceOptions] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_SERVICES;
-    try { const s = localStorage.getItem('cfo_services'); return s ? JSON.parse(s) : DEFAULT_SERVICES; }
-    catch { return DEFAULT_SERVICES; }
-  });
+  // ── Service options (loaded from /api/services) ────
+  const [serviceOptions, setServiceOptions] = useState<string[]>([]);
   const [newSvcName, setNewSvcName] = useState('');
 
   function addServiceOption(raw: string) {
     const name = raw.trim();
     if (!name || serviceOptions.includes(name)) return;
-    const updated = [...serviceOptions, name];
-    setServiceOptions(updated);
-    try { localStorage.setItem('cfo_services', JSON.stringify(updated)); } catch {}
     setRunEntries(prev => prev.map(e => ({ ...e, services: [...e.services, { name, amount: '0', included: true }] })));
     setNewSvcName('');
   }
@@ -177,6 +166,12 @@ export default function Clients() {
   }, []);
 
   useEffect(() => { loadClients(); }, []);
+
+  useEffect(() => {
+    api.getServices()
+      .then(d => setServiceOptions((d as Service[]).map(s => s.name)))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (tab === 'billing') {

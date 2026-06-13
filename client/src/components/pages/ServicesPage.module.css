@@ -1,0 +1,265 @@
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text3);
+  font-size: 13px;
+  padding: 40px 0;
+  justify-content: center;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 32px;
+}
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.emptySub {
+  font-size: 13px;
+  color: var(--text3);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+.newCard {
+  margin-bottom: 16px;
+}
+
+.formTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.svcCard {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.svcHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 14px;
+  gap: 12px;
+}
+
+.svcLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.svcIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.svcName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.svcMeta {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+.svcActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.actionBtn:hover {
+  background: var(--indigo-dim);
+  color: var(--indigo);
+  border-color: var(--indigo);
+}
+
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+.iconBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.deleteBtn:hover {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.children {
+  border-top: 1px solid var(--border);
+  padding: 8px 0 4px;
+}
+
+.child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 16px;
+  gap: 10px;
+}
+.child:hover { background: var(--bg); }
+
+.childLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.childDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.childName {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.childBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+
+.childForm {
+  padding: 10px 16px 12px;
+  border-top: 1px dashed var(--border);
+  margin-top: 4px;
+}
+.childFormLabel {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.addInput {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+.addInput:focus { border-color: var(--indigo); }
+
+.colorPicker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.colorDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  padding: 0;
+}
+.colorDot:hover { transform: scale(1.15); }
+.colorDotActive {
+  border-color: var(--text);
+  transform: scale(1.2);
+}
+
+.addActions {
+  display: flex;
+  gap: 8px;
+}
+
+.addBtn {
+  background: var(--indigo);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+}
+.cancelBtn:hover { background: var(--surface); }
