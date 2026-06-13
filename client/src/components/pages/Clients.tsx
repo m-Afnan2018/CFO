@@ -75,12 +75,13 @@ export default function Clients() {
   const [generatingInvoice, setGeneratingInvoice] = useState<string | null>(null);
 
   // ── Service options (loaded from /api/services) ────
-  const [serviceOptions, setServiceOptions] = useState<string[]>([]);
+  const [serviceOptions, setServiceOptions] = useState<Service[]>([]);
+  const [expandedSvc, setExpandedSvc]       = useState<string | null>(null);
   const [newSvcName, setNewSvcName] = useState('');
 
   function addServiceOption(raw: string) {
     const name = raw.trim();
-    if (!name || serviceOptions.includes(name)) return;
+    if (!name || serviceOptions.some(s => s.name === name)) return;
     setRunEntries(prev => prev.map(e => ({ ...e, services: [...e.services, { name, amount: '0', included: true }] })));
     setNewSvcName('');
   }
@@ -169,7 +170,7 @@ export default function Clients() {
 
   useEffect(() => {
     api.getServices()
-      .then(d => setServiceOptions((d as Service[]).map(s => s.name)))
+      .then(d => setServiceOptions(d as Service[]))
       .catch(() => {});
   }, []);
 
@@ -678,33 +679,70 @@ export default function Clients() {
         </div>
         <div className={styles.servicesMb}>
           <label className="form-label">Services</label>
-          <div className={styles.servicePillsRow}>
-            {serviceOptions.map(svc => {
-              const active = svc in form.serviceAmounts;
-              return (
-                <button
-                  key={svc}
-                  type="button"
-                  onClick={() => {
-                    const next = { ...form.serviceAmounts };
-                    if (active) { delete next[svc]; } else { next[svc] = ''; }
-                    setForm({ ...form, serviceAmounts: next });
-                  }}
-                  style={{
-                    padding: '4px 11px', fontSize: '11px', borderRadius: '20px', cursor: 'pointer',
-                    border: `1px solid ${active ? 'var(--indigo)' : 'var(--border)'}`,
-                    background: active ? 'var(--indigo-dim)' : 'transparent',
-                    color: active ? 'var(--indigo)' : 'var(--text2)',
-                    fontWeight: active ? 600 : 400,
-                    transition: 'all 0.12s',
-                  }}
-                >
-                  {active && <i className="ti ti-check" style={{ fontSize: '10px', marginRight: '4px' }} />}
-                  {svc}
-                </button>
-              );
-            })}
-          </div>
+          {serviceOptions.filter(s => !s.parentId).length === 0 ? (
+            <div className={styles.svcEmpty}>No services yet — add them in the Services page.</div>
+          ) : (
+            <div className={styles.svcParentList}>
+              {serviceOptions.filter(s => !s.parentId).map(parent => {
+                const children     = serviceOptions.filter(s => s.parentId === parent._id);
+                const hasChildren  = children.length > 0;
+                const isExpanded   = expandedSvc === parent._id;
+                const isSelected   = !hasChildren && parent.name in form.serviceAmounts;
+                const anyChild     = hasChildren && children.some(c => c.name in form.serviceAmounts);
+                const c            = colorMap[parent.color] ?? colorMap.indigo;
+
+                return (
+                  <div key={parent._id} className={styles.svcGroup}>
+                    <button
+                      type="button"
+                      className={`${styles.svcParentPill} ${isSelected || anyChild || isExpanded ? styles.svcParentPillActive : ''}`}
+                      style={isSelected || anyChild || isExpanded ? { borderColor: c.fg, background: c.bg, color: c.fg } : {}}
+                      onClick={() => {
+                        if (hasChildren) {
+                          setExpandedSvc(isExpanded ? null : parent._id);
+                        } else {
+                          const next = { ...form.serviceAmounts };
+                          if (isSelected) delete next[parent.name]; else next[parent.name] = '';
+                          setForm({ ...form, serviceAmounts: next });
+                        }
+                      }}
+                    >
+                      {(isSelected || anyChild) && <i className="ti ti-check" style={{ fontSize: '10px', marginRight: '3px' }} />}
+                      {parent.name}
+                      {hasChildren && (
+                        <i className={`ti ti-chevron-${isExpanded ? 'up' : 'down'}`} style={{ fontSize: '10px', marginLeft: '4px' }} />
+                      )}
+                    </button>
+
+                    {hasChildren && isExpanded && (
+                      <div className={styles.svcChildRow}>
+                        {children.map(child => {
+                          const active = child.name in form.serviceAmounts;
+                          const cc     = colorMap[child.color] ?? c;
+                          return (
+                            <button
+                              key={child._id}
+                              type="button"
+                              className={`${styles.svcChildPill} ${active ? styles.svcChildPillActive : ''}`}
+                              style={active ? { borderColor: cc.fg, background: cc.bg, color: cc.fg } : {}}
+                              onClick={() => {
+                                const next = { ...form.serviceAmounts };
+                                if (active) delete next[child.name]; else next[child.name] = '';
+                                setForm({ ...form, serviceAmounts: next });
+                              }}
+                            >
+                              {active && <i className="ti ti-check" style={{ fontSize: '10px', marginRight: '3px' }} />}
+                              {child.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         {Object.keys(form.serviceAmounts).length > 0 && (
           <div className={styles.servicePricingBox}>
