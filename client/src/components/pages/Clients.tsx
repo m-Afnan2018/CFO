@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Modal from '@/components/ui/Modal';
 import DeleteConfirm from '@/components/ui/DeleteConfirm';
 import PageHeader from '@/components/ui/PageHeader';
+import { useToast, Toaster } from '@/components/ui/Toast';
 import type { Client, ClientRecord, ClientBillingPeriod, ColorKey, ServiceItem, PaymentEntry, Service } from '@/types';
 import { api } from '@/lib/api';
 import ClientsYearly from './ClientsYearly';
@@ -52,6 +53,8 @@ function fmt(n: number) {
 }
 
 export default function Clients() {
+  const { toasts, dismiss, toast } = useToast();
+
   // ── Clients tab ──────────────────────────────────────────────
   const [clients, setClients]   = useState<Client[]>([]);
   const [loaded, setLoaded]     = useState(false);
@@ -123,9 +126,9 @@ export default function Clients() {
   async function confirmPayment() {
     if (!payModal) return;
     const total = payEntries.reduce((s, e) => s + (Number(e.amount) || 0), 0);
-    if (total <= 0) { alert('Enter at least one payment amount.'); return; }
+    if (total <= 0) { toast.error('Enter at least one payment amount.'); return; }
     for (const e of payEntries) {
-      if (e.method === 'Online' && !e.mode) { alert('Select a payment mode for each online entry.'); return; }
+      if (e.method === 'Online' && !e.mode) { toast.error('Select a payment mode for each online entry.'); return; }
     }
     setPaySaving(true);
     try {
@@ -135,7 +138,7 @@ export default function Clients() {
       loadBillingPeriods();
       setPayModal(null);
     } catch (e: unknown) {
-      alert(`Payment failed: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Payment failed: ${e instanceof Error ? e.message : String(e)}`);
     }
     setPaySaving(false);
   }
@@ -202,7 +205,7 @@ export default function Clients() {
 
   async function confirmRunBilling() {
     const selected = runEntries.filter(e => e.included);
-    if (!selected.length) { alert('Select at least one client.'); return; }
+    if (!selected.length) { toast.error('Select at least one client.'); return; }
     setShowRunModal(false);
     setRunningBilling(true);
     try {
@@ -220,8 +223,8 @@ export default function Clients() {
       loadBillingPeriods();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('409')) alert(`Billing for ${fmtPeriod(selectedPeriod)} already exists.`);
-      else alert(`Run Billing failed: ${msg}`);
+      if (msg.includes('409')) toast.warning(`Billing for ${fmtPeriod(selectedPeriod)} already exists.`);
+      else toast.error(`Run Billing failed: ${msg}`);
     }
     setRunningBilling(false);
   }
@@ -235,7 +238,7 @@ export default function Clients() {
       loadBillingPeriods();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      alert(`Mark All Paid failed: ${msg}`);
+      toast.error(`Mark All Paid failed: ${msg}`);
     }
     setProcessingAll(false);
   }
@@ -247,7 +250,7 @@ export default function Clients() {
       loadBillingPeriods();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      alert(`Update failed: ${msg}`);
+      toast.error(`Update failed: ${msg}`);
     }
   }
 
@@ -260,7 +263,7 @@ export default function Clients() {
       loadBillingPeriods();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      alert(`Delete failed: ${msg}`);
+      toast.error(`Delete failed: ${msg}`);
     }
     setDeletingPeriod(false);
   }
@@ -304,7 +307,7 @@ export default function Clients() {
       window.location.href = '/invoices';
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      alert(`Failed to generate invoice: ${msg}`);
+      toast.error(`Failed to generate invoice: ${msg}`);
       setGeneratingInvoice(null);
     }
   }
@@ -348,7 +351,7 @@ export default function Clients() {
   }
 
   const save = async () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim()) { toast.error('Client name is required.'); return; }
     setSaving(true);
     try {
       const initials: string = form.name.trim().split(/\s+/).map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -364,12 +367,16 @@ export default function Clients() {
       if (editing) {
         const updated = await api.updateClient(editing._id, payload);
         setClients(prev => prev.map(c => c._id === editing._id ? updated as Client : c));
+        toast.success('Client updated.');
       } else {
         const created = await api.createClient(payload);
         setClients(prev => [created as Client, ...prev]);
+        toast.success('Client added.');
       }
       setIsOpen(false);
-    } catch {}
+    } catch (e: unknown) {
+      toast.error(`Failed to save: ${e instanceof Error ? e.message : 'Something went wrong.'}`);
+    }
     setSaving(false);
   };
 
@@ -379,7 +386,10 @@ export default function Clients() {
     try {
       await api.deleteClient(deleteId);
       setClients(prev => prev.filter(c => c._id !== deleteId));
-    } catch {}
+      toast.success('Client deleted.');
+    } catch (e: unknown) {
+      toast.error(`Delete failed: ${e instanceof Error ? e.message : 'Something went wrong.'}`);
+    }
     setDeleting(false);
     setDeleteId(null);
   }
@@ -1174,6 +1184,8 @@ export default function Clients() {
           </div>
         </div>
       )}
+
+      <Toaster toasts={toasts} dismiss={dismiss} />
     </div>
   );
 }

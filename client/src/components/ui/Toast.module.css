@@ -1,0 +1,76 @@
+.container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  min-width: 260px;
+  max-width: 380px;
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: all;
+  animation: slideIn 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.msg {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  opacity: 0.6;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.close:hover { opacity: 1; }
+
+/* Variants */
+.success {
+  background: var(--emerald-dim);
+  border-color: var(--emerald);
+  color: var(--emerald);
+}
+.error {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+.warning {
+  background: var(--amber-dim);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.info {
+  background: var(--indigo-dim);
+  border-color: var(--indigo);
+  color: var(--indigo);
+}
