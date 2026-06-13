@@ -15,6 +15,7 @@ import slipTemplateRoutes from './routes/slipTemplate';
 import clientRecordRoutes from './routes/clientRecords';
 import gstFilingsRoutes, { runGSTReminderCron } from './routes/gstFilings';
 import tdsFilingsRoutes, { runTDSReminderCron } from './routes/tdsFilings';
+import serviceRoutes from './routes/services';
 import { requireAuth } from './middleware/authMiddleware';
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api/slip-template', slipTemplateRoutes);
 app.use('/api/client-records', clientRecordRoutes);
 app.use('/api/gst-filings', gstFilingsRoutes);
 app.use('/api/tds-filings', tdsFilingsRoutes);
+app.use('/api/services', serviceRoutes);
 
 mongoose
   .connect(MONGO_URI)

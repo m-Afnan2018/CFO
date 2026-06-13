@@ -1,5 +1,6 @@
 .navSection {
   flex: 1;
+  overflow-y: auto;
 }
 
 .footer {
@@ -18,4 +19,169 @@
 
 .actionBtnSpaced {
   margin-bottom: 2px;
+}
+
+/* ── Services section ── */
+.svcHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 4px;
+}
+
+.svcAddBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  transition: color 0.15s, background 0.15s;
+}
+.svcAddBtn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.svcItem {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.svcLink {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+}
+.svcLink:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.svcLinkActive {
+  background: var(--indigo-dim);
+  color: var(--indigo);
+  font-weight: 600;
+}
+
+.svcChild .svcLink {
+  padding-left: 28px;
+  font-size: 12.5px;
+}
+
+.svcChevron {
+  font-size: 11px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.svcChevronOpen {
+  transform: rotate(90deg);
+}
+
+.svcDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.svcActions {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  position: absolute;
+  right: 6px;
+}
+.svcItem:hover .svcActions {
+  display: flex;
+}
+
+.svcActionBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.svcActionBtn:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.svcActionBtnDel:hover {
+  color: var(--red);
+  background: var(--red-dim);
+}
+
+/* ── Inline add form ── */
+.svcForm {
+  padding: 4px 10px 6px;
+}
+.svcFormInner {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.svcInput {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+.svcInput:focus {
+  border-color: var(--indigo);
+}
+.svcFormBtn {
+  background: var(--indigo);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.svcFormBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.svcFormCancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 5px 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.svcFormCancel:hover {
+  color: var(--text);
+  background: var(--surface);
 }

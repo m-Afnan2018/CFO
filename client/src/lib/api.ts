@@ -80,4 +80,8 @@ export const api = {
   markTDSReceived: (id: string, receivedAt?: string) => post(`/tds-filings/${id}/mark-received`, { receivedAt }),
   markTDSPending: (id: string) => post(`/tds-filings/${id}/mark-pending`, {}),
   sendTDSReminder: (id: string) => post(`/tds-filings/${id}/send-reminder`, {}),
+  getServices: () => get('/services'),
+  createService: (data: unknown) => post('/services', data),
+  updateService: (id: string, data: unknown) => put(`/services/${id}`, data),
+  deleteService: (id: string) => del(`/services/${id}`),
 };

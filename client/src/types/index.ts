@@ -13,6 +13,16 @@ export type Page =
 
 export type ColorKey = 'emerald' | 'indigo' | 'blue' | 'amber' | 'red';
 
+export interface Service {
+  _id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  icon: string;
+  color: string;
+  order: number;
+}
+
 export interface ServiceItem {
   name: string;
   amount: number;
