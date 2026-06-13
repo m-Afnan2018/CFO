@@ -23,7 +23,7 @@ export function useToast() {
   const add = useCallback((type: ToastType, message: string) => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, type, message }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3800);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 5000);
   }, []);
 
   const dismiss = useCallback((id: number) => {

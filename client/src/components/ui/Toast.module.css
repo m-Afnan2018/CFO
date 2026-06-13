@@ -22,12 +22,19 @@
   font-weight: 500;
   pointer-events: all;
   animation: slideIn 0.2s ease;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .icon {
@@ -51,7 +58,10 @@
   display: flex;
   align-items: center;
 }
-.close:hover { opacity: 1; }
+
+.close:hover {
+  opacity: 1;
+}
 
 /* Variants */
 .success {
@@ -59,16 +69,20 @@
   border-color: var(--emerald);
   color: var(--emerald);
 }
+
 .error {
-  background: var(--red-dim);
+  /* background: var(--red-dim); */
+  background: rgb(255 255 255 / 75%);
   border-color: var(--red);
   color: var(--red);
 }
+
 .warning {
   background: var(--amber-dim);
   border-color: var(--amber);
   color: var(--amber);
 }
+
 .info {
   background: var(--indigo-dim);
   border-color: var(--indigo);
