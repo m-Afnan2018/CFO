@@ -1,0 +1,67 @@
+/* Alerts.module.css */
+
+.alertsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.alertsTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.loadingMsg {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.checkIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: var(--emerald);
+}
+
+.emptyTitle {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.emptySub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+/* Dynamic colour via CSS custom property */
+.alertIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: var(--alert-color);
+}
+
+.alertTitle {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.alertSub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+.alertBtn {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.cardTitleMb {
+  margin-bottom: 12px;
+}

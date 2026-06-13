@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import type { Invoice, Expense, DashboardKPIs } from '@/types';
 import { api } from '@/lib/api';
+import styles from './CashFlow.module.css';
 
 function fmt(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
@@ -37,19 +38,28 @@ export default function CashFlow() {
       </div>
       <div className="content">
         <div className="cf-sum">
-          <div className="cf-item"><div className="cf-label">Cash Inflow</div><div className="cf-val" style={{ color: 'var(--emerald)' }}>{fmt(inflow)}</div></div>
-          <div className="cf-item"><div className="cf-label">Cash Outflow</div><div className="cf-val" style={{ color: 'var(--red)' }}>{fmt(outflow)}</div></div>
-          <div className="cf-item"><div className="cf-label">Net Cash Flow</div><div className="cf-val" style={{ color: 'var(--blue)' }}>{fmt(net)}</div></div>
+          <div className="cf-item">
+            <div className="cf-label">Cash Inflow</div>
+            <div className={`cf-val ${styles.valGreen}`}>{fmt(inflow)}</div>
+          </div>
+          <div className="cf-item">
+            <div className="cf-label">Cash Outflow</div>
+            <div className={`cf-val ${styles.valRed}`}>{fmt(outflow)}</div>
+          </div>
+          <div className="cf-item">
+            <div className="cf-label">Net Cash Flow</div>
+            <div className={`cf-val ${styles.valBlue}`}>{fmt(net)}</div>
+          </div>
         </div>
         <div className="grid2">
           <div className="card">
             <div className="card-title">Cash Flow Chart<span className="card-sub">No data yet</span></div>
-            <div style={{ height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+            <div className={styles.placeholder}>
               Add invoices and expenses to see monthly cash flow
             </div>
           </div>
           <div className="card">
-            <div className="card-title">Runway & Forecast</div>
+            <div className="card-title">Runway &amp; Forecast</div>
             {[
               { k: 'Current Bank Balance', v: fmt(bankBalance), c: 'var(--emerald)' },
               { k: 'Monthly Burn Rate', v: fmt(monthlyBurn), c: 'var(--red)' },

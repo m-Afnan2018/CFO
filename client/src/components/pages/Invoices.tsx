@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import DeleteConfirm from '@/components/ui/DeleteConfirm';
 import type { Invoice } from '@/types';
 import { api } from '@/lib/api';
+import styles from './Invoices.module.css';
 
 const statusBadge: Record<string, string> = { Paid: 'bg', Partial: 'ba', Overdue: 'br', Pending: 'bb' };
 
@@ -82,13 +83,13 @@ export default function Invoices() {
           <input
             type="text"
             placeholder="Search client / invoice…"
-            style={{ width: '180px' }}
+            className={styles.searchInput}
             value={searchQ}
             onChange={e => setSearchQ(e.target.value)}
           />
           {months.length > 0 && (
             <div className="fp">
-              <i className="ti ti-calendar" style={{ fontSize: '13px' }} />
+              <i className={`ti ti-calendar ${styles.fpIcon}`} />
               <select value={monthFilter} onChange={e => setMonthFilter(e.target.value)}>
                 <option value="">All Months</option>
                 {months.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
@@ -96,7 +97,7 @@ export default function Invoices() {
             </div>
           )}
           <div className="fp">
-            <i className="ti ti-filter" style={{ fontSize: '13px' }} />
+            <i className={`ti ti-filter ${styles.fpIcon}`} />
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
               <option value="All">All Status</option>
               <option>Paid</option>
@@ -112,28 +113,28 @@ export default function Invoices() {
       </div>
 
       <div className="content">
-        <div className="grid4" style={{ marginBottom: '18px' }}>
+        <div className={`grid4 ${styles.grid4mb}`}>
           <div className="kpi">
             <div className="kpi-label">Total Invoiced</div>
             <div className="kpi-value">{fmt(totalInvoiced)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{invoices.length} invoices</div>
+            <div className={`kpi-change ${styles.kpiChangeSub}`}>{invoices.length} invoices</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Collected</div>
-            <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{fmt(collected)}</div>
+            <div className={`kpi-value ${styles.valGreen}`}>{fmt(collected)}</div>
             <div className="kpi-change up">
               {totalInvoiced > 0 ? Math.round((collected / totalInvoiced) * 100) : 0}% collected
             </div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Overdue</div>
-            <div className="kpi-value" style={{ color: 'var(--red)' }}>{fmt(overdue)}</div>
+            <div className={`kpi-value ${styles.valRed}`}>{fmt(overdue)}</div>
             <div className="kpi-change down">{invoices.filter(i => i.status === 'Overdue').length} invoices</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">Pending</div>
-            <div className="kpi-value" style={{ color: 'var(--amber)' }}>{fmt(pending)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+            <div className={`kpi-value ${styles.valAmber}`}>{fmt(pending)}</div>
+            <div className={`kpi-change ${styles.kpiChangeSub}`}>
               {invoices.filter(i => ['Pending', 'Partial'].includes(i.status)).length} invoices
             </div>
           </div>
@@ -146,10 +147,10 @@ export default function Invoices() {
           </div>
 
           {!loaded ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '16px 0' }}>Loading…</div>
+            <div className={styles.loadingMsg}>Loading…</div>
           ) : displayed.length === 0 ? (
-            <div style={{ padding: '32px 0', textAlign: 'center' }}>
-              <div style={{ fontSize: '13px', color: 'var(--text3)', marginBottom: '12px' }}>
+            <div className={styles.emptyCenter}>
+              <div className={styles.emptyCenterMsg}>
                 {statusFilter === 'All' && !searchQ && !monthFilter
                   ? 'No invoices yet'
                   : 'No invoices match your filters'}
@@ -171,34 +172,33 @@ export default function Invoices() {
               <tbody>
                 {displayed.map(inv => (
                   <tr key={inv._id}>
-                    <td style={{ color: 'var(--indigo)', fontWeight: 700 }}>{inv.invoiceNumber}</td>
-                    <td style={{ color: 'var(--text)', fontWeight: 500 }}>{inv.client}</td>
+                    <td className={styles.invoiceNum}>{inv.invoiceNumber}</td>
+                    <td className={styles.clientName}>{inv.client}</td>
                     <td>{inv.date || '—'}</td>
                     <td>{inv.dueDate || '—'}</td>
                     <td>₹{inv.amount.toLocaleString('en-IN')}</td>
                     <td>₹{inv.gst.toLocaleString('en-IN')}</td>
-                    <td style={{ fontWeight: 700, color: 'var(--text)' }}>₹{inv.total.toLocaleString('en-IN')}</td>
+                    <td className={styles.totalCell}>₹{inv.total.toLocaleString('en-IN')}</td>
                     <td><span className={`badge ${statusBadge[inv.status]}`}>{inv.status}</span></td>
                     <td>
-                      <div style={{ display: 'flex', gap: '6px' }}>
+                      <div className={styles.actionRow}>
                         {inv.status !== 'Paid' && (
                           <button
-                            className="btn"
-                            style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--emerald)' }}
+                            className={`btn ${styles.btnSmGreen}`}
                             title="Mark as Paid"
                             onClick={() => markAsPaid(inv)}
                             disabled={markingPaid === inv._id}
                           >
-                            <i className={`ti ${markingPaid === inv._id ? 'ti-loader-2' : 'ti-circle-check'}`} style={{ fontSize: '13px' }} />
+                            <i className={`ti ${markingPaid === inv._id ? 'ti-loader-2' : 'ti-circle-check'} ${styles.iconMd}`} />
                           </button>
                         )}
-                        <button className="btn" style={{ padding: '4px 9px', fontSize: '11px' }}
+                        <button className={`btn ${styles.btnSm}`}
                           title="Edit" onClick={() => router.push(`/invoices/${inv._id}/edit`)}>
-                          <i className="ti ti-pencil" style={{ fontSize: '12px' }} />
+                          <i className={`ti ti-pencil ${styles.iconSm}`} />
                         </button>
-                        <button className="btn" style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--red)' }}
+                        <button className={`btn ${styles.btnSmRed}`}
                           title="Delete" onClick={() => setDeleteId(inv._id)}>
-                          <i className="ti ti-trash" style={{ fontSize: '12px' }} />
+                          <i className={`ti ti-trash ${styles.iconSm}`} />
                         </button>
                       </div>
                     </td>

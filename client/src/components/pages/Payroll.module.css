@@ -1,0 +1,462 @@
+/* ── Avatar: CSS custom property driven colors ── */
+.avatarColored {
+  background: var(--avatar-bg);
+  color: var(--avatar-fg);
+}
+
+/* ── Tab nav ── */
+.tabNav {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0 24px;
+  display: flex;
+}
+
+.tabBtn {
+  padding: 12px 20px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 400;
+  color: var(--text2);
+}
+
+.tabBtnActive {
+  font-weight: 700;
+  color: var(--indigo);
+  border-bottom: 2px solid var(--indigo);
+}
+
+/* ── Shared text helpers ── */
+.kpiSub {
+  color: var(--text2);
+}
+
+.loadingText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.emptyText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 32px 0;
+  text-align: center;
+}
+
+/* ── Employee table ── */
+.thRight {
+  text-align: right;
+}
+
+.empCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empName {
+  font-weight: 500;
+}
+
+.deptCell {
+  color: var(--text2);
+}
+
+.grossCell {
+  color: var(--emerald);
+}
+
+.deductCell {
+  color: var(--red);
+}
+
+.netCell {
+  font-weight: 700;
+  color: var(--indigo);
+}
+
+.actionsCell {
+  text-align: right;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.btnSm {
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--emerald);
+}
+
+.btnIcon {
+  padding: 4px 8px;
+}
+
+.btnIconRed {
+  padding: 4px 8px;
+  color: var(--red);
+}
+
+.btnDanger {
+  color: var(--red);
+}
+
+/* ── Period nav ── */
+.periodNav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btnPeriodNav {
+  padding: 6px 14px;
+}
+
+.periodLabel {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 150px;
+  text-align: center;
+}
+
+.btnThisMonth {
+  font-size: 11px;
+}
+
+/* ── Payroll empty state ── */
+.payrollLoading {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 60px 0;
+  text-align: center;
+}
+
+.payrollEmpty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.payrollEmptyIcon {
+  font-size: 36px;
+  margin-bottom: 14px;
+}
+
+.payrollEmptyTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.payrollEmptyMsg {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+}
+
+.generateError {
+  font-size: 12px;
+  color: var(--red);
+  padding: 8px 16px;
+  background: var(--red-dim);
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+/* ── Payroll table ── */
+.tableScroll {
+  overflow-x: auto;
+}
+
+.thCenter {
+  text-align: center;
+}
+
+.grossPayCell {
+  font-weight: 600;
+}
+
+.grossPayBase {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.tdCenter {
+  text-align: center;
+}
+
+.deductAmt {
+  font-size: 12px;
+  color: var(--red);
+}
+
+.deductNone {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.netSalaryCell {
+  font-weight: 700;
+  color: var(--indigo);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.paidCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paidBadgeIcon {
+  font-size: 11px;
+}
+
+.btnSlip {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.btnMarkPaid {
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--emerald);
+  white-space: nowrap;
+}
+
+.iconSm {
+  font-size: 13px;
+}
+
+.iconXsm {
+  font-size: 12px;
+}
+
+/* ── Template tab ── */
+.templateCard {
+  max-width: 620px;
+}
+
+.templateActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* ── Modal: earnings/deductions ── */
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.earningsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.deductionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.formFieldNoMb {
+  margin-bottom: 0;
+}
+
+.hintText {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* ── Salary summary boxes ── */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summaryBox {
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.summaryBoxLabel {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 3px;
+}
+
+.summaryGross {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--emerald);
+}
+
+.summaryBoxHint {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* ── Salary Increment modal ── */
+.incrModalWidth {
+  max-width: 420px;
+}
+
+.incrEmployeeInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 12px;
+  background: var(--bg3);
+  border-radius: 10px;
+}
+
+.incrEmpName {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.incrEmpSub {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.incrTypeRow {
+  display: flex;
+  gap: 10px;
+}
+
+.incrTypeLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.incrRadio {
+  width: auto;
+  accent-color: var(--indigo);
+}
+
+.incrResult {
+  background: var(--emerald-dim);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.incrResultLabel {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+.incrResultValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--emerald);
+}
+
+.incrResultSub {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+/* ── Delete confirm modal ── */
+.deleteModalWidth {
+  max-width: 360px;
+}
+
+.deleteConfirmText {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0;
+}
+
+.btnDelete {
+  background: var(--red);
+  color: #fff;
+  border: none;
+}
+
+/* ── Analytics ── */
+.gridMb {
+  margin-bottom: 18px;
+}
+
+.deptNameCell {
+  font-weight: 600;
+}
+
+.deptTotalCell {
+  color: var(--indigo);
+  font-weight: 700;
+}
+
+.chartNoData {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.trendEmpCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trendEmpName {
+  font-weight: 500;
+}
+
+.trendDeptCell {
+  color: var(--text2);
+}
+
+.trendAvgCell {
+  font-weight: 700;
+}
+
+.trendMissing {
+  color: var(--text3);
+}
+
+.trendIcon {
+  font-size: 10px;
+  margin-left: 3px;
+}

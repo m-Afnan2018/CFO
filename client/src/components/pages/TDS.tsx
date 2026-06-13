@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import type { Invoice, TDSFiling, SMTPConfig } from '@/types';
 import { api } from '@/lib/api';
+import styles from './TDS.module.css';
 
 function fmt(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(2)}L`;
@@ -219,7 +220,7 @@ export default function TDS() {
         <div className="topbar-title">TDS Summary</div>
         <div className="topbar-right">
           <button className="btn" onClick={() => setShowSmtp(v => !v)}>
-            <i className="ti ti-settings" style={{ fontSize: '13px' }} />Email Settings
+            <i className={`ti ti-settings ${styles.settingsIcon}`} />Email Settings
           </button>
         </div>
       </div>
@@ -227,45 +228,45 @@ export default function TDS() {
       <div className="content">
 
         {/* KPIs */}
-        <div className="grid4" style={{ marginBottom: '18px' }}>
+        <div className={`grid4 ${styles.gridMb}`}>
           <div className="kpi">
             <div className="kpi-label">Total TDS Receivable</div>
-            <div className="kpi-value" style={{ color: 'var(--amber)' }}>{fmt(totalTDS)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>All invoices</div>
+            <div className={`kpi-value ${styles.kpiAmber}`}>{fmt(totalTDS)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>All invoices</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">TDS u/s 194J</div>
-            <div className="kpi-value" style={{ color: 'var(--indigo)' }}>{fmt(total194J)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>Professional services</div>
+            <div className={`kpi-value ${styles.kpiIndigo}`}>{fmt(total194J)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>Professional services</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">TDS u/s 194C</div>
-            <div className="kpi-value" style={{ color: 'var(--blue)' }}>{fmt(total194C)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>Contractor</div>
+            <div className={`kpi-value ${styles.kpiBlue}`}>{fmt(total194C)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>Contractor</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">TDS — Other Sections</div>
-            <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{fmt(totalOther)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>194H / 194I / etc.</div>
+            <div className={`kpi-value ${styles.kpiEmerald}`}>{fmt(totalOther)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>194H / 194I / etc.</div>
           </div>
         </div>
 
         {/* SMTP panel */}
         {showSmtp && (
-          <div className="card" style={{ marginBottom: '16px' }}>
+          <div className={`card ${styles.smtpCard}`}>
             <div className="card-title">
               Email / SMTP Settings
-              <span className="card-sub" style={{ color: smtp?.configured ? 'var(--emerald)' : 'var(--red)' }}>
+              <span className={`card-sub ${smtp?.configured ? styles.smtpConfigured : styles.smtpNotConfigured}`}>
                 {smtp?.configured ? '● Configured' : '○ Not configured'}
               </span>
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '12px' }}>
+            <div className={styles.smtpInfo}>
               Used to send TDS reminder emails. Shared with GST settings.
             </div>
             <div className="form-row">
               <div><label className="form-label">SMTP Host</label>
                 <input placeholder="smtp.gmail.com" value={smtpForm.smtpHost} onChange={e => setSmtpForm(f => ({ ...f, smtpHost: e.target.value }))} /></div>
-              <div style={{ maxWidth: '100px' }}><label className="form-label">Port</label>
+              <div className={styles.portField}><label className="form-label">Port</label>
                 <input type="number" placeholder="587" value={smtpForm.smtpPort} onChange={e => setSmtpForm(f => ({ ...f, smtpPort: e.target.value }))} /></div>
             </div>
             <div className="form-row">
@@ -274,11 +275,11 @@ export default function TDS() {
               <div><label className="form-label">Password / App Password</label>
                 <input type="password" placeholder="Leave blank to keep existing" value={smtpForm.smtpPass} onChange={e => setSmtpForm(f => ({ ...f, smtpPass: e.target.value }))} /></div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+            <div className={styles.smtpSaveRow}>
               <button className="btn btn-p" onClick={saveSmtp} disabled={smtpSaving}>
                 <i className="ti ti-device-floppy" />{smtpSaving ? 'Saving…' : 'Save Settings'}
               </button>
-              {smtpMsg && <span style={{ fontSize: '12px', color: smtpMsg.includes('success') ? 'var(--emerald)' : 'var(--red)' }}>{smtpMsg}</span>}
+              {smtpMsg && <span className={smtpMsg.includes('success') ? styles.smtpMsgOk : styles.smtpMsgErr}>{smtpMsg}</span>}
             </div>
           </div>
         )}
@@ -290,9 +291,9 @@ export default function TDS() {
             <span className="card-sub">{quarters.length} quarter{quarters.length !== 1 ? 's' : ''}</span>
           </div>
           {!loaded ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+            <div className={styles.loadingText}>Loading…</div>
           ) : quarters.length === 0 ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '24px 0', textAlign: 'center' }}>
+            <div className={styles.emptyText}>
               No invoices yet — add invoices with TDS deducted to see quarterly summary here
             </div>
           ) : (
@@ -302,10 +303,10 @@ export default function TDS() {
                   <th>Quarter</th>
                   <th>Invoices</th>
                   <th>Gross Amount</th>
-                  <th style={{ color: 'var(--amber)' }}>TDS Total</th>
-                  <th style={{ color: 'var(--indigo)' }}>194J</th>
-                  <th style={{ color: 'var(--blue)' }}>194C</th>
-                  <th style={{ color: 'var(--emerald)' }}>Others</th>
+                  <th className={styles.thAmber}>TDS Total</th>
+                  <th className={styles.thIndigo}>194J</th>
+                  <th className={styles.thBlue}>194C</th>
+                  <th className={styles.thEmerald}>Others</th>
                   <th>Due Date</th>
                   <th>Reminder</th>
                   <th>Status</th>
@@ -317,45 +318,45 @@ export default function TDS() {
                   const st = statusBadge(q);
                   return (
                     <tr key={q.quarter}>
-                      <td style={{ fontWeight: 700, color: 'var(--text)', fontSize: '12px' }}>{quarterLabel(q.quarter)}</td>
-                      <td style={{ color: 'var(--text2)' }}>{q.invoiceCount}</td>
+                      <td className={styles.quarterCell}>{quarterLabel(q.quarter)}</td>
+                      <td className={styles.countCell}>{q.invoiceCount}</td>
                       <td>{fmt(q.grossAmount)}</td>
-                      <td style={{ fontWeight: 700, color: 'var(--amber)' }}>{fmt(q.tdsTotal)}</td>
-                      <td style={{ color: 'var(--indigo)' }}>{fmt(q.tds194J)}</td>
-                      <td style={{ color: 'var(--blue)' }}>{fmt(q.tds194C)}</td>
-                      <td style={{ color: 'var(--emerald)' }}>{fmt(q.tdsOther)}</td>
-                      <td style={{ fontSize: '12px', color: 'var(--text2)' }}>
-                        {q.filing?.dueDate || <span style={{ color: 'var(--text3)' }}>Not set</span>}
+                      <td className={styles.tdsTotalCell}>{fmt(q.tdsTotal)}</td>
+                      <td className={styles.tds194JCell}>{fmt(q.tds194J)}</td>
+                      <td className={styles.tds194CCell}>{fmt(q.tds194C)}</td>
+                      <td className={styles.tdsOtherCell}>{fmt(q.tdsOther)}</td>
+                      <td className={styles.dueDateCell}>
+                        {q.filing?.dueDate || <span className={styles.dueDateNotSet}>Not set</span>}
                       </td>
                       <td>
                         {q.filing?.reminderEmail ? (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: q.filing?.reminderSent ? 'var(--emerald)' : 'var(--amber)' }}>
-                            <i className={`ti ${q.filing?.reminderSent ? 'ti-bell-check' : 'ti-bell'}`} style={{ fontSize: '13px' }} />
+                          <span className={`${styles.reminderSet} ${q.filing?.reminderSent ? styles.reminderSent : styles.reminderPending}`}>
+                            <i className={`ti ${q.filing?.reminderSent ? 'ti-bell-check' : 'ti-bell'} ${styles.reminderBellIcon}`} />
                             {q.filing!.reminderDays}d prior
                           </span>
-                        ) : <span style={{ fontSize: '11px', color: 'var(--text3)' }}>—</span>}
+                        ) : <span className={styles.reminderNone}>—</span>}
                       </td>
                       <td>
                         <span className={`badge ${st.badge}`}>{st.label}</span>
                         {q.filing?.status === 'Received' && q.filing.receivedAt && (
-                          <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>{q.filing.receivedAt}</div>
+                          <div className={styles.receivedAt}>{q.filing.receivedAt}</div>
                         )}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end' }}>
-                          <button className="btn" style={{ padding: '4px 9px', fontSize: '11px' }}
+                        <div className={styles.actionsGroup}>
+                          <button className={`btn ${styles.btnSettings}`}
                             title="Due date & reminder settings" onClick={() => openSettings(q)}>
-                            <i className="ti ti-settings" style={{ fontSize: '12px' }} />
+                            <i className={`ti ti-settings ${styles.settingsIcon}`} />
                           </button>
                           {q.filing?.status !== 'Received' ? (
-                            <button className="btn btn-p" style={{ padding: '4px 10px', fontSize: '11px' }}
+                            <button className={`btn btn-p ${styles.btnMarkReceived}`}
                               onClick={() => openReceivedModal(q)}>
-                              <i className="ti ti-check" style={{ fontSize: '11px' }} />Received
+                              <i className={`ti ti-check ${styles.checkIcon}`} />Received
                             </button>
                           ) : (
-                            <button className="btn" style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--text3)' }}
+                            <button className={`btn ${styles.btnRevert}`}
                               title="Revert to Pending" onClick={() => q.filing && revertToPending(q.filing)}>
-                              <i className="ti ti-arrow-back-up" style={{ fontSize: '11px' }} />
+                              <i className={`ti ti-arrow-back-up ${styles.revertIcon}`} />
                             </button>
                           )}
                         </div>
@@ -370,7 +371,7 @@ export default function TDS() {
 
         {/* TDS position summary */}
         {quarters.length > 0 && (
-          <div className="card" style={{ marginTop: '16px' }}>
+          <div className={`card ${styles.tdsSummaryCard}`}>
             <div className="card-title">TDS Position Summary</div>
             {[
               { k: 'Total TDS Receivable (All Quarters)',   v: fmt(totalTDS),   c: 'var(--amber)' },
@@ -383,7 +384,7 @@ export default function TDS() {
             ].map(row => (
               <div key={row.k} className="stat-row">
                 <span className="sk">{row.k}</span>
-                <span className="sv" style={row.c ? { color: row.c } : {}}>{row.v}</span>
+                <span className="sv" style={row.c ? { '--sv-color': row.c, color: 'var(--sv-color)' } as React.CSSProperties : {}}>{row.v}</span>
               </div>
             ))}
           </div>
@@ -393,30 +394,30 @@ export default function TDS() {
       {/* Settings Modal */}
       {settingsModal && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setSettingsModal(null); }}>
-          <div className="modal" style={{ maxWidth: '420px' }}>
+          <div className={`modal ${styles.settingsModalWidth}`}>
             <div className="modal-header">
               <span className="modal-title">TDS Settings — {quarterLabel(settingsModal.quarter)}</span>
               <button className="modal-close" onClick={() => setSettingsModal(null)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
-              <div style={{ marginBottom: '14px' }}>
+              <div className={styles.dueDateSection}>
                 <label className="form-label">Certificate Due Date</label>
                 <input type="date" value={settingsDueDate} onChange={e => setSettingsDueDate(e.target.value)} />
-                <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '4px' }}>
+                <div className={styles.dueDateHint}>
                   Deadline for clients to issue Form 16A TDS certificate
                 </div>
               </div>
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '14px', marginBottom: '14px' }}>
-                <label className="form-label" style={{ marginBottom: '8px', display: 'block' }}>Email Reminder</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div className={styles.reminderSection}>
+                <label className={`form-label ${styles.reminderLabel}`}>Email Reminder</label>
+                <div className={styles.reminderDaysRow}>
                   <input type="number" min={1} max={30} value={settingsRemDays}
-                    onChange={e => setSettingsRemDays(Number(e.target.value))} style={{ width: '65px' }} />
-                  <span style={{ fontSize: '13px', color: 'var(--text2)' }}>days before due date</span>
+                    onChange={e => setSettingsRemDays(Number(e.target.value))} className={styles.reminderDaysInput} />
+                  <span className={styles.reminderDaysText}>days before due date</span>
                 </div>
                 <input type="email" placeholder="accounts@ganesyx.com" value={settingsRemEmail}
                   onChange={e => setSettingsRemEmail(e.target.value)} />
                 {settingsDueDate && settingsRemEmail && (
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '6px' }}>
+                  <div className={styles.reminderPreview}>
                     Reminder on: <strong>{(() => {
                       const d = new Date(settingsDueDate);
                       d.setDate(d.getDate() - settingsRemDays);
@@ -427,13 +428,13 @@ export default function TDS() {
               </div>
               {settingsModal.filing && settingsRemEmail && (
                 smtp?.configured ? (
-                  <button className="btn" style={{ fontSize: '12px', padding: '5px 12px' }}
+                  <button className={`btn ${styles.btnSendReminder}`}
                     onClick={triggerReminder} disabled={sendingReminder}>
-                    <i className="ti ti-send" style={{ fontSize: '12px' }} />
+                    <i className={`ti ti-send ${styles.sendIcon}`} />
                     {sendingReminder ? 'Sending…' : reminderSent ? '✓ Sent' : 'Send Test Reminder Now'}
                   </button>
                 ) : (
-                  <div style={{ fontSize: '11px', color: 'var(--amber)', padding: '8px 10px', background: '#fffbeb', borderRadius: '6px' }}>
+                  <div className={styles.smtpWarning}>
                     ⚠ SMTP not configured — click &quot;Email Settings&quot; to set up.
                   </div>
                 )
@@ -452,32 +453,32 @@ export default function TDS() {
       {/* Mark Received Modal */}
       {receivedModal && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setReceivedModal(null); }}>
-          <div className="modal" style={{ maxWidth: '360px' }}>
+          <div className={`modal ${styles.receivedModalWidth}`}>
             <div className="modal-header">
               <span className="modal-title">Mark Received — {quarterLabel(receivedModal.quarter)}</span>
               <button className="modal-close" onClick={() => setReceivedModal(null)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
-              <div style={{ marginBottom: '12px' }}>
+              <div className={styles.receivedDateSection}>
                 <label className="form-label">Date Received (Form 16A)</label>
                 <input type="date" value={receivedDate} onChange={e => setReceivedDate(e.target.value)} />
               </div>
-              <div style={{ padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px', fontSize: '12px' }}>
-                <div className="stat-row" style={{ margin: 0 }}>
+              <div className={styles.receivedSummary}>
+                <div className={`stat-row ${styles.statRowNoMargin}`}>
                   <span className="sk">TDS Total</span>
-                  <span className="sv" style={{ color: 'var(--amber)', fontWeight: 700 }}>{fmt(receivedModal.tdsTotal)}</span>
+                  <span className={`sv ${styles.svAmber}`}>{fmt(receivedModal.tdsTotal)}</span>
                 </div>
-                <div className="stat-row" style={{ margin: 0 }}>
+                <div className={`stat-row ${styles.statRowNoMargin}`}>
                   <span className="sk">194J</span>
-                  <span className="sv" style={{ color: 'var(--indigo)' }}>{fmt(receivedModal.tds194J)}</span>
+                  <span className={`sv ${styles.svIndigo}`}>{fmt(receivedModal.tds194J)}</span>
                 </div>
-                <div className="stat-row" style={{ margin: 0 }}>
+                <div className={`stat-row ${styles.statRowNoMargin}`}>
                   <span className="sk">194C</span>
-                  <span className="sv" style={{ color: 'var(--blue)' }}>{fmt(receivedModal.tds194C)}</span>
+                  <span className={`sv ${styles.svBlue}`}>{fmt(receivedModal.tds194C)}</span>
                 </div>
-                <div className="stat-row" style={{ margin: 0, borderBottom: 'none' }}>
+                <div className={`stat-row ${styles.statRowNoMarginNoBorder}`}>
                   <span className="sk">Others</span>
-                  <span className="sv" style={{ color: 'var(--emerald)' }}>{fmt(receivedModal.tdsOther)}</span>
+                  <span className={`sv ${styles.svEmerald}`}>{fmt(receivedModal.tdsOther)}</span>
                 </div>
               </div>
             </div>

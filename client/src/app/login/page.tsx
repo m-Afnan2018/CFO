@@ -1,6 +1,7 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from './page.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,31 +35,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'var(--bg)', padding: '20px',
-    }}>
-      <div style={{ width: '100%', maxWidth: '380px' }}>
+    <div className={styles.page}>
+      <div className={styles.card}>
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '52px', height: '52px', borderRadius: '14px',
-            background: 'var(--indigo)', color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '24px', fontWeight: 800, margin: '0 auto 14px',
-          }}>G</div>
-          <div style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text)' }}>Ganesyx CFO</div>
-          <div style={{ fontSize: '12px', color: 'var(--text3)', marginTop: '5px' }}>
+        <div className={styles.logoWrap}>
+          <div className={styles.logoMark}>G</div>
+          <div className={styles.logoName}>Ganesyx CFO</div>
+          <div className={styles.logoSub}>
             Sign in to access the dashboard
           </div>
         </div>
 
         {/* Form card */}
-        <div style={{
-          background: 'var(--bg2)', border: '1px solid var(--border)',
-          borderRadius: '16px', padding: '28px 24px',
-        }}>
+        <div className={styles.formCard}>
           <form onSubmit={handleSubmit} autoComplete="on">
             <div className="form-field">
               <label className="form-label">Username</label>
@@ -73,58 +63,48 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="form-field" style={{ marginBottom: error ? '14px' : '20px' }}>
+            <div className={`form-field ${error ? styles.fieldPasswordError : styles.fieldPassword}`}>
               <label className="form-label">Password</label>
-              <div style={{ position: 'relative' }}>
+              <div className={styles.pwWrap}>
                 <input
-                  className="form-input"
+                  className={`form-input ${styles.pwInput}`}
                   type={showPw ? 'text' : 'password'}
                   placeholder="Enter password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  style={{ paddingRight: '40px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(v => !v)}
-                  style={{
-                    position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'var(--text3)', padding: '4px',
-                  }}
+                  className={styles.pwToggle}
                   tabIndex={-1}
                 >
-                  <i className={`ti ${showPw ? 'ti-eye-off' : 'ti-eye'}`} style={{ fontSize: '15px' }} />
+                  <i className={`ti ${showPw ? 'ti-eye-off' : 'ti-eye'} ${styles.pwToggleIcon}`} />
                 </button>
               </div>
             </div>
 
             {error && (
-              <div style={{
-                fontSize: '12px', color: 'var(--red)', marginBottom: '16px',
-                padding: '8px 12px', background: 'var(--red-dim)', borderRadius: '8px',
-                display: 'flex', alignItems: 'center', gap: '6px',
-              }}>
-                <i className="ti ti-alert-circle" style={{ fontSize: '13px', flexShrink: 0 }} />
+              <div className={styles.errorBanner}>
+                <i className={`ti ti-alert-circle ${styles.errorIcon}`} />
                 {error}
               </div>
             )}
 
             <button
               type="submit"
-              className="btn btn-p"
-              style={{ width: '100%', justifyContent: 'center', padding: '11px', fontSize: '14px' }}
+              className={`btn btn-p ${styles.submitBtn}`}
               disabled={loading || !username.trim() || !password}
             >
               {loading
-                ? <><i className="ti ti-loader-2" style={{ fontSize: '14px' }} />Signing in…</>
-                : <><i className="ti ti-login" style={{ fontSize: '14px' }} />Sign In</>}
+                ? <><i className={`ti ti-loader-2 ${styles.submitBtnIcon}`} />Signing in…</>
+                : <><i className={`ti ti-login ${styles.submitBtnIcon}`} />Sign In</>}
             </button>
           </form>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '11px', color: 'var(--text3)' }}>
+        <div className={styles.footer}>
           Ganesyx Pvt Ltd — Internal CFO Dashboard
         </div>
       </div>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import type { Invoice, LineItem, ServiceItem } from '@/types';
 import { api } from '@/lib/api';
+import styles from './InvoiceDesigner.module.css';
 
 const COMPANY = {
   name: 'Ganesyx Pvt Ltd',
@@ -264,16 +265,16 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
       {/* Top bar */}
       <div className="designer-bar">
         <div className="designer-bar-left">
-          <button className="btn" style={{ padding: '6px 10px' }} onClick={onClose}>
+          <button className={`btn ${styles.barBtnBack}`} onClick={onClose}>
             <i className="ti ti-arrow-left" />
           </button>
-          <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)' }}>
+          <span className={styles.barTitle}>
             {isEdit ? 'Edit Invoice' : 'Invoice Designer'}
           </span>
-          <span style={{ fontSize: '12px', color: 'var(--text3)', fontFamily: 'monospace' }}>{invNum}</span>
+          <span className={styles.barInvNum}>{invNum}</span>
         </div>
         <div className="designer-bar-right">
-          {error && <span style={{ fontSize: '12px', color: 'var(--red)' }}>{error}</span>}
+          {error && <span className={styles.barError}>{error}</span>}
           <button className="btn" onClick={printInvoice}>
             <i className="ti ti-printer" />Print / PDF
           </button>
@@ -296,11 +297,11 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
           <div className="ds-section">
             <div className="ds-header">Invoice Details</div>
             <div className="form-row">
-              <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={`form-field ${styles.formFieldNoMb}`}>
                 <label className="form-label">Invoice Number</label>
                 <input className="form-input" value={invNum} onChange={e => setInvNum(e.target.value)} />
               </div>
-              <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={`form-field ${styles.formFieldNoMb}`}>
                 <label className="form-label">Status</label>
                 <select className="form-input" value={status}
                   onChange={e => setStatus(e.target.value as Invoice['status'])}>
@@ -311,12 +312,12 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
                 </select>
               </div>
             </div>
-            <div className="form-row" style={{ marginTop: '12px', marginBottom: 0 }}>
-              <div className="form-field" style={{ marginBottom: 0 }}>
+            <div className={`form-row ${styles.formRowMt}`}>
+              <div className={`form-field ${styles.formFieldNoMb}`}>
                 <label className="form-label">Invoice Date</label>
                 <input type="date" className="form-input" value={date} onChange={e => setDate(e.target.value)} />
               </div>
-              <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={`form-field ${styles.formFieldNoMb}`}>
                 <label className="form-label">Due Date</label>
                 <input type="date" className="form-input" value={dueDate} onChange={e => setDueDate(e.target.value)} />
               </div>
@@ -339,25 +340,20 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
             {activeServices.length > 0 && (
               <div className="form-field">
                 <label className="form-label">Services</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '4px' }}>
+                <div className={styles.servicesList}>
                   {activeServices.map(svc => (
                     <label
                       key={svc.name}
-                      style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer',
-                        padding: '6px 10px', borderRadius: '6px',
-                        background: checkedServiceSet.has(svc.name) ? 'var(--indigo-dim)' : 'var(--surface)',
-                        border: `1px solid ${checkedServiceSet.has(svc.name) ? 'var(--indigo)' : 'var(--border)'}`,
-                        transition: 'all 0.1s',
-                      }}
+                      className={checkedServiceSet.has(svc.name) ? styles.serviceItemActive : styles.serviceItemInactive}
                     >
                       <input
                         type="checkbox"
                         checked={checkedServiceSet.has(svc.name)}
                         onChange={() => toggleService(svc)}
-                        style={{ accentColor: 'var(--indigo)', width: '14px', height: '14px', flexShrink: 0 }}
+                        className={styles.serviceCheckbox}
                       />
-                      <span style={{ flex: 1, fontSize: '12px', color: 'var(--text)' }}>{svc.name}</span>
-                      <span style={{ fontSize: '11px', color: 'var(--text3)', fontFamily: 'monospace' }}>
+                      <span className={styles.serviceName}>{svc.name}</span>
+                      <span className={styles.serviceAmount}>
                         ₹{svc.amount.toLocaleString('en-IN')}
                       </span>
                     </label>
@@ -370,7 +366,7 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
               <input className="form-input" type="email" placeholder="billing@client.com"
                 value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
             </div>
-            <div className="form-field" style={{ marginBottom: 0 }}>
+            <div className={`form-field ${styles.formFieldNoMb}`}>
               <label className="form-label">Address</label>
               <textarea className="form-input" rows={2}
                 placeholder="123 MG Road, Bengaluru 560001"
@@ -382,7 +378,7 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
             <div className="ds-header">Line Items</div>
             <div className="li-cols">
               <span>Description</span>
-              <span style={{ textAlign: 'center' }}>Qty</span>
+              <span className={styles.liQtyInput}>Qty</span>
               <span style={{ textAlign: 'right' }}>Rate (₹)</span>
               <span style={{ textAlign: 'right' }}>Amt</span>
               <span />
@@ -391,13 +387,13 @@ ${notes ? `<div class="notes-box"><div class="nl">Notes</div><div class="nt">${e
               <div key={idx} className="li-row">
                 <input className="form-input" placeholder="Service / item"
                   value={it.description} onChange={e => updItem(idx, 'description', e.target.value)} />
-                <input className="form-input" type="number" min="1" style={{ textAlign: 'center' }}
+                <input className={`form-input ${styles.liQtyInput}`} type="number" min="1"
                   value={it.qty} onChange={e => updItem(idx, 'qty', e.target.value)} />
                 <input className="form-input" type="number" min="0" placeholder="0"
                   value={it.unitPrice} onChange={e => updItem(idx, 'unitPrice', e.target.value)} />
                 <div className="li-amt">{parsed[idx].amt > 0 ? fmtRs(parsed[idx].amt) : '—'}</div>
                 <button className="li-del" onClick={() => delItem(idx)}>
-                  <i className="ti ti-x" style={{ fontSize: '13px' }} />
+                  <i className="ti ti-x" />
                 </button>
               </div>
             ))}

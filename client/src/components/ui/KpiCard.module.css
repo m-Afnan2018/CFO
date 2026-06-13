@@ -1,0 +1,15 @@
+.kpiIco {
+  background: var(--kpi-icon-bg, transparent);
+}
+
+.kpiIcoIcon {
+  color: var(--kpi-icon-color, inherit);
+}
+
+.kpiValue {
+  color: var(--kpi-value-color, inherit);
+}
+
+.subDefault {
+  color: var(--text2);
+}

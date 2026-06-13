@@ -1,4 +1,5 @@
 'use client';
+import styles from './KpiCard.module.css';
 
 interface KpiCardProps {
   label: string;
@@ -19,16 +20,25 @@ export default function KpiCard({
       <div className="kpi-label">
         {label}
         {icon && (
-          <div className="kpi-ico" style={iconBg ? { background: iconBg } : {}}>
-            <i className={`ti ${icon}`} style={iconColor ? { color: iconColor } : {}} />
+          <div
+            className={`kpi-ico ${styles.kpiIco}`}
+            style={{ '--kpi-icon-bg': iconBg } as React.CSSProperties}
+          >
+            <i
+              className={`ti ${icon} ${styles.kpiIcoIcon}`}
+              style={{ '--kpi-icon-color': iconColor } as React.CSSProperties}
+            />
           </div>
         )}
       </div>
-      <div className="kpi-value" style={valueColor ? { color: valueColor } : {}}>
+      <div
+        className={`kpi-value ${styles.kpiValue}`}
+        style={{ '--kpi-value-color': valueColor } as React.CSSProperties}
+      >
         {value}
       </div>
       {sub !== undefined && (
-        <div className={`kpi-change ${subCls}`} style={!subCls ? { color: 'var(--text2)' } : {}}>
+        <div className={`kpi-change ${subCls}${!subCls ? ` ${styles.subDefault}` : ''}`}>
           {sub}
         </div>
       )}

@@ -1,0 +1,298 @@
+/* ── KPI values ── */
+.kpiIndigo {
+  color: var(--indigo);
+}
+
+.kpiEmerald {
+  color: var(--emerald);
+}
+
+.kpiBlue {
+  color: var(--blue);
+}
+
+.kpiAmber {
+  color: var(--amber);
+}
+
+.kpiSub {
+  color: var(--text2);
+}
+
+/* ── SMTP panel ── */
+.smtpCard {
+  margin-bottom: 16px;
+}
+
+.smtpConfigured {
+  color: var(--emerald);
+}
+
+.smtpNotConfigured {
+  color: var(--red);
+}
+
+.smtpInfo {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+.portField {
+  max-width: 100px;
+}
+
+.smtpSaveRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.smtpMsgOk {
+  font-size: 12px;
+  color: var(--emerald);
+}
+
+.smtpMsgErr {
+  font-size: 12px;
+  color: var(--red);
+}
+
+/* ── Loading / empty ── */
+.loadingText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.emptyText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* ── Table header colored cells ── */
+.thIndigo {
+  color: var(--indigo);
+}
+
+.thEmerald {
+  color: var(--emerald);
+}
+
+.thBlue {
+  color: var(--blue);
+}
+
+.thAmber {
+  color: var(--amber);
+}
+
+/* ── Table data cells ── */
+.periodCell {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.countCell {
+  color: var(--text2);
+}
+
+.outputGstCell {
+  font-weight: 700;
+  color: var(--indigo);
+}
+
+.cgstCell {
+  color: var(--emerald);
+}
+
+.sgstCell {
+  color: var(--blue);
+}
+
+.igstCell {
+  color: var(--amber);
+}
+
+.dueDateCell {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.dueDateNotSet {
+  color: var(--text3);
+}
+
+/* ── Reminder cell ── */
+.reminderSet {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.reminderSent {
+  color: var(--emerald);
+}
+
+.reminderPending {
+  color: var(--amber);
+}
+
+.reminderBellIcon {
+  font-size: 13px;
+}
+
+.reminderNone {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── Status cell ── */
+.filedAt {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* ── Actions column ── */
+.actionsGroup {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+}
+
+.btnSettings {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+.settingsIcon {
+  font-size: 12px;
+}
+
+.btnMarkFiled {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.checkIcon {
+  font-size: 11px;
+}
+
+.btnRevert {
+  padding: 4px 9px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.revertIcon {
+  font-size: 11px;
+}
+
+/* ── Tax summary card ── */
+.taxSummaryCard {
+  margin-top: 16px;
+}
+
+/* ── Filing Settings Modal ── */
+.settingsModalWidth {
+  max-width: 420px;
+}
+
+.dueDateSection {
+  margin-bottom: 14px;
+}
+
+.dueDateHint {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.reminderSection {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.reminderLabel {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.reminderDaysRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.reminderDaysInput {
+  width: 65px;
+}
+
+.reminderDaysText {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.reminderPreview {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 6px;
+}
+
+.btnSendReminder {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+.sendIcon {
+  font-size: 12px;
+}
+
+.smtpWarning {
+  font-size: 11px;
+  color: var(--amber);
+  padding: 8px 10px;
+  background: #fffbeb;
+  border-radius: 6px;
+}
+
+/* ── Mark Filed Modal ── */
+.filedModalWidth {
+  max-width: 360px;
+}
+
+.filedDateSection {
+  margin-bottom: 12px;
+}
+
+.filedSummary {
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.svIndigo {
+  color: var(--indigo);
+  font-weight: 700;
+}
+
+.svEmerald {
+  color: var(--emerald);
+}
+
+.svBlue {
+  color: var(--blue);
+}
+
+.svAmber {
+  color: var(--amber);
+}

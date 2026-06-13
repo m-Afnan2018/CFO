@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { DashboardKPIs, Invoice, Client, Employee } from '@/types';
 import { api } from '@/lib/api';
+import KpiCard from '@/components/ui/KpiCard';
+import styles from './Overview.module.css';
 
 const zeroKPIs: DashboardKPIs = {
   totalRevenue: 0, netProfit: 0, netProfitMargin: 0,
@@ -59,67 +61,97 @@ export default function Overview() {
       <div className="topbar">
         <div className="topbar-title">CFO Overview</div>
         <div className="topbar-right">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => router.push('/alerts')}>
+          <div className={styles.alertRow} onClick={() => router.push('/alerts')}>
             <div className="dot-alert" />
-            <span style={{ fontSize: '12px', color: 'var(--text2)' }}>{alertCount === null ? '…' : alertCount} Alert{alertCount === 1 ? '' : 's'}</span>
+            <span className={styles.alertLabel}>{alertCount === null ? '…' : alertCount} Alert{alertCount === 1 ? '' : 's'}</span>
           </div>
         </div>
       </div>
 
       <div className="content">
         <div className="grid4">
-          <div className="kpi">
-            <div className="kpi-label">Total Revenue<div className="kpi-ico" style={{ background: 'var(--emerald-dim)' }}><i className="ti ti-trending-up" style={{ color: 'var(--emerald)' }} /></div></div>
-            <div className="kpi-value">{fmt(kpis.totalRevenue)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>This month</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Net Profit<div className="kpi-ico" style={{ background: 'var(--indigo-dim)' }}><i className="ti ti-coin" style={{ color: 'var(--indigo)' }} /></div></div>
-            <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{fmt(kpis.netProfit)}</div>
-            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />Margin: {kpis.netProfitMargin}%</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Pending Receivables<div className="kpi-ico" style={{ background: 'var(--amber-dim)' }}><i className="ti ti-clock" style={{ color: 'var(--amber)' }} /></div></div>
-            <div className="kpi-value" style={{ color: 'var(--amber)' }}>{fmt(kpis.pendingReceivables)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{kpis.pendingCount} invoices pending</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Total Expenses<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-receipt" style={{ color: 'var(--red)' }} /></div></div>
-            <div className="kpi-value">{fmt(kpis.totalExpenses)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>This month</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Cash In Bank<div className="kpi-ico" style={{ background: 'var(--blue-dim)' }}><i className="ti ti-building-bank" style={{ color: 'var(--blue)' }} /></div></div>
-            <div className="kpi-value">{fmt(kpis.cashInBank)}</div>
-            <div className="kpi-change up"><i className="ti ti-arrow-up-right" style={{ fontSize: '11px' }} />{cashRunway === '—' ? 'Available' : `${cashRunway}mo runway`}</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Monthly Burn<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-flame" style={{ color: 'var(--red)' }} /></div></div>
-            <div className="kpi-value">{fmt(kpis.monthlyBurn)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{cashRunway === '—' ? 'No burn data' : `${cashRunway}mo runway`}</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Active Clients<div className="kpi-ico" style={{ background: 'var(--indigo-dim)' }}><i className="ti ti-users" style={{ color: 'var(--indigo)' }} /></div></div>
-            <div className="kpi-value">{kpis.activeClients}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>{kpis.totalClients} total</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Overdue Payments<div className="kpi-ico" style={{ background: 'var(--red-dim)' }}><i className="ti ti-alert-triangle" style={{ color: 'var(--red)' }} /></div></div>
-            <div className="kpi-value" style={{ color: 'var(--red)' }}>{fmt(kpis.overduePayments)}</div>
-            <div className="kpi-change down">{kpis.overdueCount} invoices overdue</div>
-          </div>
+          <KpiCard
+            label="Total Revenue"
+            value={fmt(kpis.totalRevenue)}
+            icon="ti-trending-up"
+            iconBg="var(--emerald-dim)"
+            iconColor="var(--emerald)"
+            sub="This month"
+          />
+          <KpiCard
+            label="Net Profit"
+            value={fmt(kpis.netProfit)}
+            icon="ti-coin"
+            iconBg="var(--indigo-dim)"
+            iconColor="var(--indigo)"
+            valueColor="var(--emerald)"
+            sub={`Margin: ${kpis.netProfitMargin}%`}
+            subCls="up"
+          />
+          <KpiCard
+            label="Pending Receivables"
+            value={fmt(kpis.pendingReceivables)}
+            icon="ti-clock"
+            iconBg="var(--amber-dim)"
+            iconColor="var(--amber)"
+            valueColor="var(--amber)"
+            sub={`${kpis.pendingCount} invoices pending`}
+          />
+          <KpiCard
+            label="Total Expenses"
+            value={fmt(kpis.totalExpenses)}
+            icon="ti-receipt"
+            iconBg="var(--red-dim)"
+            iconColor="var(--red)"
+            sub="This month"
+          />
+          <KpiCard
+            label="Cash In Bank"
+            value={fmt(kpis.cashInBank)}
+            icon="ti-building-bank"
+            iconBg="var(--blue-dim)"
+            iconColor="var(--blue)"
+            sub={cashRunway === '—' ? 'Available' : `${cashRunway}mo runway`}
+            subCls="up"
+          />
+          <KpiCard
+            label="Monthly Burn"
+            value={fmt(kpis.monthlyBurn)}
+            icon="ti-flame"
+            iconBg="var(--red-dim)"
+            iconColor="var(--red)"
+            sub={cashRunway === '—' ? 'No burn data' : `${cashRunway}mo runway`}
+          />
+          <KpiCard
+            label="Active Clients"
+            value={kpis.activeClients}
+            icon="ti-users"
+            iconBg="var(--indigo-dim)"
+            iconColor="var(--indigo)"
+            sub={`${kpis.totalClients} total`}
+          />
+          <KpiCard
+            label="Overdue Payments"
+            value={fmt(kpis.overduePayments)}
+            icon="ti-alert-triangle"
+            iconBg="var(--red-dim)"
+            iconColor="var(--red)"
+            valueColor="var(--red)"
+            sub={`${kpis.overdueCount} invoices overdue`}
+            subCls="down"
+          />
         </div>
 
         <div className="grid21">
           <div className="card">
-            <div className="card-title">Revenue & Expense Trend<span className="card-sub">No data yet</span></div>
-            <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+            <div className="card-title">Revenue &amp; Expense Trend<span className="card-sub">No data yet</span></div>
+            <div className={styles.placeholder}>
               Add invoices and expenses to see the trend chart
             </div>
           </div>
           <div className="card">
             <div className="card-title">Profit Margin %<span className="card-sub">No data yet</span></div>
-            <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+            <div className={styles.placeholder}>
               No margin data yet
             </div>
           </div>
@@ -129,7 +161,7 @@ export default function Overview() {
           <div className="card">
             <div className="card-title">Top Clients by Revenue</div>
             {topClients.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No client data yet</div>
+              <div className={styles.emptySmall}>No client data yet</div>
             ) : topClients.map((c, i) => (
               <div key={c._id} className="bar-row">
                 <span className="bar-label">{c.name}</span>
@@ -142,7 +174,7 @@ export default function Overview() {
           </div>
           <div className="card">
             <div className="card-title">Service Revenue Mix</div>
-            <div style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text3)', fontSize: '12px' }}>
+            <div className={styles.placeholderMd}>
               No service data yet
             </div>
           </div>
@@ -168,16 +200,16 @@ export default function Overview() {
           <div className="card">
             <div className="card-title">Recent Transactions</div>
             {invoices.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No transactions yet</div>
+              <div className={styles.emptySmall}>No transactions yet</div>
             ) : (
               <table>
                 <thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
                 <tbody>
                   {invoices.slice(0, 5).map(inv => (
                     <tr key={inv._id}>
-                      <td style={{ color: 'var(--indigo)', fontWeight: 700 }}>{inv.invoiceNumber}</td>
+                      <td className={styles.invoiceNum}>{inv.invoiceNumber}</td>
                       <td>{inv.client}</td>
-                      <td style={{ color: 'var(--text)', fontWeight: 600 }}>₹{inv.total.toLocaleString('en-IN')}</td>
+                      <td className={styles.invoiceAmount}>₹{inv.total.toLocaleString('en-IN')}</td>
                       <td>{inv.date}</td>
                       <td><span className={`badge ${statusBadge[inv.status]}`}>{inv.status}</span></td>
                     </tr>
@@ -189,14 +221,17 @@ export default function Overview() {
           <div className="card">
             <div className="card-title">Upcoming Dues</div>
             {upcomingDues.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '8px 0' }}>No pending dues</div>
+              <div className={styles.emptySmall}>No pending dues</div>
             ) : upcomingDues.map(inv => (
               <div key={inv._id} className="stat-row">
                 <div>
-                  <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: 500 }}>{inv.client}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)' }}>Due: {inv.dueDate || '—'}</div>
+                  <div className={styles.dueClient}>{inv.client}</div>
+                  <div className={styles.dueDate}>Due: {inv.dueDate || '—'}</div>
                 </div>
-                <span style={{ color: inv.status === 'Overdue' ? 'var(--red)' : 'var(--amber)', fontWeight: 700 }}>
+                <span
+                  className={styles.dueAmount}
+                  style={{ '--due-color': inv.status === 'Overdue' ? 'var(--red)' : 'var(--amber)' } as React.CSSProperties}
+                >
                   {fmt(inv.total)}
                 </span>
               </div>

@@ -2,9 +2,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import Modal from '@/components/ui/Modal';
 import DeleteConfirm from '@/components/ui/DeleteConfirm';
+import PageHeader from '@/components/ui/PageHeader';
 import type { Client, ClientRecord, ClientBillingPeriod, ColorKey, ServiceItem, PaymentEntry } from '@/types';
 import { api } from '@/lib/api';
 import ClientsYearly from './ClientsYearly';
+import styles from './Clients.module.css';
 
 const colorMap: Record<string, { bg: string; fg: string }> = {
   emerald: { bg: 'var(--emerald-dim)', fg: 'var(--emerald)' },
@@ -393,62 +395,59 @@ export default function Clients() {
 
   return (
     <div>
-      <div className="topbar">
-        <div className="topbar-title">Client Management</div>
-        <div className="topbar-right">
-          {tab === 'clients' ? (<>
-            <input
-              type="text"
-              placeholder="Search clients…"
-              style={{ width: '200px' }}
-              value={searchQ}
-              onChange={e => setSearchQ(e.target.value)}
-            />
-            <button className="btn btn-p" onClick={openAdd}><i className="ti ti-plus" />Add Client</button>
-          </>) : tab === 'billing' ? (<>
-            {periodExists && pendingRecords.length > 0 && (
-              <button className="btn btn-p" onClick={processAll} disabled={processingAll}>
-                <i className="ti ti-check" />Mark All Paid ({pendingRecords.length})
-              </button>
-            )}
-            {!periodExists && (
-              <button className="btn btn-p" onClick={openRunModal} disabled={runningBilling || activeClients.length === 0}>
-                <i className="ti ti-player-play" />
-                {runningBilling ? 'Running…' : `Run Billing (${activeClients.length})`}
-              </button>
-            )}
-          </>) : null}
-        </div>
-      </div>
+      <PageHeader title="Client Management">
+        {tab === 'clients' ? (<>
+          <input
+            type="text"
+            placeholder="Search clients…"
+            className={styles.searchInput}
+            value={searchQ}
+            onChange={e => setSearchQ(e.target.value)}
+          />
+          <button className="btn btn-p" onClick={openAdd}><i className="ti ti-plus" />Add Client</button>
+        </>) : tab === 'billing' ? (<>
+          {periodExists && pendingRecords.length > 0 && (
+            <button className="btn btn-p" onClick={processAll} disabled={processingAll}>
+              <i className="ti ti-check" />Mark All Paid ({pendingRecords.length})
+            </button>
+          )}
+          {!periodExists && (
+            <button className="btn btn-p" onClick={openRunModal} disabled={runningBilling || activeClients.length === 0}>
+              <i className="ti ti-player-play" />
+              {runningBilling ? 'Running…' : `Run Billing (${activeClients.length})`}
+            </button>
+          )}
+        </>) : null}
+      </PageHeader>
 
       <div className="content">
         {/* Tabs */}
-        <div className="tabs" style={{ marginBottom: '20px' }}>
+        <div className={`tabs ${styles.tabsBar}`}>
           <button className={`tab${tab === 'clients' ? ' active' : ''}`} onClick={() => setTab('clients')}>
-            <i className="ti ti-users" style={{ marginRight: '5px', fontSize: '13px' }} />Clients
+            <i className={`ti ti-users ${styles.tabIcon}`} />Clients
           </button>
           <button className={`tab${tab === 'billing' ? ' active' : ''}`} onClick={() => setTab('billing')}>
-            <i className="ti ti-refresh" style={{ marginRight: '5px', fontSize: '13px' }} />Monthly Billing
+            <i className={`ti ti-refresh ${styles.tabIcon}`} />Monthly Billing
           </button>
           <button className={`tab${tab === 'yearly' ? ' active' : ''}`} onClick={() => setTab('yearly')}>
-            <i className="ti ti-calendar-stats" style={{ marginRight: '5px', fontSize: '13px' }} />Yearly
+            <i className={`ti ti-calendar-stats ${styles.tabIcon}`} />Yearly
           </button>
         </div>
 
         {/* ── CLIENTS TAB ─────────────────────────────────────────── */}
         {tab === 'clients' && (<>
-          <div className="grid4" style={{ marginBottom: '18px' }}>
+          <div className={`grid4 ${styles.kpiGrid}`}>
             <div className="kpi">
               <div className="kpi-label">Total Clients</div>
               <div className="kpi-value">{clients.length}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+              <div className={`kpi-change ${styles.kpiText2}`}>
                 {clients.length === 0 ? 'Add your first client' : 'In system'}
               </div>
             </div>
             <div className="kpi">
               <div className="kpi-label">Active</div>
-              <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{activeCount}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+              <div className={`kpi-value ${styles.kpiEmerald}`}>{activeCount}</div>
+              <div className={`kpi-change ${styles.kpiText2}`}>
                 {clients.length > 0 ? `${retentionPct}% retention` : '—'}
               </div>
             </div>
@@ -467,10 +466,10 @@ export default function Clients() {
           <div className="card">
             <div className="card-title">All Clients<span className="card-sub">{displayed.length} shown</span></div>
             {!loaded ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '16px 0' }}>Loading…</div>
+              <div className={styles.loadingText}>Loading…</div>
             ) : displayed.length === 0 ? (
-              <div style={{ padding: '32px 0', textAlign: 'center' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text3)', marginBottom: '12px' }}>
+              <div className={styles.emptyState}>
+                <div className={styles.emptyMsg}>
                   {searchQ ? 'No clients match your search' : 'No clients yet'}
                 </div>
                 {!searchQ && <button className="btn btn-p" onClick={openAdd}><i className="ti ti-plus" />Add your first client</button>}
@@ -486,26 +485,26 @@ export default function Clients() {
                     return (
                       <tr key={c._id}>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                          <div className={styles.rowGap9}>
                             <div className="avatar" style={{ background: col.bg, color: col.fg }}>{c.initials}</div>
                             <div>
-                              <div style={{ color: 'var(--text)', fontWeight: 600 }}>{c.name}</div>
-                              <div style={{ fontSize: '11px', color: 'var(--text3)' }}>{c.email}</div>
+                              <div className={styles.clientName}>{c.name}</div>
+                              <div className={styles.clientEmail}>{c.email}</div>
                             </div>
                           </div>
                         </td>
                         <td>{c.service}</td>
-                        <td style={{ color: 'var(--text)', fontWeight: 700 }}>₹{c.monthlyBilling.toLocaleString('en-IN')}</td>
+                        <td className={styles.billingAmount}>₹{c.monthlyBilling.toLocaleString('en-IN')}</td>
                         <td>{c.manager || '—'}</td>
                         <td>{c.renewal || '—'}</td>
                         <td><span className={`badge ${statusBadge[c.status]}`}>{c.status}</span></td>
                         <td>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <button className="btn" style={{ padding: '4px 9px', fontSize: '11px' }} title="Edit" onClick={() => openEdit(c)}>
-                              <i className="ti ti-pencil" style={{ fontSize: '12px' }} />
+                          <div className={styles.rowEnd}>
+                            <button className={`btn ${styles.btnSm}`} title="Edit" onClick={() => openEdit(c)}>
+                              <i className={`ti ti-pencil ${styles.btnSmIcon}`} />
                             </button>
-                            <button className="btn" style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--red)' }} title="Delete" onClick={() => setDeleteId(c._id)}>
-                              <i className="ti ti-trash" style={{ fontSize: '12px' }} />
+                            <button className={`btn ${styles.btnSmDanger}`} title="Delete" onClick={() => setDeleteId(c._id)}>
+                              <i className={`ti ti-trash ${styles.btnSmIcon}`} />
                             </button>
                           </div>
                         </td>
@@ -524,47 +523,47 @@ export default function Clients() {
         {/* ── MONTHLY BILLING TAB ──────────────────────────────────── */}
         {tab === 'billing' && (<>
           {/* Period navigator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <button className="btn" style={{ padding: '5px 10px' }} onClick={() => setSelectedPeriod(p => shiftMonth(p, -1))}>
-              <i className="ti ti-chevron-left" style={{ fontSize: '13px' }} />
+          <div className={styles.periodNav}>
+            <button className={`btn ${styles.periodNavBtn}`} onClick={() => setSelectedPeriod(p => shiftMonth(p, -1))}>
+              <i className="ti ti-chevron-left" />
             </button>
-            <span style={{ fontWeight: 700, fontSize: '15px', minWidth: '90px', textAlign: 'center', color: 'var(--text)' }}>
+            <span className={styles.periodLabel}>
               {fmtPeriod(selectedPeriod)}
             </span>
-            <button className="btn" style={{ padding: '5px 10px' }} onClick={() => setSelectedPeriod(p => shiftMonth(p, 1))}>
-              <i className="ti ti-chevron-right" style={{ fontSize: '13px' }} />
+            <button className={`btn ${styles.periodNavBtn}`} onClick={() => setSelectedPeriod(p => shiftMonth(p, 1))}>
+              <i className="ti ti-chevron-right" />
             </button>
             {periodExists && (
-              <button className="btn" style={{ marginLeft: 'auto', padding: '5px 10px', color: 'var(--red)' }}
+              <button className={`btn ${styles.periodDeleteBtn}`}
                 title="Delete this billing period" onClick={deletePeriod} disabled={deletingPeriod}>
-                <i className="ti ti-trash" style={{ fontSize: '12px' }} />
+                <i className="ti ti-trash" />
               </button>
             )}
           </div>
 
           {/* Summary KPIs */}
           {periodSummary && (
-            <div className="grid4" style={{ marginBottom: '16px' }}>
+            <div className={`grid4 ${styles.billingKpiGrid}`}>
               <div className="kpi">
                 <div className="kpi-label">Total Billing</div>
                 <div className="kpi-value">{periodSummary.total > 0 ? fmt(periodSummary.total) : '—'}</div>
-                <div className="kpi-change" style={{ color: 'var(--text2)' }}>{periodSummary.count} clients</div>
+                <div className={`kpi-change ${styles.kpiText2}`}>{periodSummary.count} clients</div>
               </div>
               <div className="kpi">
                 <div className="kpi-label">Pending</div>
-                <div className="kpi-value" style={{ color: 'var(--text2)' }}>{periodSummary.pending > 0 ? fmt(periodSummary.pending) : '—'}</div>
-                <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+                <div className={`kpi-value ${styles.kpiPending}`}>{periodSummary.pending > 0 ? fmt(periodSummary.pending) : '—'}</div>
+                <div className={`kpi-change ${styles.kpiText2}`}>
                   {periodSummary.count - periodSummary.paidCount} clients
                 </div>
               </div>
               <div className="kpi">
                 <div className="kpi-label">Collected</div>
-                <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{periodSummary.paid > 0 ? fmt(periodSummary.paid) : '—'}</div>
+                <div className={`kpi-value ${styles.kpiCollected}`}>{periodSummary.paid > 0 ? fmt(periodSummary.paid) : '—'}</div>
                 <div className="kpi-change up">{periodSummary.paidCount} clients paid</div>
               </div>
               <div className="kpi">
                 <div className="kpi-label">Collection Rate</div>
-                <div className="kpi-value" style={{ color: 'var(--emerald)' }}>
+                <div className={`kpi-value ${styles.kpiCollected}`}>
                   {periodSummary.count > 0 ? `${Math.round((periodSummary.paidCount / periodSummary.count) * 100)}%` : '—'}
                 </div>
                 <div className="kpi-change up">{fmtPeriod(selectedPeriod)}</div>
@@ -579,8 +578,8 @@ export default function Clients() {
             </div>
 
             {!periodExists ? (
-              <div style={{ padding: '36px 0', textAlign: 'center' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text3)', marginBottom: '14px' }}>
+              <div className={styles.billingEmpty}>
+                <div className={styles.billingEmptyMsg}>
                   No billing records for {fmtPeriod(selectedPeriod)}
                 </div>
                 {activeClients.length > 0 ? (
@@ -589,11 +588,11 @@ export default function Clients() {
                     {runningBilling ? 'Running…' : `Run Billing for ${fmtPeriod(selectedPeriod)} (${activeClients.length} active clients)`}
                   </button>
                 ) : (
-                  <div style={{ fontSize: '12px', color: 'var(--text3)' }}>No active clients. Add clients first.</div>
+                  <div className={styles.noActiveClients}>No active clients. Add clients first.</div>
                 )}
               </div>
             ) : !billingLoaded ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '16px 0' }}>Loading…</div>
+              <div className={styles.loadingText}>Loading…</div>
             ) : (
               <table>
                 <thead>
@@ -606,59 +605,57 @@ export default function Clients() {
                       <tr key={r._id}>
                         <td>
                           <div
-                            style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer' }}
+                            className={styles.clientCell}
                             onClick={() => setServicePopup(r)}
                             title="View services"
                           >
                             <div className="avatar" style={{ background: col.bg, color: col.fg }}>{r.initials}</div>
                             <div>
-                              <div style={{ color: 'var(--text)', fontWeight: 600 }}>{r.name}</div>
-                              <div style={{ fontSize: '11px', color: 'var(--text3)' }}>{r.service}</div>
+                              <div className={styles.clientName}>{r.name}</div>
+                              <div className={styles.clientEmail}>{r.service}</div>
                             </div>
                           </div>
                         </td>
-                        <td style={{ color: 'var(--text)', fontWeight: 700 }}>₹{r.monthlyBilling.toLocaleString('en-IN')}</td>
+                        <td className={styles.billingAmount}>₹{r.monthlyBilling.toLocaleString('en-IN')}</td>
                         <td>
                           {r.payments && r.payments.length > 0 ? (() => {
                             const received = r.payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
                             return (
-                              <button type="button" onClick={() => setPayDetail(r)}
-                                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
+                              <button type="button" onClick={() => setPayDetail(r)} className={styles.receivedBtn}>
                                 <span style={{ fontWeight: 700, color: received >= r.monthlyBilling ? 'var(--emerald)' : 'var(--amber)', textDecoration: 'underline dotted' }}>
                                   ₹{received.toLocaleString('en-IN')}
                                 </span>
-                                <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '1px' }}>
+                                <div className={styles.receivedEntries}>
                                   {r.payments.length} entr{r.payments.length === 1 ? 'y' : 'ies'}
                                 </div>
                               </button>
                             );
-                          })() : <span style={{ color: 'var(--text3)' }}>—</span>}
+                          })() : <span className={styles.receivedNone}>—</span>}
                         </td>
-                        <td style={{ color: 'var(--text2)' }}>{r.manager || '—'}</td>
+                        <td className={styles.managerText}>{r.manager || '—'}</td>
                         <td><span className={`badge ${recBadge[r.status]}`}>{r.status}</span></td>
                         <td>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                          <div className={styles.billingActions}>
                             <button
-                              className="btn"
-                              style={{ padding: '4px 10px', fontSize: '11px' }}
+                              className={`btn ${styles.btnInvoice}`}
                               onClick={() => generateInvoice(r)}
                               disabled={generatingInvoice === r._id}
                               title={r.invoiceId ? 'View Invoice' : 'Generate Invoice'}
                             >
-                              <i className="ti ti-file-invoice" style={{ fontSize: '11px' }} />
+                              <i className={`ti ti-file-invoice ${styles.btnInvoiceIcon}`} />
                               {generatingInvoice === r._id ? '…' : r.invoiceId ? 'View Invoice' : 'Invoice'}
                             </button>
                             {(r.status === 'Pending' || r.status === 'Partial') && (
-                              <button className="btn btn-p" style={{ padding: '4px 10px', fontSize: '11px' }}
+                              <button className={`btn btn-p ${styles.btnPay}`}
                                 onClick={() => openPayModal(r)}>
-                                <i className="ti ti-credit-card" style={{ fontSize: '11px' }} />
+                                <i className={`ti ti-credit-card ${styles.btnInvoiceIcon}`} />
                                 {r.status === 'Partial' ? 'Update Payment' : 'Mark Paid'}
                               </button>
                             )}
                             {(r.status === 'Paid' || r.status === 'Partial') && (
-                              <button className="btn" style={{ padding: '4px 10px', fontSize: '11px', color: 'var(--text3)' }}
+                              <button className={`btn ${styles.btnUndo}`}
                                 onClick={() => updateRecord(r._id, { status: 'Pending' })}>
-                                <i className="ti ti-arrow-back-up" style={{ fontSize: '11px' }} />Undo
+                                <i className={`ti ti-arrow-back-up ${styles.btnInvoiceIcon}`} />Undo
                               </button>
                             )}
                           </div>
@@ -684,9 +681,9 @@ export default function Clients() {
           <div><label className="form-label">Client Name</label><input placeholder="Nexus Brands" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
           <div><label className="form-label">Email</label><input type="email" placeholder="contact@company.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
         </div>
-        <div style={{ marginBottom: '10px' }}>
+        <div className={styles.servicesMb}>
           <label className="form-label">Services</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+          <div className={styles.servicePillsRow}>
             {serviceOptions.map(svc => {
               const active = svc in form.serviceAmounts;
               return (
@@ -715,17 +712,17 @@ export default function Clients() {
           </div>
         </div>
         {Object.keys(form.serviceAmounts).length > 0 && (
-          <div style={{ marginBottom: '12px', background: 'var(--surface2,var(--surface))', border: '1px solid var(--border)', borderRadius: '8px', padding: '10px 12px' }}>
-            <div style={{ fontSize: '10px', color: 'var(--text3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+          <div className={styles.servicePricingBox}>
+            <div className={styles.servicePricingLabel}>
               Service Pricing
             </div>
             {Object.entries(form.serviceAmounts).map(([svc, amt]) => {
               const svcType = form.serviceTypes[svc] ?? 'Monthly';
               return (
-              <div key={svc} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ flex: 1, fontSize: '12px', color: 'var(--text2)' }}>{svc}</span>
+              <div key={svc} className={styles.servicePricingRow}>
+                <span className={styles.servicePricingName}>{svc}</span>
                 {/* Monthly / One Time toggle */}
-                <div style={{ display: 'flex', gap: '3px' }}>
+                <div className={styles.serviceTypeToggle}>
                   {(['Monthly', 'One Time'] as const).map(t => (
                     <button key={t} type="button"
                       onClick={() => setForm({ ...form, serviceTypes: { ...form.serviceTypes, [svc]: t } })}
@@ -739,22 +736,22 @@ export default function Clients() {
                     >{t}</button>
                   ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--text3)' }}>₹</span>
+                <div className={styles.servicePricingAmountGroup}>
+                  <span className={styles.servicePricingRupee}>₹</span>
                   <input
                     type="number"
                     placeholder="0"
                     value={amt}
                     onChange={e => setForm({ ...form, serviceAmounts: { ...form.serviceAmounts, [svc]: e.target.value } })}
-                    style={{ width: '100px' }}
+                    className={styles.servicePricingAmountInput}
                   />
                 </div>
               </div>
               );
             })}
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text3)', fontWeight: 600 }}>Monthly Billing Total</span>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>
+            <div className={styles.servicePricingTotal}>
+              <span className={styles.servicePricingTotalLabel}>Monthly Billing Total</span>
+              <span className={styles.servicePricingTotalValue}>
                 ₹{Object.entries(form.serviceAmounts)
                     .filter(([svc]) => (form.serviceTypes[svc] ?? 'Monthly') === 'Monthly')
                     .reduce((s, [, v]) => s + (Number(v) || 0), 0)
@@ -804,25 +801,25 @@ export default function Clients() {
         const total = svcs.reduce((s, v) => s + v.amount, 0) || servicePopup.monthlyBilling;
         return (
           <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setServicePopup(null); }}>
-            <div className="modal" style={{ maxWidth: '380px' }}>
+            <div className={`modal ${styles.servicesModal}`}>
               <div className="modal-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className={styles.servicesModalHeader}>
                   <div className="avatar" style={{ background: col.bg, color: col.fg }}>{servicePopup.initials}</div>
                   <span className="modal-title">{servicePopup.name}</span>
                 </div>
                 <button className="modal-close" onClick={() => setServicePopup(null)}><i className="ti ti-x" /></button>
               </div>
               <div className="modal-body">
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text3)', marginBottom: '10px' }}>Active Services</div>
+                <div className={styles.sectionLabel}>Active Services</div>
                 {svcs.map(s => (
-                  <div key={s.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: '8px', background: 'var(--surface2)', marginBottom: '6px' }}>
+                  <div key={s.name} className={styles.serviceRow}>
                     <span className="badge bi" style={{ fontSize: '12px' }}>{s.name}</span>
-                    {s.amount > 0 && <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: '13px' }}>₹{s.amount.toLocaleString('en-IN')}</span>}
+                    {s.amount > 0 && <span className={styles.serviceAmount}>₹{s.amount.toLocaleString('en-IN')}</span>}
                   </div>
                 ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--text3)' }}>Monthly Total</span>
-                  <span style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)' }}>₹{total.toLocaleString('en-IN')}</span>
+                <div className={styles.servicesTotalRow}>
+                  <span className={styles.servicesTotalLabel}>Monthly Total</span>
+                  <span className={styles.servicesTotalValue}>₹{total.toLocaleString('en-IN')}</span>
                 </div>
               </div>
               <div className="modal-footer">
@@ -840,13 +837,13 @@ export default function Clients() {
         const balance  = payDetail.monthlyBilling - received;
         return (
           <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setPayDetail(null); }}>
-            <div className="modal" style={{ maxWidth: '420px' }}>
+            <div className={`modal ${styles.payDetailModal}`}>
               <div className="modal-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className={styles.payDetailHeaderInner}>
                   <div className="avatar" style={{ background: col.bg, color: col.fg }}>{payDetail.initials}</div>
                   <div>
                     <div className="modal-title">{payDetail.name}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '1px' }}>{fmtPeriod(payDetail.billingPeriod)}</div>
+                    <div className={styles.payDetailPeriod}>{fmtPeriod(payDetail.billingPeriod)}</div>
                   </div>
                 </div>
                 <button className="modal-close" onClick={() => setPayDetail(null)}><i className="ti ti-x" /></button>
@@ -854,49 +851,45 @@ export default function Clients() {
 
               <div className="modal-body">
                 {/* Summary row */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                  <div style={{ flex: 1, padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '3px' }}>Billed</div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>₹{payDetail.monthlyBilling.toLocaleString('en-IN')}</div>
+                <div className={styles.payDetailSummary}>
+                  <div className={styles.payDetailSummaryCard}>
+                    <div className={styles.payDetailSummaryLabel}>Billed</div>
+                    <div className={styles.payDetailSummaryValue}>₹{payDetail.monthlyBilling.toLocaleString('en-IN')}</div>
                   </div>
-                  <div style={{ flex: 1, padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '3px' }}>Received</div>
+                  <div className={styles.payDetailSummaryCard}>
+                    <div className={styles.payDetailSummaryLabel}>Received</div>
                     <div style={{ fontWeight: 700, fontSize: '14px', color: received >= payDetail.monthlyBilling ? 'var(--emerald)' : 'var(--amber)' }}>₹{received.toLocaleString('en-IN')}</div>
                   </div>
                   {balance > 0 && (
-                    <div style={{ flex: 1, padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px' }}>
-                      <div style={{ fontSize: '10px', color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '3px' }}>Pending</div>
+                    <div className={styles.payDetailSummaryCard}>
+                      <div className={styles.payDetailSummaryLabel}>Pending</div>
                       <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--red)' }}>₹{balance.toLocaleString('en-IN')}</div>
                     </div>
                   )}
                 </div>
 
                 {/* Payment entries */}
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text3)', marginBottom: '8px' }}>
+                <div className={styles.payEntriesSectionLabel}>
                   Payment Entries
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div className={styles.payEntriesList}>
                   {(payDetail.payments ?? []).map((p, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px' }}>
-                      {/* Date */}
-                      <div style={{ minWidth: '82px' }}>
-                        <div style={{ fontSize: '10px', color: 'var(--text3)', marginBottom: '1px' }}>Date</div>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)', fontFamily: 'monospace' }}>{p.date || '—'}</div>
+                    <div key={i} className={styles.payEntryRow}>
+                      <div className={styles.payEntryDate}>
+                        <div className={styles.payEntryLabel}>Date</div>
+                        <div className={styles.payEntryDateValue}>{p.date || '—'}</div>
                       </div>
-                      {/* Amount */}
-                      <div style={{ minWidth: '80px' }}>
-                        <div style={{ fontSize: '10px', color: 'var(--text3)', marginBottom: '1px' }}>Amount</div>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>₹{Number(p.amount).toLocaleString('en-IN')}</div>
+                      <div className={styles.payEntryAmountCol}>
+                        <div className={styles.payEntryLabel}>Amount</div>
+                        <div className={styles.payEntryAmountValue}>₹{Number(p.amount).toLocaleString('en-IN')}</div>
                       </div>
-                      {/* Method + detail */}
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '10px', color: 'var(--text3)', marginBottom: '1px' }}>{p.method}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text2)', fontWeight: 500 }}>
+                      <div className={styles.payEntryMethodCol}>
+                        <div className={styles.payEntryLabel}>{p.method}</div>
+                        <div className={styles.payEntryMethodValue}>
                           {p.method === 'Online' ? (p.mode || '—') : (p.receivedFrom ? `From: ${p.receivedFrom}` : 'Cash')}
                         </div>
                       </div>
-                      {/* Method badge */}
-                      <span className={`badge ${p.method === 'Online' ? 'bi' : 'ba'}`} style={{ fontSize: '10px' }}>{p.method}</span>
+                      <span className={`badge ${p.method === 'Online' ? 'bi' : 'ba'} ${styles.payEntryBadge}`}>{p.method}</span>
                     </div>
                   ))}
                 </div>
@@ -922,28 +915,28 @@ export default function Clients() {
         const isFull  = total === billing;
         return (
           <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setPayModal(null); }}>
-            <div className="modal" style={{ maxWidth: '480px' }}>
+            <div className={`modal ${styles.payModal}`}>
               <div className="modal-header">
                 <span className="modal-title">Payment — {payModal.name}</span>
                 <button className="modal-close" onClick={() => setPayModal(null)}><i className="ti ti-x" /></button>
               </div>
 
-              <div className="modal-body" style={{ padding: '0' }}>
+              <div className={`modal-body ${styles.payModalBody}`}>
                 {/* Billing context bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px', background: 'var(--surface2)', borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--text2)' }}>Monthly Billing</span>
-                  <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>₹{billing.toLocaleString('en-IN')}</span>
+                <div className={styles.payContextBar}>
+                  <span className={styles.payContextLabel}>Monthly Billing</span>
+                  <span className={styles.payContextValue}>₹{billing.toLocaleString('en-IN')}</span>
                 </div>
 
                 {/* Payment entries */}
-                <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className={styles.payEntriesContainer}>
                   {payEntries.map((entry, i) => (
-                    <div key={i} style={{ border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', background: 'var(--surface)' }}>
+                    <div key={i} className={styles.payEntryCard}>
 
                       {/* Row 1: Amount + Online/Offline */}
-                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
-                          <span style={{ fontSize: '14px', color: 'var(--text3)', fontWeight: 600 }}>₹</span>
+                      <div className={styles.payEntryCardRow1}>
+                        <div className={styles.payEntryAmountGroup}>
+                          <span className={styles.payEntryRupeeSign}>₹</span>
                           <input
                             type="number" min={0}
                             value={entry.amount || ''}
@@ -952,7 +945,7 @@ export default function Clients() {
                             style={{ width: '100%', fontWeight: 700, fontSize: '14px' }}
                           />
                         </div>
-                        <div style={{ display: 'flex', borderRadius: '7px', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
+                        <div className={styles.payMethodToggle}>
                           {(['Online', 'Offline'] as const).map(m => (
                             <button key={m} type="button"
                               onClick={() => updateEntry(i, { method: m, mode: m === 'Online' ? 'UPI' : undefined, receivedFrom: m === 'Offline' ? '' : undefined })}
@@ -967,26 +960,25 @@ export default function Clients() {
                           ))}
                         </div>
                         {payEntries.length > 1 && (
-                          <button type="button" onClick={() => removeEntry(i)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text3)', padding: '4px', flexShrink: 0 }}>
-                            <i className="ti ti-x" style={{ fontSize: '14px' }} />
+                          <button type="button" onClick={() => removeEntry(i)} className={styles.payEntryRemoveBtn}>
+                            <i className={`ti ti-x ${styles.payEntryRemoveIcon}`} />
                           </button>
                         )}
                       </div>
 
                       {/* Date received */}
-                      <div style={{ marginBottom: '8px' }}>
+                      <div className={styles.payDateRow}>
                         <input
                           type="date"
                           value={entry.date || today}
                           onChange={e => updateEntry(i, { date: e.target.value })}
-                          style={{ fontSize: '12px', width: '160px' }}
+                          className={styles.payDateInput}
                         />
                       </div>
 
                       {/* Row 2: mode chips (Online) or received-from (Offline) */}
                       {entry.method === 'Online' && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                        <div className={styles.payModeChips}>
                           {['Bank Transfer', 'UPI', 'NEFT', 'RTGS', 'Cheque'].map(mode => (
                             <button key={mode} type="button" onClick={() => updateEntry(i, { mode })}
                               style={{
@@ -1014,30 +1006,30 @@ export default function Clients() {
                   ))}
 
                   {/* Add entry button */}
-                  <button type="button" className="btn" style={{ alignSelf: 'flex-start', fontSize: '12px' }} onClick={addEntry}>
-                    <i className="ti ti-plus" style={{ fontSize: '12px' }} />Add Payment Entry
+                  <button type="button" className={`btn ${styles.addEntryBtn}`} onClick={addEntry}>
+                    <i className={`ti ti-plus ${styles.addEntryIcon}`} />Add Payment Entry
                   </button>
                 </div>
 
                 {/* Summary bar */}
-                <div style={{ padding: '10px 20px', borderTop: '1px solid var(--border)', background: 'var(--surface2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text2)' }}>
+                <div className={styles.paySummaryBar}>
+                  <div className={styles.paySummaryLabel}>
                     Total received: <strong style={{ color: isOver ? 'var(--red)' : isFull ? 'var(--emerald)' : 'var(--amber)' }}>
                       ₹{total.toLocaleString('en-IN')}
                     </strong>
                   </div>
                   {!isFull && !isOver && balance > 0 && (
-                    <div style={{ fontSize: '11px', color: 'var(--amber)' }}>
+                    <div className={styles.payPartialMsg}>
                       ₹{balance.toLocaleString('en-IN')} pending → will be marked <strong>Partial</strong>
                     </div>
                   )}
                   {isFull && (
-                    <div style={{ fontSize: '11px', color: 'var(--emerald)' }}>
-                      <i className="ti ti-circle-check" style={{ fontSize: '12px', marginRight: '4px' }} />Full payment
+                    <div className={styles.payFullMsg}>
+                      <i className={`ti ti-circle-check ${styles.payFullIcon}`} />Full payment
                     </div>
                   )}
                   {isOver && (
-                    <div style={{ fontSize: '11px', color: 'var(--red)' }}>
+                    <div className={styles.payOverMsg}>
                       ₹{(total - billing).toLocaleString('en-IN')} over billing — check amounts
                     </div>
                   )}
@@ -1059,33 +1051,32 @@ export default function Clients() {
       {/* ── Run Billing review modal ── */}
       {showRunModal && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setShowRunModal(false); }}>
-          <div className="modal" style={{ maxWidth: '580px' }}>
+          <div className={`modal ${styles.runModal}`}>
             <div className="modal-header">
               <span className="modal-title">Review Billing — {fmtPeriod(selectedPeriod)}</span>
               <button className="modal-close" onClick={() => setShowRunModal(false)}><i className="ti ti-x" /></button>
             </div>
 
-            <div className="modal-body" style={{ padding: '0', maxHeight: '60vh', overflowY: 'auto' }}>
+            <div className={`modal-body ${styles.runModalBody}`}>
               {runEntries.map((entry, i) => {
                 const col        = colorMap[entry.colorKey] || colorMap.emerald;
                 const clientTotal = entry.services.filter(s => s.included).reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
-                const activeSvcs  = entry.services.filter(s => s.included);
 
                 return (
-                  <div key={entry.clientId} style={{ borderBottom: '1px solid var(--border)', padding: '14px 20px', opacity: entry.included ? 1 : 0.45 }}>
+                  <div key={entry.clientId} className={styles.runClientRow} style={{ opacity: entry.included ? 1 : 0.45 }}>
 
                     {/* Client header */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: entry.included ? '12px' : 0 }}>
+                    <div className={entry.included ? styles.runClientHeader : styles.rowGap10}>
                       <input
                         type="checkbox"
                         checked={entry.included}
                         onChange={ev => setRunEntries(prev => prev.map((r, j) => j === i ? { ...r, included: ev.target.checked } : r))}
-                        style={{ width: '15px', height: '15px', cursor: 'pointer', accentColor: 'var(--indigo)', flexShrink: 0 }}
+                        className={styles.runCheckbox}
                       />
-                      <div className="avatar" style={{ background: col.bg, color: col.fg, width: '28px', height: '28px', fontSize: '10px', flexShrink: 0 }}>{entry.initials}</div>
-                      <span style={{ fontWeight: 700, color: 'var(--text)', flex: 1 }}>{entry.name}</span>
+                      <div className={`avatar ${styles.runAvatar}`} style={{ background: col.bg, color: col.fg }}>{entry.initials}</div>
+                      <span className={styles.runClientName}>{entry.name}</span>
                       {entry.included && (
-                        <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>
+                        <span className={styles.runClientTotal}>
                           ₹{clientTotal.toLocaleString('en-IN')}
                         </span>
                       )}
@@ -1093,29 +1084,29 @@ export default function Clients() {
 
                     {/* Service checkbox list */}
                     {entry.included && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div className={styles.runSvcList}>
                         {entry.services.map((svc, si) => (
-                          <div key={svc.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '5px 8px', borderRadius: '7px', background: svc.included ? 'var(--surface2)' : 'transparent' }}>
+                          <div key={svc.name} className={svc.included ? styles.runSvcRowActive : styles.runSvcRow}>
                             <input
                               type="checkbox"
                               checked={svc.included}
                               onChange={ev => setRunEntries(prev => prev.map((r, j) =>
                                 j === i ? { ...r, services: r.services.map((s, k) => k === si ? { ...s, included: ev.target.checked } : s) } : r
                               ))}
-                              style={{ width: '14px', height: '14px', cursor: 'pointer', accentColor: 'var(--indigo)', flexShrink: 0 }}
+                              className={styles.runSvcCheckbox}
                             />
                             <span style={{ flex: 1, fontSize: '12px', color: svc.included ? 'var(--text)' : 'var(--text3)', fontWeight: svc.included ? 500 : 400 }}>
                               {svc.name}
                             </span>
                             {svc.included && (<>
-                              <span style={{ fontSize: '11px', color: 'var(--text3)' }}>₹</span>
+                              <span className={styles.runSvcRupee}>₹</span>
                               <input
                                 type="number"
                                 value={svc.amount}
                                 onChange={ev => setRunEntries(prev => prev.map((r, j) =>
                                   j === i ? { ...r, services: r.services.map((s, k) => k === si ? { ...s, amount: ev.target.value } : s) } : r
                                 ))}
-                                style={{ width: '100px', padding: '3px 7px', textAlign: 'right', fontSize: '13px', fontWeight: 700 }}
+                                className={styles.runSvcInput}
                                 min="0"
                               />
                             </>)}
@@ -1135,9 +1126,9 @@ export default function Clients() {
                 sum + e.services.filter(s => s.included).reduce((s2, s) => s2 + (Number(s.amount) || 0), 0), 0);
               const count = runEntries.filter(e => e.included).length;
               return (<>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px', borderTop: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--text3)' }}>{count} client{count !== 1 ? 's' : ''} selected</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)' }}>Total: ₹{total.toLocaleString('en-IN')}</span>
+                <div className={styles.runFooterSummary}>
+                  <span className={styles.runFooterCount}>{count} client{count !== 1 ? 's' : ''} selected</span>
+                  <span className={styles.runFooterTotal}>Total: ₹{total.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="modal-footer">
                   <button className="btn" onClick={() => setShowRunModal(false)}>Cancel</button>

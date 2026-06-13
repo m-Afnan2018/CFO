@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import type { Employee, ColorKey, SalaryRecord, EmployeeTrend, SalaryAnalytics, SlipTemplate } from '@/types';
 import { api } from '@/lib/api';
 import SalarySlipViewer from './SalarySlipViewer';
+import styles from './Payroll.module.css';
 
 const DeptPayrollChart = dynamic(() => import('@/components/charts/DeptPayrollChart'), { ssr: false });
 
@@ -348,20 +349,16 @@ export default function Payroll() {
                 Generate Slips ({paidRecords.length})
               </button>
             )}
-            <button className="btn" style={{ color: 'var(--red)' }} onClick={deletePeriod} disabled={deletingPeriod}>
+            <button className={`btn ${styles.btnDanger}`} onClick={deletePeriod} disabled={deletingPeriod}>
               <i className="ti ti-trash" />{deletingPeriod ? 'Deleting…' : 'Delete Period'}
             </button>
           </>)}
         </div>
       </div>
 
-      <div style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)', padding: '0 24px', display: 'flex' }}>
+      <div className={styles.tabNav}>
         {([['employees', 'Employees'], ['payroll', 'Monthly Payroll'], ['analytics', 'Analytics'], ['template', 'Slip Template']] as const).map(([t, label]) => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            padding: '12px 20px', fontSize: '13px', fontWeight: tab === t ? 700 : 400,
-            color: tab === t ? 'var(--indigo)' : 'var(--text2)', background: 'none', border: 'none',
-            borderBottom: tab === t ? '2px solid var(--indigo)' : '2px solid transparent', cursor: 'pointer',
-          }}>
+          <button key={t} onClick={() => setTab(t)} className={`${styles.tabBtn} ${tab === t ? styles.tabBtnActive : ''}`}>
             {label}
           </button>
         ))}
@@ -371,35 +368,35 @@ export default function Payroll() {
 
         {/* ── Employees Tab ── */}
         {tab === 'employees' && (<>
-          <div className="grid4" style={{ marginBottom: '18px' }}>
+          <div className={`grid4 ${styles.gridMb}`}>
             <div className="kpi">
               <div className="kpi-label">Headcount</div>
               <div className="kpi-value">{employees.length}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>{deptCount} dept{deptCount !== 1 ? 's' : ''}</div>
+              <div className={`kpi-change ${styles.kpiSub}`}>{deptCount} dept{deptCount !== 1 ? 's' : ''}</div>
             </div>
             <div className="kpi">
               <div className="kpi-label">Monthly Payroll</div>
               <div className="kpi-value">{fmt(totalPayroll)}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>Gross roster cost</div>
+              <div className={`kpi-change ${styles.kpiSub}`}>Gross roster cost</div>
             </div>
             <div className="kpi">
               <div className="kpi-label">Avg Salary</div>
               <div className="kpi-value">{fmt(avgSalary)}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>Per employee</div>
+              <div className={`kpi-change ${styles.kpiSub}`}>Per employee</div>
             </div>
             <div className="kpi">
               <div className="kpi-label">Total Incentives</div>
               <div className="kpi-value">{fmt(employees.reduce((s, e) => s + e.incentives, 0))}</div>
-              <div className="kpi-change" style={{ color: 'var(--text2)' }}>Across all employees</div>
+              <div className={`kpi-change ${styles.kpiSub}`}>Across all employees</div>
             </div>
           </div>
 
           <div className="card">
             <div className="card-title">Employee Roster</div>
             {!loaded ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+              <div className={styles.loadingText}>Loading…</div>
             ) : employees.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '32px 0', textAlign: 'center' }}>
+              <div className={styles.emptyText}>
                 No employees yet — click <strong>Add Employee</strong> to get started
               </div>
             ) : (
@@ -408,7 +405,7 @@ export default function Payroll() {
                   <tr>
                     <th>Employee</th><th>Department</th><th>Base Salary</th>
                     <th>Gross Pay</th><th>Deductions</th><th>Net Salary</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th className={styles.thRight}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -417,32 +414,31 @@ export default function Payroll() {
                     return (
                       <tr key={emp._id}>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div className="avatar" style={{ background: col.bg, color: col.fg }}>{emp.initials}</div>
-                            <span style={{ fontWeight: 500 }}>{emp.name}</span>
+                          <div className={styles.empCell}>
+                            <div className={`avatar ${styles.avatarColored}`} style={{ '--avatar-bg': col.bg, '--avatar-fg': col.fg } as React.CSSProperties}>{emp.initials}</div>
+                            <span className={styles.empName}>{emp.name}</span>
                           </div>
                         </td>
-                        <td style={{ color: 'var(--text2)' }}>{emp.department}</td>
+                        <td className={styles.deptCell}>{emp.department}</td>
                         <td>{fmt(emp.baseSalary)}</td>
-                        <td style={{ color: 'var(--emerald)' }}>
+                        <td className={styles.grossCell}>
                           {fmt(emp.baseSalary + (emp.hra ?? 0) + (emp.specialAllowance ?? 0) + emp.incentives)}
                         </td>
-                        <td style={{ color: 'var(--red)' }}>
+                        <td className={styles.deductCell}>
                           −{fmt((emp.providentFund ?? 0) + (emp.esi ?? 0) + (emp.professionalTax ?? 0) + (emp.tds ?? 0) + emp.deductions)}
                         </td>
-                        <td style={{ fontWeight: 700, color: 'var(--indigo)' }}>{fmt(emp.finalSalary)}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                            <button className="btn"
-                              style={{ padding: '4px 10px', fontSize: '11px', color: 'var(--emerald)' }}
+                        <td className={styles.netCell}>{fmt(emp.finalSalary)}</td>
+                        <td className={styles.actionsCell}>
+                          <div className={styles.actionGroup}>
+                            <button className={`btn ${styles.btnSm}`}
                               title="Salary Increment"
                               onClick={() => { setIncrementEmp(emp); setIncrType('pct'); setIncrVal(''); }}>
-                              <i className="ti ti-trending-up" style={{ fontSize: '13px' }} />
+                              <i className={`ti ti-trending-up ${styles.iconSm}`} />
                             </button>
-                            <button className="btn" style={{ padding: '4px 8px' }} onClick={() => openEdit(emp)}>
+                            <button className={`btn ${styles.btnIcon}`} onClick={() => openEdit(emp)}>
                               <i className="ti ti-pencil" />
                             </button>
-                            <button className="btn" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={() => setDeleteId(emp._id)}>
+                            <button className={`btn ${styles.btnIconRed}`} onClick={() => setDeleteId(emp._id)}>
                               <i className="ti ti-trash" />
                             </button>
                           </div>
@@ -458,38 +454,38 @@ export default function Payroll() {
 
         {/* ── Monthly Payroll Tab ── */}
         {tab === 'payroll' && (<>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-            <button className="btn" style={{ padding: '6px 14px' }} onClick={() => shiftMonth(-1)}>
+          <div className={styles.periodNav}>
+            <button className={`btn ${styles.btnPeriodNav}`} onClick={() => shiftMonth(-1)}>
               <i className="ti ti-chevron-left" style={{ fontSize: '14px' }} />
             </button>
-            <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)', minWidth: '150px', textAlign: 'center' }}>
+            <div className={styles.periodLabel}>
               {periodLabel(payPeriod)}
             </div>
-            <button className="btn" style={{ padding: '6px 14px' }} onClick={() => shiftMonth(1)}>
+            <button className={`btn ${styles.btnPeriodNav}`} onClick={() => shiftMonth(1)}>
               <i className="ti ti-chevron-right" style={{ fontSize: '14px' }} />
             </button>
             {payPeriod !== currentPeriod() && (
-              <button className="btn" style={{ fontSize: '11px' }} onClick={() => setPayPeriod(currentPeriod())}>
+              <button className={`btn ${styles.btnThisMonth}`} onClick={() => setPayPeriod(currentPeriod())}>
                 This Month
               </button>
             )}
           </div>
 
           {!recordsLoaded ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '60px 0', textAlign: 'center' }}>Loading…</div>
+            <div className={styles.payrollLoading}>Loading…</div>
           ) : records.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-              <div style={{ fontSize: '36px', marginBottom: '14px' }}>📋</div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginBottom: '6px' }}>
+            <div className={styles.payrollEmpty}>
+              <div className={styles.payrollEmptyIcon}>📋</div>
+              <div className={styles.payrollEmptyTitle}>
                 No payroll for {periodLabel(payPeriod)}
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--text2)', marginBottom: '20px' }}>
+              <div className={styles.payrollEmptyMsg}>
                 {employees.length > 0
                   ? `Snapshot ${employees.length} employee${employees.length !== 1 ? 's' : ''} from the current roster into this pay period.`
                   : 'Add employees from the Employees tab before generating payroll.'}
               </div>
               {generateError && (
-                <div style={{ fontSize: '12px', color: 'var(--red)', padding: '8px 16px', background: 'var(--red-dim)', borderRadius: '8px', display: 'inline-block', marginBottom: '16px' }}>
+                <div className={styles.generateError}>
                   {generateError}
                 </div>
               )}
@@ -501,11 +497,11 @@ export default function Payroll() {
               )}
             </div>
           ) : (<>
-            <div className="grid4" style={{ marginBottom: '18px' }}>
+            <div className={`grid4 ${styles.gridMb}`}>
               <div className="kpi">
                 <div className="kpi-label">Total Payroll</div>
                 <div className="kpi-value">{fmt(recTotal)}</div>
-                <div className="kpi-change" style={{ color: 'var(--text2)' }}>{records.length} employees</div>
+                <div className={`kpi-change ${styles.kpiSub}`}>{records.length} employees</div>
               </div>
               <div className="kpi">
                 <div className="kpi-label">Disbursed</div>
@@ -517,14 +513,14 @@ export default function Payroll() {
                 <div className="kpi-value" style={{ color: recPendingCount > 0 ? 'var(--amber)' : 'var(--text)' }}>
                   {fmt(recTotal - recPaid)}
                 </div>
-                <div className="kpi-change" style={{ color: 'var(--text2)' }}>{recPendingCount} pending</div>
+                <div className={`kpi-change ${styles.kpiSub}`}>{recPendingCount} pending</div>
               </div>
               <div className="kpi">
                 <div className="kpi-label">Completion</div>
                 <div className="kpi-value" style={{ color: recPendingCount === 0 ? 'var(--emerald)' : 'var(--amber)' }}>
                   {records.length > 0 ? Math.round(((records.length - recPendingCount) / records.length) * 100) : 0}%
                 </div>
-                <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+                <div className={`kpi-change ${styles.kpiSub}`}>
                   {recPendingCount === 0 ? 'Fully disbursed' : 'In progress'}
                 </div>
               </div>
@@ -535,14 +531,14 @@ export default function Payroll() {
                 {periodLabel(payPeriod)} — Salary Breakdown
                 <span className="card-sub">Edit leave days &amp; bonus per row · auto-saves on blur</span>
               </div>
-              <div style={{ overflowX: 'auto' }}>
+              <div className={styles.tableScroll}>
                 <table>
                   <thead>
                     <tr>
                       <th>Employee</th><th>Department</th><th>Gross Pay</th>
-                      <th style={{ textAlign: 'center' }}>Leave Days</th>
+                      <th className={styles.thCenter}>Leave Days</th>
                       <th>Leave Ded.</th>
-                      <th style={{ textAlign: 'center' }}>Bonus (₹)</th>
+                      <th className={styles.thCenter}>Bonus (₹)</th>
                       <th>Deductions</th><th>Net Salary</th><th />
                     </tr>
                   </thead>
@@ -561,17 +557,17 @@ export default function Payroll() {
                       return (
                         <tr key={rec._id}>
                           <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <div className="avatar" style={{ background: col.bg, color: col.fg }}>{rec.initials}</div>
-                              <span style={{ fontWeight: 500 }}>{rec.name}</span>
+                            <div className={styles.empCell}>
+                              <div className={`avatar ${styles.avatarColored}`} style={{ '--avatar-bg': col.bg, '--avatar-fg': col.fg } as React.CSSProperties}>{rec.initials}</div>
+                              <span className={styles.empName}>{rec.name}</span>
                             </div>
                           </td>
-                          <td style={{ color: 'var(--text2)' }}>{rec.department}</td>
+                          <td className={styles.deptCell}>{rec.department}</td>
                           <td>
-                            <div style={{ fontWeight: 600 }}>{fmt(grossPay)}</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text3)' }}>base {fmt(rec.baseSalary)}</div>
+                            <div className={styles.grossPayCell}>{fmt(grossPay)}</div>
+                            <div className={styles.grossPayBase}>base {fmt(rec.baseSalary)}</div>
                           </td>
-                          <td style={{ textAlign: 'center' }}>
+                          <td className={styles.tdCenter}>
                             <input
                               type="number" min="0" max="31"
                               value={e.leaveDays}
@@ -581,10 +577,10 @@ export default function Payroll() {
                               disabled={isSaving || isPaid}
                             />
                           </td>
-                          <td style={{ color: leaveDays > 0 ? 'var(--red)' : 'var(--text3)', fontSize: '12px' }}>
+                          <td className={leaveDays > 0 ? styles.deductAmt : styles.deductNone}>
                             {leaveDays > 0 ? `−${fmt(leaveDeduct)}` : '—'}
                           </td>
-                          <td style={{ textAlign: 'center' }}>
+                          <td className={styles.tdCenter}>
                             <input
                               type="number" min="0"
                               value={e.bonus}
@@ -594,36 +590,34 @@ export default function Payroll() {
                               disabled={isSaving || isPaid}
                             />
                           </td>
-                          <td style={{ color: 'var(--red)', fontSize: '12px' }}>−{fmt(statDed)}</td>
-                          <td style={{ fontWeight: 700, color: 'var(--indigo)', fontSize: '14px', whiteSpace: 'nowrap' }}>
+                          <td className={styles.deductAmt}>−{fmt(statDed)}</td>
+                          <td className={styles.netSalaryCell}>
                             {fmt(netSalary)}
                           </td>
-                          <td style={{ whiteSpace: 'nowrap' }}>
+                          <td className={styles.nowrap}>
                             {isPaid ? (
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <div className={styles.paidCell}>
                                 <span className="badge bg" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                  <i className="ti ti-circle-check" style={{ fontSize: '11px' }} /> Paid
+                                  <i className={`ti ti-circle-check ${styles.paidBadgeIcon}`} /> Paid
                                 </span>
                                 <button
-                                  className="btn"
-                                  style={{ padding: '3px 8px', fontSize: '11px' }}
+                                  className={`btn ${styles.btnSlip}`}
                                   title="View Salary Slip"
                                   onClick={() => {
                                     setSlipViewIdx(paidRecords.findIndex(r => r._id === rec._id));
                                     setSlipViewOpen(true);
                                   }}
                                 >
-                                  <i className="ti ti-file-text" style={{ fontSize: '12px' }} />
+                                  <i className={`ti ti-file-text ${styles.iconXsm}`} />
                                 </button>
                               </div>
                             ) : (
                               <button
-                                className="btn"
-                                style={{ padding: '4px 12px', fontSize: '12px', color: 'var(--emerald)', whiteSpace: 'nowrap' }}
+                                className={`btn ${styles.btnMarkPaid}`}
                                 onClick={() => markPaid(rec)}
                                 disabled={isSaving}
                               >
-                                <i className={`ti ${isSaving ? 'ti-loader-2' : 'ti-circle-check'}`} style={{ fontSize: '13px' }} />
+                                <i className={`ti ${isSaving ? 'ti-loader-2' : 'ti-circle-check'} ${styles.iconSm}`} />
                                 {isSaving ? 'Saving…' : 'Mark Paid'}
                               </button>
                             )}
@@ -648,7 +642,7 @@ export default function Payroll() {
         {/* ── Slip Template Tab ── */}
         {tab === 'template' && (
           <div>
-            <div className="card" style={{ maxWidth: '620px' }}>
+            <div className={`card ${styles.templateCard}`}>
               <div className="card-title">
                 Salary Slip Template
                 <span className="card-sub">Company details printed on all salary slips</span>
@@ -699,7 +693,7 @@ export default function Payroll() {
                   value={templateForm.footerNote}
                   onChange={e => setTemplateForm(f => ({ ...f, footerNote: e.target.value }))} />
               </div>
-              <div style={{ marginTop: '16px', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <div className={styles.templateActions}>
                 <button className="btn" onClick={() => setTemplateForm(slipTemplate)}>Reset</button>
                 <button className="btn btn-p" onClick={saveTemplate} disabled={templateSaving}>
                   <i className="ti ti-device-floppy" />
@@ -748,25 +742,25 @@ export default function Payroll() {
               </div>
 
               {/* Earnings */}
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Earnings</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={styles.sectionLabel}>Earnings</div>
+              <div className={styles.earningsGrid}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Basic Salary (₹) *</label>
                   <input className="form-input" type="number" min="0" placeholder="50000" value={form.baseSalary}
                     onChange={e => setForm(f => ({ ...f, baseSalary: e.target.value }))} />
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">HRA (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.hra}
                     onChange={e => setForm(f => ({ ...f, hra: e.target.value }))} />
-                  {base > 0 && <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>40% = ₹{Math.round(base * 0.4).toLocaleString('en-IN')}</div>}
+                  {base > 0 && <div className={styles.hintText}>40% = ₹{Math.round(base * 0.4).toLocaleString('en-IN')}</div>}
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Special Allowance (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.specialAllowance}
                     onChange={e => setForm(f => ({ ...f, specialAllowance: e.target.value }))} />
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Incentives (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.incentives}
                     onChange={e => setForm(f => ({ ...f, incentives: e.target.value }))} />
@@ -774,30 +768,30 @@ export default function Payroll() {
               </div>
 
               {/* Deductions */}
-              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Deductions</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={styles.sectionLabel}>Deductions</div>
+              <div className={styles.deductionsGrid}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Provident Fund (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.providentFund}
                     onChange={e => setForm(f => ({ ...f, providentFund: e.target.value }))} />
-                  {base > 0 && <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>12% = ₹{Math.round(base * 0.12).toLocaleString('en-IN')}</div>}
+                  {base > 0 && <div className={styles.hintText}>12% = ₹{Math.round(base * 0.12).toLocaleString('en-IN')}</div>}
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">ESI (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.esi}
                     onChange={e => setForm(f => ({ ...f, esi: e.target.value }))} />
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Professional Tax (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="200" value={form.professionalTax}
                     onChange={e => setForm(f => ({ ...f, professionalTax: e.target.value }))} />
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">TDS / Income Tax (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.tds}
                     onChange={e => setForm(f => ({ ...f, tds: e.target.value }))} />
                 </div>
-                <div className="form-field" style={{ marginBottom: 0 }}>
+                <div className={`form-field ${styles.formFieldNoMb}`}>
                   <label className="form-label">Other Deductions (₹)</label>
                   <input className="form-input" type="number" min="0" placeholder="0" value={form.deductions}
                     onChange={e => setForm(f => ({ ...f, deductions: e.target.value }))} />
@@ -805,24 +799,24 @@ export default function Payroll() {
               </div>
 
               {/* Summary */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ background: 'var(--bg3)', borderRadius: '10px', padding: '10px 14px' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '3px' }}>Gross Pay</div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--emerald)' }}>{fmt(grossPay)}</div>
-                  <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>
+              <div className={styles.summaryGrid}>
+                <div className={styles.summaryBox}>
+                  <div className={styles.summaryBoxLabel}>Gross Pay</div>
+                  <div className={styles.summaryGross}>{fmt(grossPay)}</div>
+                  <div className={styles.summaryBoxHint}>
                     {base > 0 ? `base ${fmt(base)} + HRA ${fmt(hra)} + special ${fmt(special)} + inc ${fmt(inc)}` : '—'}
                   </div>
                 </div>
-                <div style={{ background: 'var(--bg3)', borderRadius: '10px', padding: '10px 14px' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginBottom: '3px' }}>Net Salary</div>
+                <div className={styles.summaryBox}>
+                  <div className={styles.summaryBoxLabel}>Net Salary</div>
                   <div style={{ fontSize: '17px', fontWeight: 800, color: computedFinal >= 0 ? 'var(--indigo)' : 'var(--red)' }}>{fmt(computedFinal)}</div>
-                  <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>
+                  <div className={styles.summaryBoxHint}>
                     {base > 0 ? `PF ${fmt(pf)} + ESI ${fmt(esiAmt)} + PT ${fmt(pt)} + TDS ${fmt(tdsAmt)} + other ${fmt(ded)}` : '—'}
                   </div>
                 </div>
               </div>
 
-              <div className="form-field" style={{ marginBottom: 0 }}>
+              <div className={`form-field ${styles.formFieldNoMb}`}>
                 <label className="form-label">Color Tag</label>
                 <select className="form-input" value={form.colorKey}
                   onChange={e => setForm(f => ({ ...f, colorKey: e.target.value as ColorKey }))}>
@@ -843,7 +837,7 @@ export default function Payroll() {
       {/* ── Salary Increment ── */}
       {incrementEmp && (
         <div className="modal-overlay" onClick={() => { setIncrementEmp(null); setIncrVal(''); }}>
-          <div className="modal" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
+          <div className={`modal ${styles.incrModalWidth}`} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <span className="modal-title">Salary Increment</span>
               <button className="modal-close" onClick={() => { setIncrementEmp(null); setIncrVal(''); }}>
@@ -851,32 +845,31 @@ export default function Payroll() {
               </button>
             </div>
             <div className="modal-body">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px', padding: '12px', background: 'var(--bg3)', borderRadius: '10px' }}>
-                <div className="avatar"
-                  style={{ background: colorMap[incrementEmp.colorKey]?.bg, color: colorMap[incrementEmp.colorKey]?.fg }}>
+              <div className={styles.incrEmployeeInfo}>
+                <div className={`avatar ${styles.avatarColored}`} style={{ '--avatar-bg': colorMap[incrementEmp.colorKey]?.bg, '--avatar-fg': colorMap[incrementEmp.colorKey]?.fg } as React.CSSProperties}>
                   {incrementEmp.initials}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>{incrementEmp.name}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text2)' }}>
+                  <div className={styles.incrEmpName}>{incrementEmp.name}</div>
+                  <div className={styles.incrEmpSub}>
                     {incrementEmp.department} &middot; Current base: <strong>{fmt(incrementEmp.baseSalary)}</strong>
                   </div>
                 </div>
               </div>
               <div className="form-field">
                 <label className="form-label">Increment Type</label>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div className={styles.incrTypeRow}>
                   {(['pct', 'fixed'] as const).map(t => (
-                    <label key={t} style={{
-                      display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px',
-                      cursor: 'pointer', flex: 1, padding: '10px 12px',
-                      border: `2px solid ${incrType === t ? 'var(--indigo)' : 'var(--border)'}`,
-                      borderRadius: '8px',
-                      background: incrType === t ? 'var(--indigo-dim)' : 'transparent',
-                      transition: 'all 0.15s',
-                    }}>
+                    <label
+                      key={t}
+                      className={styles.incrTypeLabel}
+                      style={{
+                        border: `2px solid ${incrType === t ? 'var(--indigo)' : 'var(--border)'}`,
+                        background: incrType === t ? 'var(--indigo-dim)' : 'transparent',
+                      }}
+                    >
                       <input type="radio" name="incrType" value={t} checked={incrType === t}
-                        onChange={() => setIncrType(t)} style={{ accentColor: 'var(--indigo)' }} />
+                        onChange={() => setIncrType(t)} className={styles.incrRadio} />
                       {t === 'pct' ? 'Percentage (%)' : 'Fixed Amount (₹)'}
                     </label>
                   ))}
@@ -891,10 +884,10 @@ export default function Payroll() {
                   value={incrVal} onChange={e => setIncrVal(e.target.value)} />
               </div>
               {incrVal && parseFloat(incrVal) > 0 && (
-                <div style={{ background: 'var(--emerald-dim)', borderRadius: '10px', padding: '12px 14px' }}>
-                  <div style={{ fontSize: '11px', color: 'var(--text2)', marginBottom: '4px' }}>New Base Salary</div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--emerald)' }}>{fmt(newBase())}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '4px' }}>
+                <div className={styles.incrResult}>
+                  <div className={styles.incrResultLabel}>New Base Salary</div>
+                  <div className={styles.incrResultValue}>{fmt(newBase())}</div>
+                  <div className={styles.incrResultSub}>
                     +{fmt(newBase() - incrementEmp.baseSalary)} increase from {fmt(incrementEmp.baseSalary)}
                   </div>
                 </div>
@@ -914,19 +907,19 @@ export default function Payroll() {
       {/* ── Delete Employee Confirm ── */}
       {deleteId && (
         <div className="modal-overlay" onClick={() => setDeleteId(null)}>
-          <div className="modal" style={{ maxWidth: '360px' }} onClick={e => e.stopPropagation()}>
+          <div className={`modal ${styles.deleteModalWidth}`} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <span className="modal-title">Remove Employee</span>
               <button className="modal-close" onClick={() => setDeleteId(null)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
-              <p style={{ fontSize: '13px', color: 'var(--text2)', margin: 0 }}>
+              <p className={styles.deleteConfirmText}>
                 This will permanently remove the employee record. This cannot be undone.
               </p>
             </div>
             <div className="modal-footer">
               <button className="btn" onClick={() => setDeleteId(null)}>Cancel</button>
-              <button className="btn" style={{ background: 'var(--red)', color: '#fff', border: 'none' }} onClick={confirmDelete}>
+              <button className={`btn ${styles.btnDelete}`} onClick={confirmDelete}>
                 Remove
               </button>
             </div>
@@ -966,21 +959,21 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
 
   return (
     <>
-      <div className="grid4" style={{ marginBottom: '18px' }}>
+      <div className={`grid4 ${styles.gridMb}`}>
         <div className="kpi">
           <div className="kpi-label">Total Headcount</div>
           <div className="kpi-value">{employees.length}</div>
-          <div className="kpi-change" style={{ color: 'var(--text2)' }}>{depts.length} department{depts.length === 1 ? '' : 's'}</div>
+          <div className={`kpi-change ${styles.kpiSub}`}>{depts.length} department{depts.length === 1 ? '' : 's'}</div>
         </div>
         <div className="kpi">
           <div className="kpi-label">Monthly Payroll</div>
           <div className="kpi-value">{fmt(totalPayroll)}</div>
-          <div className="kpi-change" style={{ color: 'var(--text2)' }}>Current roster</div>
+          <div className={`kpi-change ${styles.kpiSub}`}>Current roster</div>
         </div>
         <div className="kpi">
           <div className="kpi-label">Avg Salary</div>
           <div className="kpi-value">{fmt(avgSalary)}</div>
-          <div className="kpi-change" style={{ color: 'var(--text2)' }}>Per employee</div>
+          <div className={`kpi-change ${styles.kpiSub}`}>Per employee</div>
         </div>
         <div className="kpi">
           <div className="kpi-label">Payroll / Revenue</div>
@@ -989,27 +982,27 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
             : 'var(--text)' }}>
             {payrollToRevenue ? `${payrollToRevenue}%` : '—'}
           </div>
-          <div className="kpi-change" style={{ color: 'var(--text2)' }}>
+          <div className={`kpi-change ${styles.kpiSub}`}>
             {payrollToRevenue ? `of ${fmt(totalRevenue)} revenue` : 'No paid invoices yet'}
           </div>
         </div>
       </div>
 
-      <div className="grid2" style={{ marginBottom: '18px' }}>
+      <div className={`grid2 ${styles.gridMb}`}>
         <div className="card">
           <div className="card-title">Department Breakdown<span className="card-sub">From current employee roster</span></div>
           {employees.length === 0 ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>No employees yet</div>
+            <div className={styles.chartNoData}>No employees yet</div>
           ) : (
             <table>
               <thead><tr><th>Department</th><th>Headcount</th><th>Avg Salary</th><th>Total Cost</th><th>Share</th></tr></thead>
               <tbody>
                 {depts.map(d => (
                   <tr key={d.name}>
-                    <td style={{ fontWeight: 600 }}>{d.name}</td>
+                    <td className={styles.deptNameCell}>{d.name}</td>
                     <td>{d.count}</td>
                     <td>{fmt(d.avg)}</td>
-                    <td style={{ color: 'var(--indigo)', fontWeight: 700 }}>{fmt(d.total)}</td>
+                    <td className={styles.deptTotalCell}>{fmt(d.total)}</td>
                     <td><span className="badge bg">{totalPayroll > 0 ? ((d.total / totalPayroll) * 100).toFixed(0) : 0}%</span></td>
                   </tr>
                 ))}
@@ -1021,7 +1014,7 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
         <div className="card">
           <div className="card-title">Payroll by Department</div>
           {depts.length === 0 ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>No data yet</div>
+            <div className={styles.chartNoData}>No data yet</div>
           ) : (
             <div style={{ height: `${Math.max(160, depts.length * 44)}px` }}>
               <DeptPayrollChart labels={depts.map(d => d.name)} data={depts.map(d => d.total)} />
@@ -1036,13 +1029,13 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
           <span className="card-sub">Period-over-period from payroll history</span>
         </div>
         {!analyticsLoaded ? (
-          <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+          <div className={styles.loadingText}>Loading…</div>
         ) : trends.length === 0 ? (
-          <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>
+          <div className={styles.loadingText}>
             No payroll runs yet — generate payroll from the Monthly Payroll tab to see trends
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className={styles.tableScroll}>
             <table>
               <thead>
                 <tr>
@@ -1061,12 +1054,12 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
                   return (
                     <tr key={trend._id}>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div className="avatar" style={{ background: col.bg, color: col.fg }}>{trend.initials}</div>
-                          <span style={{ fontWeight: 500 }}>{trend.name}</span>
+                        <div className={styles.trendEmpCell}>
+                          <div className={`avatar ${styles.avatarColored}`} style={{ '--avatar-bg': col.bg, '--avatar-fg': col.fg } as React.CSSProperties}>{trend.initials}</div>
+                          <span className={styles.trendEmpName}>{trend.name}</span>
                         </div>
                       </td>
-                      <td style={{ color: 'var(--text2)' }}>{trend.department}</td>
+                      <td className={styles.trendDeptCell}>{trend.department}</td>
                       {vals.map((v, i) => {
                         const prev = i > 0 ? vals[i - 1] : null;
                         const up   = v !== null && prev !== null && v > prev;
@@ -1076,14 +1069,14 @@ function AnalyticsTab({ employees, analytics, analyticsLoaded, totalRevenue }: A
                             {v !== null ? (
                               <span>
                                 {fmt(v)}
-                                {up && <i className="ti ti-arrow-up-right" style={{ fontSize: '10px', marginLeft: '3px' }} />}
-                                {dn && <i className="ti ti-arrow-down-right" style={{ fontSize: '10px', marginLeft: '3px' }} />}
+                                {up && <i className={`ti ti-arrow-up-right ${styles.trendIcon}`} />}
+                                {dn && <i className={`ti ti-arrow-down-right ${styles.trendIcon}`} />}
                               </span>
-                            ) : <span style={{ color: 'var(--text3)' }}>—</span>}
+                            ) : <span className={styles.trendMissing}>—</span>}
                           </td>
                         );
                       })}
-                      <td style={{ fontWeight: 700 }}>{known.length > 0 ? fmt(avg) : '—'}</td>
+                      <td className={styles.trendAvgCell}>{known.length > 0 ? fmt(avg) : '—'}</td>
                     </tr>
                   );
                 })}

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Invoice } from '@/types';
 import { api } from '@/lib/api';
+import styles from './Payments.module.css';
 
 const PaymentModeChart = dynamic(() => import('@/components/charts/PaymentModeChart'), { ssr: false });
 
@@ -53,19 +54,35 @@ export default function Payments() {
         <div className="topbar-title">Payment Tracking</div>
       </div>
       <div className="content">
-        <div className="grid4" style={{ marginBottom: '18px' }}>
-          <div className="kpi"><div className="kpi-label">Total Collected</div><div className="kpi-value" style={{ color: 'var(--emerald)' }}>{fmt(sum(collected))}</div><div className="kpi-change" style={{ color: 'var(--text2)' }}>{collected.length} invoices</div></div>
-          <div className="kpi"><div className="kpi-label">Pending</div><div className="kpi-value" style={{ color: 'var(--amber)' }}>{fmt(sum(pending))}</div><div className="kpi-change" style={{ color: 'var(--text2)' }}>{pending.length} invoices</div></div>
-          <div className="kpi"><div className="kpi-label">Overdue</div><div className="kpi-value" style={{ color: 'var(--red)' }}>{fmt(sum(overdue))}</div><div className="kpi-change down">{overdue.length} invoices</div></div>
-          <div className="kpi"><div className="kpi-label">Partial Payments</div><div className="kpi-value" style={{ color: 'var(--indigo)' }}>{fmt(sum(partial))}</div><div className="kpi-change" style={{ color: 'var(--text2)' }}>{partial.length} invoices</div></div>
+        <div className={`grid4 ${styles.grid4mb}`}>
+          <div className="kpi">
+            <div className="kpi-label">Total Collected</div>
+            <div className={`kpi-value ${styles.valGreen}`}>{fmt(sum(collected))}</div>
+            <div className={`kpi-change ${styles.kpiChangeSub}`}>{collected.length} invoices</div>
+          </div>
+          <div className="kpi">
+            <div className="kpi-label">Pending</div>
+            <div className={`kpi-value ${styles.valAmber}`}>{fmt(sum(pending))}</div>
+            <div className={`kpi-change ${styles.kpiChangeSub}`}>{pending.length} invoices</div>
+          </div>
+          <div className="kpi">
+            <div className="kpi-label">Overdue</div>
+            <div className={`kpi-value ${styles.valRed}`}>{fmt(sum(overdue))}</div>
+            <div className="kpi-change down">{overdue.length} invoices</div>
+          </div>
+          <div className="kpi">
+            <div className="kpi-label">Partial Payments</div>
+            <div className={`kpi-value ${styles.valIndigo}`}>{fmt(sum(partial))}</div>
+            <div className={`kpi-change ${styles.kpiChangeSub}`}>{partial.length} invoices</div>
+          </div>
         </div>
         <div className="grid2">
           <div className="card">
             <div className="card-title">Receivable Aging</div>
             {!loaded ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+              <div className={styles.loadingMsg}>Loading…</div>
             ) : outstanding.length === 0 ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>No outstanding receivables</div>
+              <div className={styles.loadingMsg}>No outstanding receivables</div>
             ) : buckets.map(b => (
               <div key={b.label} className="bar-row">
                 <span className="bar-label">{b.label}</span>

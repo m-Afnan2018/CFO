@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { SalaryRecord, SlipTemplate } from '@/types';
+import styles from './SalarySlipViewer.module.css';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -156,32 +157,32 @@ export default function SalarySlipViewer({ records, initialIndex, period, templa
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
+    <div className={styles.overlay}>
 
       {/* ── Top bar ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: '56px', flexShrink: 0, background: 'var(--bg2)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className={styles.topBar}>
+        <div className={styles.topBarLeft}>
           <button className="modal-close" onClick={onClose}><i className="ti ti-x" /></button>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)' }}>
+          <div className={styles.topBarTitle}>
             Salary Slip &mdash; {periodLabel(period)}
           </div>
         </div>
 
         {records.length > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button className="btn" style={{ padding: '4px 10px' }} onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0}>
+          <div className={styles.pagination}>
+            <button className={`btn ${styles.paginationBtnSm}`} onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0}>
               <i className="ti ti-chevron-left" />
             </button>
-            <span style={{ fontSize: '13px', color: 'var(--text2)', minWidth: '68px', textAlign: 'center' }}>
+            <span className={styles.pageLabel}>
               {idx + 1} / {records.length}
             </span>
-            <button className="btn" style={{ padding: '4px 10px' }} onClick={() => setIdx(i => Math.min(records.length - 1, i + 1))} disabled={idx === records.length - 1}>
+            <button className={`btn ${styles.paginationBtnSm}`} onClick={() => setIdx(i => Math.min(records.length - 1, i + 1))} disabled={idx === records.length - 1}>
               <i className="ti ti-chevron-right" />
             </button>
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className={styles.printGroup}>
           <button className="btn" onClick={() => doPrint([rec])}>
             <i className="ti ti-printer" /> Print
           </button>
@@ -194,42 +195,45 @@ export default function SalarySlipViewer({ records, initialIndex, period, templa
       </div>
 
       {/* ── Slip preview ── */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '32px 20px', display: 'flex', justifyContent: 'center' }}>
-        <div style={{
-          width: '100%', maxWidth: '680px', background: '#ffffff', borderRadius: '14px',
-          padding: '36px', border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 4px 32px rgba(0,0,0,0.12)', color: '#0f172a',
-        }}>
+      <div className={styles.scrollArea}>
+        <div className={styles.slip}>
 
           {/* Company header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '18px', borderBottom: '2px solid #e2e8f0', marginBottom: '20px' }}>
+          <div className={styles.slipHeader}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '7px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'linear-gradient(135deg,#10b981,#6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px', color: '#fff', flexShrink: 0 }}>G</div>
-                <div style={{ fontSize: '18px', fontWeight: 800 }}>{template.companyName || 'Ganesyx Pvt Ltd'}</div>
+              <div className={styles.companyLogoRow}>
+                <div className={styles.companyLogo}>G</div>
+                <div className={styles.companyName}>{template.companyName || 'Ganesyx Pvt Ltd'}</div>
               </div>
-              {template.companyAddress && <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '2px' }}>{template.companyAddress}</div>}
-              {contactLine && <div style={{ fontSize: '12px', color: '#64748b' }}>{contactLine}</div>}
-              {template.panNumber && <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '3px' }}>PAN: {template.panNumber}</div>}
+              {template.companyAddress && <div className={styles.companyAddress}>{template.companyAddress}</div>}
+              {contactLine && <div className={styles.companyContact}>{contactLine}</div>}
+              {template.panNumber && <div className={styles.companyPan}>PAN: {template.panNumber}</div>}
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Salary Slip</div>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#6366f1', marginTop: '3px' }}>{periodLabel(period)}</div>
+            <div className={styles.slipTitleBlock}>
+              <div className={styles.slipTitleLabel}>Salary Slip</div>
+              <div className={styles.slipPeriod}>{periodLabel(period)}</div>
             </div>
           </div>
 
           {/* Employee info */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#f8fafc', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
+          <div className={styles.empGrid}>
             {([['Employee', rec.name], ['Department', rec.department], ['Pay Period', periodLabel(period)], ['Status', rec.status]] as [string, string][]).map(([label, value]) => (
               <div key={label}>
-                <div style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>{label}</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: label === 'Status' ? (rec.status === 'Paid' ? '#10b981' : '#f59e0b') : '#0f172a' }}>{value}</div>
+                <div className={styles.empFieldLabel}>{label}</div>
+                <div
+                  className={styles.empFieldValue}
+                  style={label === 'Status'
+                    ? { '--emp-val-color': rec.status === 'Paid' ? '#10b981' : '#f59e0b' } as React.CSSProperties
+                    : undefined}
+                >
+                  {value}
+                </div>
               </div>
             ))}
           </div>
 
           {/* Earnings & Deductions */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '18px' }}>
+          <div className={styles.earningsGrid}>
             <div>
               <SectionHead>Earnings</SectionHead>
               {earnings.map(e => (
@@ -239,7 +243,7 @@ export default function SalarySlipViewer({ records, initialIndex, period, templa
             </div>
             <div>
               <SectionHead>Deductions</SectionHead>
-              {deductions.length === 0 && <div style={{ fontSize: '12px', color: '#94a3b8', padding: '5px 0' }}>No deductions</div>}
+              {deductions.length === 0 && <div className={styles.noDed}>No deductions</div>}
               {deductions.map(d => (
                 <SRow key={d.label} label={d.label} value={`−${fmtINR(d.amount)}`} color="#ef4444" />
               ))}
@@ -252,18 +256,21 @@ export default function SalarySlipViewer({ records, initialIndex, period, templa
           </div>
 
           {/* Net salary */}
-          <div style={{ background: 'linear-gradient(135deg,rgba(99,102,241,0.07),rgba(16,185,129,0.07))', border: '1.5px solid rgba(99,102,241,0.18)', borderRadius: '10px', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+          <div className={styles.netBanner}>
             <div>
-              <div style={{ fontSize: '10px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>Net Salary Payable</div>
-              <div style={{ fontSize: '30px', fontWeight: 800, color: '#6366f1', letterSpacing: '-0.5px' }}>{fmtINR(net)}</div>
+              <div className={styles.netLabel}>Net Salary Payable</div>
+              <div className={styles.netAmount}>{fmtINR(net)}</div>
             </div>
-            <div style={{ background: rec.status === 'Paid' ? '#10b981' : '#f59e0b', color: '#fff', padding: '7px 18px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em' }}>
+            <div
+              className={styles.statusBadge}
+              style={{ '--badge-bg': rec.status === 'Paid' ? '#10b981' : '#f59e0b' } as React.CSSProperties}
+            >
               {rec.status === 'Paid' ? '✓ PAID' : 'PENDING'}
             </div>
           </div>
 
           {/* Footer */}
-          <div style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+          <div className={styles.slipFooter}>
             {template.footerNote || 'This is a system generated payslip and does not require a signature.'}
           </div>
         </div>
@@ -274,7 +281,7 @@ export default function SalarySlipViewer({ records, initialIndex, period, templa
 
 function SectionHead({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', paddingBottom: '7px', borderBottom: '1px solid #e2e8f0', marginBottom: '8px' }}>
+    <div className={styles.sectionHead}>
       {children}
     </div>
   );
@@ -282,18 +289,28 @@ function SectionHead({ children }: { children: React.ReactNode }) {
 
 function SRow({ label, value, color = '#0f172a' }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: '13px', borderBottom: '1px dashed #f1f5f9' }}>
-      <span style={{ color: '#475569' }}>{label}</span>
-      <span style={{ fontWeight: 600, color }}>{value}</span>
+    <div className={styles.sRow}>
+      <span className={styles.sRowLabel}>{label}</span>
+      <span
+        className={styles.sRowValue}
+        style={{ '--srow-color': color } as React.CSSProperties}
+      >
+        {value}
+      </span>
     </div>
   );
 }
 
 function STotalRow({ label, value, color = '#0f172a' }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', fontSize: '13px', fontWeight: 700, borderTop: '1px solid #e2e8f0', marginTop: '2px' }}>
+    <div className={styles.sTotalRow}>
       <span>{label}</span>
-      <span style={{ color }}>{value}</span>
+      <span
+        className={styles.sTotalValue}
+        style={{ '--stotal-color': color } as React.CSSProperties}
+      >
+        {value}
+      </span>
     </div>
   );
 }

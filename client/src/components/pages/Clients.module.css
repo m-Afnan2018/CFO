@@ -1,0 +1,598 @@
+/* ── Layout helpers ─────────────────────────────────────── */
+.rowGap9 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.rowGap10 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rowEnd {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+.tabsBar {
+  margin-bottom: 20px;
+}
+.tabIcon {
+  margin-right: 5px;
+  font-size: 13px;
+}
+
+/* ── KPI section ────────────────────────────────────────── */
+.kpiGrid {
+  margin-bottom: 18px;
+}
+.kpiText2 {
+  color: var(--text2);
+}
+.kpiEmerald {
+  color: var(--emerald);
+}
+
+/* ── Client table cells ─────────────────────────────────── */
+.clientName {
+  color: var(--text);
+  font-weight: 600;
+}
+.clientEmail {
+  font-size: 11px;
+  color: var(--text3);
+}
+.billingAmount {
+  color: var(--text);
+  font-weight: 700;
+}
+.managerText {
+  color: var(--text2);
+}
+
+/* ── Action buttons ─────────────────────────────────────── */
+.btnSm {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+.btnSmDanger {
+  padding: 4px 9px;
+  font-size: 11px;
+  color: var(--red);
+}
+.btnSmIcon {
+  font-size: 12px;
+}
+
+/* ── Loading / empty states ─────────────────────────────── */
+.loadingText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 16px 0;
+}
+.emptyState {
+  padding: 32px 0;
+  text-align: center;
+}
+.emptyMsg {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+/* ── Search input ───────────────────────────────────────── */
+.searchInput {
+  width: 200px;
+}
+
+/* ── Period navigator ───────────────────────────────────── */
+.periodNav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.periodNavBtn {
+  padding: 5px 10px;
+}
+.periodLabel {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 90px;
+  text-align: center;
+  color: var(--text);
+}
+.periodDeleteBtn {
+  margin-left: auto;
+  padding: 5px 10px;
+  color: var(--red);
+}
+
+/* ── Billing KPI grid ───────────────────────────────────── */
+.billingKpiGrid {
+  margin-bottom: 16px;
+}
+.kpiPending {
+  color: var(--text2);
+}
+.kpiCollected {
+  color: var(--emerald);
+}
+
+/* ── Billing empty state ────────────────────────────────── */
+.billingEmpty {
+  padding: 36px 0;
+  text-align: center;
+}
+.billingEmptyMsg {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+.noActiveClients {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* ── Billing table: received cell ───────────────────────── */
+.receivedBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.receivedEntries {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.receivedNone {
+  color: var(--text3);
+}
+
+/* ── Billing table: action buttons ─────────────────────── */
+.billingActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.btnInvoice {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.btnInvoiceIcon {
+  font-size: 11px;
+}
+.btnPay {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.btnUndo {
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── Clickable client cell in billing table ─────────────── */
+.clientCell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+/* ── Modal: services popup ──────────────────────────────── */
+.servicesModal {
+  max-width: 380px;
+}
+.servicesModalHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--surface2);
+  margin-bottom: 6px;
+}
+.serviceAmount {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 13px;
+}
+.servicesTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.servicesTotalLabel {
+  font-size: 12px;
+  color: var(--text3);
+}
+.servicesTotalValue {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* ── Modal: payment detail popup ───────────────────────── */
+.payDetailModal {
+  max-width: 420px;
+}
+.payDetailHeaderInner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.payDetailPeriod {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+.payDetailSummary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.payDetailSummaryCard {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+}
+.payDetailSummaryLabel {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.payDetailSummaryValue {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+.payEntriesSectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.payEntriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.payEntryRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+}
+.payEntryDate {
+  min-width: 82px;
+}
+.payEntryLabel {
+  font-size: 10px;
+  color: var(--text3);
+  margin-bottom: 1px;
+}
+.payEntryDateValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: monospace;
+}
+.payEntryAmountCol {
+  min-width: 80px;
+}
+.payEntryAmountValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.payEntryMethodCol {
+  flex: 1;
+}
+.payEntryMethodValue {
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.payEntryBadge {
+  font-size: 10px;
+}
+
+/* ── Modal: payment entry modal ─────────────────────────── */
+.payModal {
+  max-width: 480px;
+}
+.payModalBody {
+  padding: 0;
+}
+.payContextBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.payContextLabel {
+  font-size: 12px;
+  color: var(--text2);
+}
+.payContextValue {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+.payEntriesContainer {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.payEntryCard {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+}
+.payEntryCardRow1 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.payEntryAmountGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.payEntryRupeeSign {
+  font-size: 14px;
+  color: var(--text3);
+  font-weight: 600;
+}
+.payMethodToggle {
+  display: flex;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.payEntryRemoveBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 4px;
+  flex-shrink: 0;
+}
+.payEntryRemoveIcon {
+  font-size: 14px;
+}
+.payDateRow {
+  margin-bottom: 8px;
+}
+.payDateInput {
+  font-size: 12px;
+  width: 160px;
+}
+.payModeChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.addEntryBtn {
+  align-self: flex-start;
+  font-size: 12px;
+}
+.addEntryIcon {
+  font-size: 12px;
+}
+.paySummaryBar {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.paySummaryLabel {
+  font-size: 12px;
+  color: var(--text2);
+}
+.payFullMsg {
+  font-size: 11px;
+  color: var(--emerald);
+}
+.payFullIcon {
+  font-size: 12px;
+  margin-right: 4px;
+}
+.payOverMsg {
+  font-size: 11px;
+  color: var(--red);
+}
+.payPartialMsg {
+  font-size: 11px;
+  color: var(--amber);
+}
+
+/* ── Modal: run billing modal ───────────────────────────── */
+.runModal {
+  max-width: 580px;
+}
+.runModalBody {
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.runClientRow {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+}
+.runClientHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.runCheckbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--indigo);
+  flex-shrink: 0;
+}
+.runAvatar {
+  width: 28px;
+  height: 28px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.runClientName {
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.runClientTotal {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+.runSvcList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.runSvcCheckbox {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--indigo);
+  flex-shrink: 0;
+}
+.runSvcRupee {
+  font-size: 11px;
+  color: var(--text3);
+}
+.runSvcInput {
+  width: 100px;
+  padding: 3px 7px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+}
+.runFooterSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+}
+.runFooterCount {
+  font-size: 12px;
+  color: var(--text3);
+}
+.runFooterTotal {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Modal: add/edit client ─────────────────────────────── */
+.servicesMb {
+  margin-bottom: 10px;
+}
+.servicePillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.servicePricingBox {
+  margin-bottom: 12px;
+  background: var(--surface2, var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.servicePricingLabel {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.servicePricingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.servicePricingName {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text2);
+}
+.serviceTypeToggle {
+  display: flex;
+  gap: 3px;
+}
+.servicePricingAmountGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.servicePricingRupee {
+  font-size: 12px;
+  color: var(--text3);
+}
+.servicePricingAmountInput {
+  width: 100px;
+}
+.servicePricingTotal {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+.servicePricingTotalLabel {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 600;
+}
+.servicePricingTotalValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}

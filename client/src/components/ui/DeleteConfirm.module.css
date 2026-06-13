@@ -1,0 +1,15 @@
+.modal {
+  max-width: 360px;
+}
+
+.message {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0;
+}
+
+.deleteBtn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+}

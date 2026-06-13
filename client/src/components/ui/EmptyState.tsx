@@ -1,4 +1,5 @@
 'use client';
+import styles from './EmptyState.module.css';
 
 interface EmptyStateProps {
   message: string;
@@ -7,8 +8,8 @@ interface EmptyStateProps {
 
 export default function EmptyState({ message, action }: EmptyStateProps) {
   return (
-    <div style={{ padding: '32px 0', textAlign: 'center' }}>
-      <div style={{ fontSize: '13px', color: 'var(--text3)', marginBottom: action ? '12px' : 0 }}>
+    <div className={styles.root}>
+      <div className={action ? styles.messageWithAction : styles.message}>
         {message}
       </div>
       {action && (

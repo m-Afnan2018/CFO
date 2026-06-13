@@ -5,6 +5,7 @@ import Modal from "@/components/ui/Modal";
 import DeleteConfirm from "@/components/ui/DeleteConfirm";
 import type { Expense } from "@/types";
 import { api } from "@/lib/api";
+import styles from "./Expenses.module.css";
 
 const ExpenseTrendChart = dynamic(
     () => import("@/components/charts/ExpenseTrendChart"),
@@ -176,16 +177,13 @@ export default function Expenses() {
             </div>
 
             <div className="content">
-                <div className="grid4" style={{ marginBottom: "18px" }}>
+                <div className={`grid4 ${styles.grid4mb}`}>
                     <div className="kpi">
                         <div className="kpi-label">Total Expenses</div>
                         <div className="kpi-value">
                             {total > 0 ? fmt(total) : "—"}
                         </div>
-                        <div
-                            className="kpi-change"
-                            style={{ color: "var(--text2)" }}
-                        >
+                        <div className={`kpi-change ${styles.kpiChangeSub}`}>
                             This period
                         </div>
                     </div>
@@ -194,10 +192,7 @@ export default function Expenses() {
                         <div className="kpi-value">
                             {fixed > 0 ? fmt(fixed) : "—"}
                         </div>
-                        <div
-                            className="kpi-change"
-                            style={{ color: "var(--text2)" }}
-                        >
+                        <div className={`kpi-change ${styles.kpiChangeSub}`}>
                             {total > 0 ? Math.round((fixed / total) * 100) : 0}%
                             of total
                         </div>
@@ -207,10 +202,7 @@ export default function Expenses() {
                         <div className="kpi-value">
                             {variable > 0 ? fmt(variable) : "—"}
                         </div>
-                        <div
-                            className="kpi-change"
-                            style={{ color: "var(--text2)" }}
-                        >
+                        <div className={`kpi-change ${styles.kpiChangeSub}`}>
                             {total > 0
                                 ? Math.round((variable / total) * 100)
                                 : 0}
@@ -219,13 +211,10 @@ export default function Expenses() {
                     </div>
                     <div className="kpi">
                         <div className="kpi-label">Largest Category</div>
-                        <div className="kpi-value" style={{ fontSize: "16px" }}>
+                        <div className={`kpi-value ${styles.kpiValueSmall}`}>
                             {largest ? largest[0] : "—"}
                         </div>
-                        <div
-                            className="kpi-change"
-                            style={{ color: "var(--text2)" }}
-                        >
+                        <div className={`kpi-change ${styles.kpiChangeSub}`}>
                             {largest
                                 ? `${fmt(largest[1])} (${Math.round((largest[1] / total) * 100)}%)`
                                 : "No data"}
@@ -237,13 +226,7 @@ export default function Expenses() {
                     <div className="card">
                         <div className="card-title">Expense by Category</div>
                         {catBars.length === 0 ? (
-                            <div
-                                style={{
-                                    fontSize: "12px",
-                                    color: "var(--text3)",
-                                    padding: "8px 0",
-                                }}
-                            >
+                            <div className={styles.emptySmall}>
                                 No expense data yet
                             </div>
                         ) : (
@@ -280,24 +263,12 @@ export default function Expenses() {
                 <div className="card">
                     <div className="card-title">Recent Expenses</div>
                     {!loaded ? (
-                        <div
-                            style={{
-                                fontSize: "12px",
-                                color: "var(--text3)",
-                                padding: "16px 0",
-                            }}
-                        >
+                        <div className={styles.emptySmall}>
                             Loading…
                         </div>
                     ) : displayed.length === 0 ? (
-                        <div style={{ padding: "32px 0", textAlign: "center" }}>
-                            <div
-                                style={{
-                                    fontSize: "13px",
-                                    color: "var(--text3)",
-                                    marginBottom: "12px",
-                                }}
-                            >
+                        <div className={styles.emptyCenter}>
+                            <div className={styles.emptyCenterMsg}>
                                 {catFilter !== "All Categories"
                                     ? `No ${catFilter} expenses`
                                     : "No expenses yet"}
@@ -335,12 +306,7 @@ export default function Expenses() {
                                         </td>
                                         <td>{exp.vendor || "—"}</td>
                                         <td>{exp.description}</td>
-                                        <td
-                                            style={{
-                                                color: "var(--text)",
-                                                fontWeight: 700,
-                                            }}
-                                        >
+                                        <td className={styles.amountCell}>
                                             ₹
                                             {exp.amount.toLocaleString("en-IN")}
                                         </td>
@@ -352,48 +318,24 @@ export default function Expenses() {
                                             </span>
                                         </td>
                                         <td>
-                                            <div
-                                                style={{
-                                                    display: "flex",
-                                                    gap: "6px",
-                                                }}
-                                            >
+                                            <div className={styles.actionRow}>
                                                 <button
-                                                    className="btn"
-                                                    style={{
-                                                        padding: "4px 9px",
-                                                        fontSize: "11px",
-                                                    }}
+                                                    className={`btn ${styles.btnSm}`}
                                                     title="Edit"
                                                     onClick={() =>
                                                         openEdit(exp)
                                                     }
                                                 >
-                                                    <i
-                                                        className="ti ti-pencil"
-                                                        style={{
-                                                            fontSize: "12px",
-                                                        }}
-                                                    />
+                                                    <i className={`ti ti-pencil ${styles.iconSm}`} />
                                                 </button>
                                                 <button
-                                                    className="btn"
-                                                    style={{
-                                                        padding: "4px 9px",
-                                                        fontSize: "11px",
-                                                        color: "var(--red)",
-                                                    }}
+                                                    className={`btn ${styles.btnSmRed}`}
                                                     title="Delete"
                                                     onClick={() =>
                                                         setDeleteId(exp._id)
                                                     }
                                                 >
-                                                    <i
-                                                        className="ti ti-trash"
-                                                        style={{
-                                                            fontSize: "12px",
-                                                        }}
-                                                    />
+                                                    <i className={`ti ti-trash ${styles.iconSm}`} />
                                                 </button>
                                             </div>
                                         </td>
@@ -494,7 +436,7 @@ export default function Expenses() {
                         </select>
                     </div>
                 </div>
-                <div style={{ marginBottom: "8px" }}>
+                <div className={styles.descField}>
                     <label className="form-label">Description</label>
                     <input
                         placeholder="Brief description"

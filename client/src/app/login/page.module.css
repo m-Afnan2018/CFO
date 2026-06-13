@@ -1,0 +1,118 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.logoWrap {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logoMark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--indigo);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 auto 14px;
+}
+
+.logoName {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.logoSub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+
+.formCard {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+
+.fieldPassword {
+  margin-bottom: 20px;
+}
+
+.fieldPasswordError {
+  margin-bottom: 14px;
+}
+
+.pwWrap {
+  position: relative;
+}
+
+.pwInput {
+  padding-right: 40px;
+}
+
+.pwToggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  padding: 4px;
+}
+
+.pwToggleIcon {
+  font-size: 15px;
+}
+
+.errorBanner {
+  font-size: 12px;
+  color: var(--red);
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: var(--red-dim);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.errorIcon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.submitBtn {
+  width: 100%;
+  justify-content: center;
+  padding: 11px;
+  font-size: 14px;
+}
+
+.submitBtnIcon {
+  font-size: 14px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--text3);
+}

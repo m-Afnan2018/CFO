@@ -1,4 +1,5 @@
 'use client';
+import styles from './DeleteConfirm.module.css';
 
 interface DeleteConfirmProps {
   title?: string;
@@ -19,19 +20,18 @@ export default function DeleteConfirm({
 }: DeleteConfirmProps) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal" style={{ maxWidth: '360px' }} onClick={e => e.stopPropagation()}>
+      <div className={`modal ${styles.modal}`} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <span className="modal-title">{title}</span>
           <button className="modal-close" onClick={onCancel}><i className="ti ti-x" /></button>
         </div>
         <div className="modal-body">
-          <p style={{ fontSize: '13px', color: 'var(--text2)', margin: 0 }}>{message}</p>
+          <p className={styles.message}>{message}</p>
         </div>
         <div className="modal-footer">
           <button className="btn" onClick={onCancel}>Cancel</button>
           <button
-            className="btn"
-            style={{ background: 'var(--red)', color: '#fff', border: 'none' }}
+            className={`btn ${styles.deleteBtn}`}
             onClick={onConfirm}
             disabled={loading}
           >

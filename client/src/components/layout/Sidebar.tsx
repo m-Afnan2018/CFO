@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@/context/ThemeContext';
+import styles from './Sidebar.module.css';
 
 interface NavItem {
   href: string;
@@ -52,7 +53,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
   return (
-    <div className="sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="sidebar">
       <div className="sidebar-logo">
         <div className="logo-mark">
           <div className="logo-icon">G</div>
@@ -62,7 +63,7 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      <div className="nav-section" style={{ flex: 1 }}>
+      <div className={`nav-section ${styles.navSection}`}>
         {sections.map(section => (
           <div key={section.label}>
             <div className="nav-label">{section.label}</div>
@@ -80,19 +81,17 @@ export default function Sidebar() {
           </div>
         ))}
       </div>
-      <div style={{ padding: '12px 10px', borderTop: '1px solid var(--border)' }}>
+      <div className={styles.footer}>
         <button
           onClick={toggle}
-          className="nav-item"
-          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', textAlign: 'left', marginBottom: '2px' }}
+          className={`nav-item ${styles.actionBtn} ${styles.actionBtnSpaced}`}
         >
           <i className={`ti ${theme === 'dark' ? 'ti-sun' : 'ti-moon'}`} />
           {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
         </button>
         <button
           onClick={handleLogout}
-          className="nav-item"
-          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text2)', textAlign: 'left' }}
+          className={`nav-item ${styles.actionBtn}`}
         >
           <i className="ti ti-logout" />
           Sign Out

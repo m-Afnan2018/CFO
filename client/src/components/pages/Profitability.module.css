@@ -1,0 +1,49 @@
+/* Profitability.module.css */
+
+.grid3mb {
+  margin-bottom: 18px;
+}
+
+/* Dynamic accent colour via CSS custom property */
+.kpiAccent {
+  border-left: 3px solid var(--kpi-accent-color);
+}
+
+/* Dynamic value colour + small font */
+.kpiValueSm {
+  font-size: 16px;
+  color: var(--kpi-value-color);
+}
+
+.kpiChangeSub {
+  color: var(--text2);
+}
+
+.placeholder {
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 12px;
+}
+
+.cardMb {
+  margin-bottom: 16px;
+}
+
+.loadingMsg {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.serviceCell {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.revenueCell {
+  color: var(--emerald);
+  font-weight: 700;
+}

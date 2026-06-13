@@ -1,0 +1,313 @@
+/* ── Grid spacing ── */
+.gridMb {
+  margin-bottom: 18px;
+}
+
+/* ── stat-row overrides (no margin when used inline) ── */
+.statRowNoMargin {
+  margin: 0;
+}
+
+.statRowNoMarginNoBorder {
+  margin: 0;
+  border-bottom: none;
+}
+
+/* ── KPI values ── */
+.kpiAmber {
+  color: var(--amber);
+}
+
+.kpiIndigo {
+  color: var(--indigo);
+}
+
+.kpiBlue {
+  color: var(--blue);
+}
+
+.kpiEmerald {
+  color: var(--emerald);
+}
+
+.kpiSub {
+  color: var(--text2);
+}
+
+/* ── SMTP panel ── */
+.smtpCard {
+  margin-bottom: 16px;
+}
+
+.smtpConfigured {
+  color: var(--emerald);
+}
+
+.smtpNotConfigured {
+  color: var(--red);
+}
+
+.smtpInfo {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+.portField {
+  max-width: 100px;
+}
+
+.smtpSaveRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.smtpMsgOk {
+  font-size: 12px;
+  color: var(--emerald);
+}
+
+.smtpMsgErr {
+  font-size: 12px;
+  color: var(--red);
+}
+
+/* ── Loading / empty ── */
+.loadingText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}
+
+.emptyText {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* ── Table header colored ── */
+.thAmber {
+  color: var(--amber);
+}
+
+.thIndigo {
+  color: var(--indigo);
+}
+
+.thBlue {
+  color: var(--blue);
+}
+
+.thEmerald {
+  color: var(--emerald);
+}
+
+/* ── Table data cells ── */
+.quarterCell {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.countCell {
+  color: var(--text2);
+}
+
+.tdsTotalCell {
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.tds194JCell {
+  color: var(--indigo);
+}
+
+.tds194CCell {
+  color: var(--blue);
+}
+
+.tdsOtherCell {
+  color: var(--emerald);
+}
+
+.dueDateCell {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.dueDateNotSet {
+  color: var(--text3);
+}
+
+/* ── Reminder cell ── */
+.reminderSet {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.reminderSent {
+  color: var(--emerald);
+}
+
+.reminderPending {
+  color: var(--amber);
+}
+
+.reminderBellIcon {
+  font-size: 13px;
+}
+
+.reminderNone {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── Status cell ── */
+.receivedAt {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* ── Actions column ── */
+.actionsGroup {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-end;
+}
+
+.btnSettings {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+.settingsIcon {
+  font-size: 12px;
+}
+
+.btnMarkReceived {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.checkIcon {
+  font-size: 11px;
+}
+
+.btnRevert {
+  padding: 4px 9px;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.revertIcon {
+  font-size: 11px;
+}
+
+/* ── TDS summary card ── */
+.tdsSummaryCard {
+  margin-top: 16px;
+}
+
+/* ── Settings Modal ── */
+.settingsModalWidth {
+  max-width: 420px;
+}
+
+.dueDateSection {
+  margin-bottom: 14px;
+}
+
+.dueDateHint {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.reminderSection {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-bottom: 14px;
+}
+
+.reminderLabel {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.reminderDaysRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.reminderDaysInput {
+  width: 65px;
+}
+
+.reminderDaysText {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.reminderPreview {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 6px;
+}
+
+.btnSendReminder {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+.sendIcon {
+  font-size: 12px;
+}
+
+.smtpWarning {
+  font-size: 11px;
+  color: var(--amber);
+  padding: 8px 10px;
+  background: #fffbeb;
+  border-radius: 6px;
+}
+
+/* ── Mark Received Modal ── */
+.receivedModalWidth {
+  max-width: 360px;
+}
+
+.receivedDateSection {
+  margin-bottom: 12px;
+}
+
+.receivedSummary {
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.svAmber {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.svIndigo {
+  color: var(--indigo);
+}
+
+.svBlue {
+  color: var(--blue);
+}
+
+.svEmerald {
+  color: var(--emerald);
+}

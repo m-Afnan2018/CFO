@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { Invoice, GSTFiling, SMTPConfig } from '@/types';
 import { api } from '@/lib/api';
+import styles from './GST.module.css';
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -213,36 +214,36 @@ export default function GST() {
         <div className="grid4" style={{ marginBottom: '18px' }}>
           <div className="kpi">
             <div className="kpi-label">Total Output GST</div>
-            <div className="kpi-value" style={{ color: 'var(--indigo)' }}>{fmt(totalOutputGST)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>All invoices</div>
+            <div className={`kpi-value ${styles.kpiIndigo}`}>{fmt(totalOutputGST)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>All invoices</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">CGST (Central)</div>
-            <div className="kpi-value" style={{ color: 'var(--emerald)' }}>{fmt(totalCGST)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>Intrastate share</div>
+            <div className={`kpi-value ${styles.kpiEmerald}`}>{fmt(totalCGST)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>Intrastate share</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">SGST (State)</div>
-            <div className="kpi-value" style={{ color: 'var(--blue)' }}>{fmt(totalSGST)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>Intrastate share</div>
+            <div className={`kpi-value ${styles.kpiBlue}`}>{fmt(totalSGST)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>Intrastate share</div>
           </div>
           <div className="kpi">
             <div className="kpi-label">IGST (Interstate)</div>
-            <div className="kpi-value" style={{ color: 'var(--amber)' }}>{fmt(totalIGST)}</div>
-            <div className="kpi-change" style={{ color: 'var(--text2)' }}>Interstate invoices</div>
+            <div className={`kpi-value ${styles.kpiAmber}`}>{fmt(totalIGST)}</div>
+            <div className={`kpi-change ${styles.kpiSub}`}>Interstate invoices</div>
           </div>
         </div>
 
         {/* SMTP panel */}
         {showSmtp && (
-          <div className="card" style={{ marginBottom: '16px' }}>
+          <div className={`card ${styles.smtpCard}`}>
             <div className="card-title">
               Email / SMTP Settings
-              <span className="card-sub" style={{ color: smtp?.configured ? 'var(--emerald)' : 'var(--red)' }}>
+              <span className={`card-sub ${smtp?.configured ? styles.smtpConfigured : styles.smtpNotConfigured}`}>
                 {smtp?.configured ? '● Configured' : '○ Not configured'}
               </span>
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '12px' }}>
+            <div className={styles.smtpInfo}>
               Used to send GST reminder emails. For Gmail, create an App Password at <strong>myaccount.google.com → Security → App Passwords</strong>.
             </div>
             <div className="form-row">
@@ -251,7 +252,7 @@ export default function GST() {
                 <input placeholder="smtp.gmail.com" value={smtpForm.smtpHost}
                   onChange={e => setSmtpForm(f => ({ ...f, smtpHost: e.target.value }))} />
               </div>
-              <div style={{ maxWidth: '100px' }}>
+              <div className={styles.portField}>
                 <label className="form-label">Port</label>
                 <input type="number" placeholder="587" value={smtpForm.smtpPort}
                   onChange={e => setSmtpForm(f => ({ ...f, smtpPort: e.target.value }))} />
@@ -269,12 +270,12 @@ export default function GST() {
                   onChange={e => setSmtpForm(f => ({ ...f, smtpPass: e.target.value }))} />
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px' }}>
+            <div className={styles.smtpSaveRow}>
               <button className="btn btn-p" onClick={saveSmtp} disabled={smtpSaving}>
                 <i className="ti ti-device-floppy" />{smtpSaving ? 'Saving…' : 'Save Settings'}
               </button>
               {smtpMsg && (
-                <span style={{ fontSize: '12px', color: smtpMsg.includes('success') ? 'var(--emerald)' : 'var(--red)' }}>
+                <span className={smtpMsg.includes('success') ? styles.smtpMsgOk : styles.smtpMsgErr}>
                   {smtpMsg}
                 </span>
               )}
@@ -290,9 +291,9 @@ export default function GST() {
           </div>
 
           {!loaded ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+            <div className={styles.loadingText}>Loading…</div>
           ) : months.length === 0 ? (
-            <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '24px 0', textAlign: 'center' }}>
+            <div className={styles.emptyText}>
               No invoices yet — add invoices to see monthly GST summary
             </div>
           ) : (
@@ -302,10 +303,10 @@ export default function GST() {
                   <th>Period</th>
                   <th>Invoices</th>
                   <th>Revenue</th>
-                  <th style={{ color: 'var(--indigo)' }}>Output GST</th>
-                  <th style={{ color: 'var(--emerald)' }}>CGST</th>
-                  <th style={{ color: 'var(--blue)' }}>SGST</th>
-                  <th style={{ color: 'var(--amber)' }}>IGST</th>
+                  <th className={styles.thIndigo}>Output GST</th>
+                  <th className={styles.thEmerald}>CGST</th>
+                  <th className={styles.thBlue}>SGST</th>
+                  <th className={styles.thAmber}>IGST</th>
                   <th>Due Date</th>
                   <th>Reminder</th>
                   <th>Status</th>
@@ -318,49 +319,49 @@ export default function GST() {
                   const hasReminder = !!(m.filing?.reminderEmail);
                   return (
                     <tr key={m.period}>
-                      <td style={{ fontWeight: 700, color: 'var(--text)' }}>{fmtPeriod(m.period)}</td>
-                      <td style={{ color: 'var(--text2)' }}>{m.invoiceCount}</td>
+                      <td className={styles.periodCell}>{fmtPeriod(m.period)}</td>
+                      <td className={styles.countCell}>{m.invoiceCount}</td>
                       <td>{fmt(m.revenue)}</td>
-                      <td style={{ fontWeight: 700, color: 'var(--indigo)' }}>{fmt(m.outputGST)}</td>
-                      <td style={{ color: 'var(--emerald)' }}>{fmt(m.cgst)}</td>
-                      <td style={{ color: 'var(--blue)' }}>{fmt(m.sgst)}</td>
-                      <td style={{ color: 'var(--amber)' }}>{fmt(m.igst)}</td>
-                      <td style={{ fontSize: '12px', color: 'var(--text2)' }}>
-                        {m.filing?.dueDate || <span style={{ color: 'var(--text3)' }}>Not set</span>}
+                      <td className={styles.outputGstCell}>{fmt(m.outputGST)}</td>
+                      <td className={styles.cgstCell}>{fmt(m.cgst)}</td>
+                      <td className={styles.sgstCell}>{fmt(m.sgst)}</td>
+                      <td className={styles.igstCell}>{fmt(m.igst)}</td>
+                      <td className={styles.dueDateCell}>
+                        {m.filing?.dueDate || <span className={styles.dueDateNotSet}>Not set</span>}
                       </td>
                       <td>
                         {hasReminder ? (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: m.filing?.reminderSent ? 'var(--emerald)' : 'var(--amber)' }}>
-                            <i className={`ti ${m.filing?.reminderSent ? 'ti-bell-check' : 'ti-bell'}`} style={{ fontSize: '13px' }} />
+                          <span className={`${styles.reminderSet} ${m.filing?.reminderSent ? styles.reminderSent : styles.reminderPending}`}>
+                            <i className={`ti ${m.filing?.reminderSent ? 'ti-bell-check' : 'ti-bell'} ${styles.reminderBellIcon}`} />
                             {m.filing!.reminderDays}d prior
                           </span>
                         ) : (
-                          <span style={{ fontSize: '11px', color: 'var(--text3)' }}>—</span>
+                          <span className={styles.reminderNone}>—</span>
                         )}
                       </td>
                       <td>
                         <span className={`badge ${st.badge}`}>{st.label}</span>
                         {m.filing?.status === 'Filed' && m.filing.filedAt && (
-                          <div style={{ fontSize: '10px', color: 'var(--text3)', marginTop: '2px' }}>
+                          <div className={styles.filedAt}>
                             {m.filing.filedAt}
                           </div>
                         )}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '5px', justifyContent: 'flex-end' }}>
-                          <button className="btn" style={{ padding: '4px 9px', fontSize: '11px' }}
+                        <div className={styles.actionsGroup}>
+                          <button className={`btn ${styles.btnSettings}`}
                             title="Due date & reminder settings" onClick={() => openSettings(m)}>
-                            <i className="ti ti-settings" style={{ fontSize: '12px' }} />
+                            <i className={`ti ti-settings ${styles.settingsIcon}`} />
                           </button>
                           {m.filing?.status !== 'Filed' ? (
-                            <button className="btn btn-p" style={{ padding: '4px 10px', fontSize: '11px' }}
+                            <button className={`btn btn-p ${styles.btnMarkFiled}`}
                               onClick={() => openFiledModal(m)}>
-                              <i className="ti ti-check" style={{ fontSize: '11px' }} />Mark Filed
+                              <i className={`ti ti-check ${styles.checkIcon}`} />Mark Filed
                             </button>
                           ) : (
-                            <button className="btn" style={{ padding: '4px 9px', fontSize: '11px', color: 'var(--text3)' }}
+                            <button className={`btn ${styles.btnRevert}`}
                               title="Revert to Due" onClick={() => m.filing && revertToDue(m.filing)}>
-                              <i className="ti ti-arrow-back-up" style={{ fontSize: '11px' }} />
+                              <i className={`ti ti-arrow-back-up ${styles.revertIcon}`} />
                             </button>
                           )}
                         </div>
@@ -375,7 +376,7 @@ export default function GST() {
 
         {/* Tax summary card */}
         {months.length > 0 && (
-          <div className="card" style={{ marginTop: '16px' }}>
+          <div className={`card ${styles.taxSummaryCard}`}>
             <div className="card-title">Tax Position Summary</div>
             {[
               { k: 'Total Output GST (All Invoices)', v: fmt(totalOutputGST), c: 'var(--indigo)' },
@@ -387,7 +388,7 @@ export default function GST() {
             ].map(row => (
               <div key={row.k} className="stat-row">
                 <span className="sk">{row.k}</span>
-                <span className="sv" style={row.c ? { color: row.c } : {}}>{row.v}</span>
+                <span className="sv" style={row.c ? { '--sv-color': row.c, color: 'var(--sv-color)' } as React.CSSProperties : {}}>{row.v}</span>
               </div>
             ))}
           </div>
@@ -397,32 +398,32 @@ export default function GST() {
       {/* ── Filing Settings Modal ── */}
       {settingsModal && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setSettingsModal(null); }}>
-          <div className="modal" style={{ maxWidth: '420px' }}>
+          <div className={`modal ${styles.settingsModalWidth}`}>
             <div className="modal-header">
               <span className="modal-title">Filing Settings — {fmtPeriod(settingsModal.period)}</span>
               <button className="modal-close" onClick={() => setSettingsModal(null)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
-              <div style={{ marginBottom: '14px' }}>
+              <div className={styles.dueDateSection}>
                 <label className="form-label">GSTR-3B Due Date</label>
                 <input type="date" value={settingsDueDate} onChange={e => setSettingsDueDate(e.target.value)} />
-                <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '4px' }}>
+                <div className={styles.dueDateHint}>
                   Standard deadline: 20th of the following month
                 </div>
               </div>
 
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '14px', marginTop: '4px', marginBottom: '14px' }}>
-                <label className="form-label" style={{ marginBottom: '8px', display: 'block' }}>Email Reminder</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <div className={styles.reminderSection}>
+                <label className={`form-label ${styles.reminderLabel}`}>Email Reminder</label>
+                <div className={styles.reminderDaysRow}>
                   <input type="number" min={1} max={30} value={settingsRemDays}
                     onChange={e => setSettingsRemDays(Number(e.target.value))}
-                    style={{ width: '65px' }} />
-                  <span style={{ fontSize: '13px', color: 'var(--text2)' }}>days before due date</span>
+                    className={styles.reminderDaysInput} />
+                  <span className={styles.reminderDaysText}>days before due date</span>
                 </div>
                 <input type="email" placeholder="accounts@ganesyx.com" value={settingsRemEmail}
                   onChange={e => setSettingsRemEmail(e.target.value)} />
                 {settingsDueDate && settingsRemEmail && (
-                  <div style={{ fontSize: '11px', color: 'var(--text3)', marginTop: '6px' }}>
+                  <div className={styles.reminderPreview}>
                     Reminder will be sent on: <strong>{(() => {
                       const d = new Date(settingsDueDate);
                       d.setDate(d.getDate() - settingsRemDays);
@@ -435,14 +436,14 @@ export default function GST() {
               {settingsModal.filing && settingsRemEmail && (
                 <div style={{ marginBottom: '4px' }}>
                   {smtp?.configured ? (
-                    <button className="btn" style={{ fontSize: '12px', padding: '5px 12px' }}
+                    <button className={`btn ${styles.btnSendReminder}`}
                       onClick={triggerReminder} disabled={sendingReminder}>
-                      <i className="ti ti-send" style={{ fontSize: '12px' }} />
+                      <i className={`ti ti-send ${styles.sendIcon}`} />
                       {sendingReminder ? 'Sending…' : reminderSent ? '✓ Sent' : 'Send Test Reminder Now'}
                     </button>
                   ) : (
-                    <div style={{ fontSize: '11px', color: 'var(--amber)', padding: '8px 10px', background: '#fffbeb', borderRadius: '6px' }}>
-                      ⚠ SMTP not configured — click "Email Settings" at the top to set up.
+                    <div className={styles.smtpWarning}>
+                      ⚠ SMTP not configured — click &quot;Email Settings&quot; at the top to set up.
                     </div>
                   )}
                 </div>
@@ -461,21 +462,21 @@ export default function GST() {
       {/* ── Mark as Filed Modal ── */}
       {filedModal && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setFiledModal(null); }}>
-          <div className="modal" style={{ maxWidth: '360px' }}>
+          <div className={`modal ${styles.filedModalWidth}`}>
             <div className="modal-header">
               <span className="modal-title">Mark as Filed — {fmtPeriod(filedModal.period)}</span>
               <button className="modal-close" onClick={() => setFiledModal(null)}><i className="ti ti-x" /></button>
             </div>
             <div className="modal-body">
-              <div style={{ marginBottom: '12px' }}>
+              <div className={styles.filedDateSection}>
                 <label className="form-label">Date Filed with GSTN</label>
                 <input type="date" value={filedDate} onChange={e => setFiledDate(e.target.value)} />
               </div>
-              <div style={{ padding: '10px 12px', background: 'var(--surface2)', borderRadius: '8px', fontSize: '12px' }}>
-                <div className="stat-row" style={{ margin: 0 }}><span className="sk">Output GST</span><span className="sv" style={{ color: 'var(--indigo)', fontWeight: 700 }}>{fmt(filedModal.outputGST)}</span></div>
-                <div className="stat-row" style={{ margin: 0 }}><span className="sk">CGST</span><span className="sv" style={{ color: 'var(--emerald)' }}>{fmt(filedModal.cgst)}</span></div>
-                <div className="stat-row" style={{ margin: 0 }}><span className="sk">SGST</span><span className="sv" style={{ color: 'var(--blue)' }}>{fmt(filedModal.sgst)}</span></div>
-                <div className="stat-row" style={{ margin: 0, borderBottom: 'none' }}><span className="sk">IGST</span><span className="sv" style={{ color: 'var(--amber)' }}>{fmt(filedModal.igst)}</span></div>
+              <div className={styles.filedSummary}>
+                <div className="stat-row" style={{ margin: 0 }}><span className="sk">Output GST</span><span className={`sv ${styles.svIndigo}`}>{fmt(filedModal.outputGST)}</span></div>
+                <div className="stat-row" style={{ margin: 0 }}><span className="sk">CGST</span><span className={`sv ${styles.svEmerald}`}>{fmt(filedModal.cgst)}</span></div>
+                <div className="stat-row" style={{ margin: 0 }}><span className="sk">SGST</span><span className={`sv ${styles.svBlue}`}>{fmt(filedModal.sgst)}</span></div>
+                <div className="stat-row" style={{ margin: 0, borderBottom: 'none' }}><span className="sk">IGST</span><span className={`sv ${styles.svAmber}`}>{fmt(filedModal.igst)}</span></div>
               </div>
             </div>
             <div className="modal-footer">

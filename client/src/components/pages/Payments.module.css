@@ -1,0 +1,31 @@
+/* Payments.module.css */
+
+.grid4mb {
+  margin-bottom: 18px;
+}
+
+.valGreen {
+  color: var(--emerald);
+}
+
+.valAmber {
+  color: var(--amber);
+}
+
+.valRed {
+  color: var(--red);
+}
+
+.valIndigo {
+  color: var(--indigo);
+}
+
+.kpiChangeSub {
+  color: var(--text2);
+}
+
+.loadingMsg {
+  font-size: 12px;
+  color: var(--text3);
+  padding: 12px 0;
+}

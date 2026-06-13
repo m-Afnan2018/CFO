@@ -1,0 +1,22 @@
+/* CashFlow.module.css */
+
+.valGreen {
+  color: var(--emerald);
+}
+
+.valRed {
+  color: var(--red);
+}
+
+.valBlue {
+  color: var(--blue);
+}
+
+.placeholder {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 12px;
+}

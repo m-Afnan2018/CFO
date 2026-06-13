@@ -1,0 +1,70 @@
+/* Reports.module.css */
+
+.yearSelect {
+  min-width: 80px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Dynamic bg/colour via CSS custom properties */
+.iconBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconEl {
+  font-size: 18px;
+  color: var(--icon-color);
+}
+
+.cardTitleText {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cardSubText {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.cardDesc {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.btnRow {
+  display: flex;
+  gap: 8px;
+}
+
+.btnFlex {
+  flex: 1;
+  justify-content: center;
+}
+
+.iconAnim {
+  font-size: 12px;
+  animation: reportSpin 0.9s linear infinite;
+}
+
+.iconNorm {
+  font-size: 12px;
+}
+
+@keyframes reportSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

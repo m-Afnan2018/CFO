@@ -1,0 +1,172 @@
+/* ── Loading / empty states ─────────────────────────────── */
+.loading {
+  padding: 32px 0;
+  font-size: 13px;
+  color: var(--text3);
+}
+.noData {
+  padding: 48px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+/* ── Year navigator ─────────────────────────────────────── */
+.yearNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.yearNavBtn {
+  padding: 5px 10px;
+}
+.yearNavIcon {
+  font-size: 13px;
+}
+.yearLabel {
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 52px;
+  text-align: center;
+  color: var(--text);
+}
+.yearJumpList {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+}
+.yearJumpBtn {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+/* ── Year KPI grid ──────────────────────────────────────── */
+.kpiGrid {
+  margin-bottom: 20px;
+}
+.kpiText2 {
+  color: var(--text2);
+}
+.kpiEmerald {
+  color: var(--emerald);
+}
+
+/* ── Monthly breakdown card ─────────────────────────────── */
+.monthlyCard {
+  margin-bottom: 20px;
+}
+
+/* ── Table: header cells ────────────────────────────────── */
+.thRight {
+  text-align: right;
+}
+.thRightEmerald {
+  text-align: right;
+  color: var(--emerald);
+}
+.thRightRed {
+  text-align: right;
+  color: var(--red);
+}
+.thRightAmber {
+  text-align: right;
+  color: var(--amber);
+}
+.thRateBar {
+  min-width: 130px;
+}
+
+/* ── Table: empty month row ─────────────────────────────── */
+.emptyMonthRow {
+  opacity: 0.3;
+}
+.emptyMonthName {
+  color: var(--text2);
+  font-weight: 600;
+}
+.emptyMonthData {
+  text-align: right;
+  color: var(--text3);
+  font-size: 11px;
+}
+
+/* ── Table: data month cells ────────────────────────────── */
+.monthName {
+  font-weight: 700;
+  color: var(--text);
+}
+.tdRight {
+  text-align: right;
+}
+.tdRightText2 {
+  text-align: right;
+  color: var(--text2);
+}
+.tdRightBold {
+  text-align: right;
+  font-weight: 600;
+}
+
+/* ── Table footer ───────────────────────────────────────── */
+.totalFooterRow {
+  border-top: 2px solid var(--border);
+}
+.totalLabel {
+  font-weight: 800;
+  color: var(--text);
+}
+.totalCount {
+  text-align: right;
+  color: var(--text2);
+  font-weight: 600;
+}
+.totalBilled {
+  text-align: right;
+  font-weight: 700;
+}
+
+/* ── YoY table ──────────────────────────────────────────── */
+.yoyYearBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 700;
+  font-size: 13px;
+}
+.yoyActiveDot {
+  font-size: 10px;
+  margin-left: 5px;
+}
+.yoyDelta {
+  font-size: 10px;
+  margin-left: 5px;
+}
+
+/* ── RateBar component ──────────────────────────────────── */
+.rateBarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rateBarTrack {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+.rateBarFill {
+  /* width is data-driven — kept as inline style */
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+  background: var(--bar-color);
+}
+.rateBarPct {
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 32px;
+  color: var(--bar-color);
+}

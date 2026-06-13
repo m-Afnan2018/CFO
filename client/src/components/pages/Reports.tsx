@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { Client, Invoice, Expense, SalaryRecord, PayPeriodSummary } from '@/types';
 import { api } from '@/lib/api';
+import styles from './Reports.module.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -410,7 +411,7 @@ export default function Reports() {
       <div className="topbar">
         <div className="topbar-title">Financial Reports</div>
         <div className="topbar-right">
-          <select value={year} onChange={e => setYear(e.target.value)} style={{ minWidth: '80px' }}>
+          <select value={year} onChange={e => setYear(e.target.value)} className={styles.yearSelect}>
             {years.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
@@ -430,36 +431,39 @@ export default function Reports() {
                 onMouseOver={e => (e.currentTarget.style.borderColor = r.color)}
                 onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--border)')}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: r.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <i className={`ti ${r.icon}`} style={{ color: r.color, fontSize: '18px' }} />
+                <div className={styles.cardHeader}>
+                  <div
+                    className={styles.iconBox}
+                    style={{ '--icon-bg': r.bg, '--icon-color': r.color } as React.CSSProperties}
+                  >
+                    <i className={`ti ${r.icon} ${styles.iconEl}`} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, color: 'var(--text)' }}>{r.title}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text2)' }}>{r.sub}</div>
+                    <div className={styles.cardTitleText}>{r.title}</div>
+                    <div className={styles.cardSubText}>{r.sub}</div>
                   </div>
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text3)', marginBottom: '14px', lineHeight: 1.5 }}>{r.desc}</div>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div className={styles.cardDesc}>{r.desc}</div>
+                <div className={styles.btnRow}>
                   <button
-                    className="btn"
-                    style={{ flex: 1, justifyContent: 'center', opacity: pdfBusy ? 0.65 : 1 }}
+                    className={`btn ${styles.btnFlex}`}
+                    style={pdfBusy ? { opacity: 0.65 } : undefined}
                     disabled={busy}
                     onClick={() => handle(r.key, r.gen, 'pdf')}
                   >
                     {pdfBusy
-                      ? <><i className="ti ti-loader-2" style={{ fontSize: '12px', animation: 'spin 0.9s linear infinite' }} />&nbsp;Generating…</>
-                      : <><i className="ti ti-file-type-pdf" style={{ fontSize: '12px' }} />&nbsp;PDF</>}
+                      ? <><i className={`ti ti-loader-2 ${styles.iconAnim}`} />&nbsp;Generating…</>
+                      : <><i className={`ti ti-file-type-pdf ${styles.iconNorm}`} />&nbsp;PDF</>}
                   </button>
                   <button
-                    className="btn"
-                    style={{ flex: 1, justifyContent: 'center', opacity: csvBusy ? 0.65 : 1 }}
+                    className={`btn ${styles.btnFlex}`}
+                    style={csvBusy ? { opacity: 0.65 } : undefined}
                     disabled={busy}
                     onClick={() => handle(r.key, r.gen, 'csv')}
                   >
                     {csvBusy
-                      ? <><i className="ti ti-loader-2" style={{ fontSize: '12px', animation: 'spin 0.9s linear infinite' }} />&nbsp;Generating…</>
-                      : <><i className="ti ti-table" style={{ fontSize: '12px' }} />&nbsp;Excel</>}
+                      ? <><i className={`ti ti-loader-2 ${styles.iconAnim}`} />&nbsp;Generating…</>
+                      : <><i className={`ti ti-table ${styles.iconNorm}`} />&nbsp;Excel</>}
                   </button>
                 </div>
               </div>
@@ -467,8 +471,6 @@ export default function Reports() {
           })}
         </div>
       </div>
-
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 }

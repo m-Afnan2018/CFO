@@ -1,0 +1,403 @@
+/* ── Designer top bar ── */
+.barTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.barInvNum {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: monospace;
+}
+
+.barBtnBack {
+  padding: 6px 10px;
+}
+
+.barError {
+  font-size: 12px;
+  color: var(--red);
+}
+
+/* ── Form sections ── */
+.formRowMt {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.formFieldNoMb {
+  margin-bottom: 0;
+}
+
+/* ── Services list (client services) ── */
+.servicesList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.serviceItemActive {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.1s;
+  background: var(--indigo-dim);
+  border: 1px solid var(--indigo);
+}
+
+.serviceItemInactive {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.1s;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.serviceCheckbox {
+  accent-color: var(--indigo);
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.serviceName {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.serviceAmount {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: monospace;
+}
+
+/* ── Tax section ── */
+.taxRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.gstRateField {
+  max-width: 140px;
+  margin-bottom: 0;
+}
+
+.taxTypeField {
+  margin-bottom: 0;
+}
+
+.taxTypeButtons {
+  display: flex;
+  gap: 4px;
+}
+
+/* ── TDS section ── */
+.tdsRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.tdsSectionField {
+  max-width: 180px;
+  margin-bottom: 0;
+}
+
+.tdsRateField {
+  max-width: 100px;
+  margin-bottom: 0;
+}
+
+.tdsInfo {
+  font-size: 12px;
+  color: var(--amber);
+  padding-bottom: 4px;
+}
+
+.tdsInfoSub {
+  color: var(--text2);
+  font-size: 11px;
+}
+
+/* ── Line items ── */
+.addItemBtn {
+  margin-top: 10px;
+}
+
+.liQtyInput {
+  text-align: center;
+}
+
+/* ── Preview: company logo ── */
+.previewLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #10b981, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* ── Preview: header layout ── */
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.previewHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.previewCompanyName {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.previewCompanyTagline {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.previewCompanyAddr {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.previewCompanyGst {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.previewHeaderRight {
+  text-align: right;
+}
+
+.previewInvoiceTitle {
+  font-size: 28px;
+  font-weight: 900;
+  color: #6366f1;
+  letter-spacing: -1px;
+}
+
+.previewInvNum {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 4px;
+}
+
+.previewInvDates {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+  line-height: 1.8;
+}
+
+/* ── Preview: bill-to section ── */
+.previewBillTo {
+  margin-bottom: 24px;
+}
+
+.previewClientName {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.previewClientPlaceholder {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.previewClientEmail {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.previewClientAddr {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 3px;
+  white-space: pre-line;
+}
+
+.previewStatusRow {
+  margin-top: 10px;
+}
+
+/* ── Preview: line items table ── */
+.previewThNum {
+  width: 32px;
+}
+
+.previewThQty {
+  text-align: right;
+  width: 48px;
+}
+
+.previewThRate {
+  text-align: right;
+  width: 96px;
+}
+
+.previewThAmt {
+  text-align: right;
+  width: 96px;
+}
+
+.previewTdNum {
+  color: #94a3b8;
+}
+
+.previewTdQty {
+  text-align: right;
+}
+
+.previewTdRate {
+  text-align: right;
+}
+
+.previewTdAmt {
+  text-align: right;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.previewTdDescPlaceholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.previewEmptyRow {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Preview: totals ── */
+.previewTotalsWrap {
+  border-top: 2px solid #e2e8f0;
+  padding-top: 16px;
+  margin-top: 4px;
+}
+
+.previewTotalsInner {
+  max-width: 240px;
+  margin-left: auto;
+}
+
+.previewTotalsRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 13px;
+}
+
+.previewTotalsLabel {
+  color: #64748b;
+}
+
+.previewTotalsValue {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.previewTotalsFinal {
+  display: flex;
+  justify-content: space-between;
+  border-top: 2px solid #0f172a;
+  padding-top: 10px;
+  margin-top: 8px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.previewTotalsFinalLabel {
+  color: #0f172a;
+}
+
+.previewTotalsFinalValue {
+  color: #6366f1;
+}
+
+.previewTdsRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.previewTdsDeduct {
+  color: #b45309;
+}
+
+.previewNetRow {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 8px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.previewNetLabel {
+  color: #64748b;
+}
+
+.previewNetValue {
+  color: #059669;
+}
+
+/* ── Preview: notes box ── */
+.previewNotes {
+  margin-top: 28px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.previewNotesText {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ── Preview: footer ── */
+.previewFooter {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+}

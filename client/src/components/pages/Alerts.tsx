@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Invoice, Client, Employee } from '@/types';
 import { api } from '@/lib/api';
+import styles from './Alerts.module.css';
 
 interface AlertItem {
   id: string;
@@ -90,37 +91,40 @@ export default function Alerts() {
       <div className="content">
         <div className="grid2">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 700 }}>Active Alerts</span>
+            <div className={styles.alertsHeader}>
+              <span className={styles.alertsTitle}>Active Alerts</span>
               {totalAlerts > 0 && (
                 <span className={`badge ${urgentCount > 0 ? 'br' : 'ba'}`}>{totalAlerts} alert{totalAlerts === 1 ? '' : 's'}</span>
               )}
             </div>
 
             {!loaded ? (
-              <div style={{ fontSize: '12px', color: 'var(--text3)', padding: '12px 0' }}>Loading…</div>
+              <div className={styles.loadingMsg}>Loading…</div>
             ) : alerts.length === 0 ? (
               <div className="alert-item a-in">
-                <i className="ti ti-circle-check" style={{ color: 'var(--emerald)', fontSize: '18px', flexShrink: 0 }} />
+                <i className={`ti ti-circle-check ${styles.checkIcon}`} />
                 <div>
-                  <div style={{ fontSize: '13px', color: 'var(--text)', fontWeight: 600 }}>No active alerts</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>Everything looks on track — overdue invoices, renewals, and payroll will surface here automatically</div>
+                  <div className={styles.emptyTitle}>No active alerts</div>
+                  <div className={styles.emptySub}>Everything looks on track — overdue invoices, renewals, and payroll will surface here automatically</div>
                 </div>
               </div>
             ) : alerts.map(a => (
               <div key={a.id} className={`alert-item ${a.cls}`}>
-                <i className={`ti ${a.icon}`} style={{ color: a.color, fontSize: '18px', flexShrink: 0 }} />
+                <i
+                  className={`ti ${a.icon} ${styles.alertIcon}`}
+                  style={{ '--alert-color': a.color } as React.CSSProperties}
+                />
                 <div>
-                  <div style={{ fontSize: '13px', color: 'var(--text)', fontWeight: 600 }}>{a.title}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text2)', marginTop: '2px' }}>{a.sub}</div>
+                  <div className={styles.alertTitle}>{a.title}</div>
+                  <div className={styles.alertSub}>{a.sub}</div>
                 </div>
-                <button className="btn" style={{ marginLeft: 'auto', padding: '4px 10px', fontSize: '11px', flexShrink: 0 }} onClick={() => router.push(a.target)}>{a.action}</button>
+                <button className={`btn ${styles.alertBtn}`} onClick={() => router.push(a.target)}>{a.action}</button>
               </div>
             ))}
           </div>
 
           <div className="card">
-            <div className="card-title" style={{ marginBottom: '12px' }}>Alert Thresholds</div>
+            <div className={`card-title ${styles.cardTitleMb}`}>Alert Thresholds</div>
             {[
               { k: 'Overdue Invoice Alert', v: 'Status = Overdue' },
               { k: 'Due Date Reminder', v: 'Status = Pending / Partial' },
